@@ -4,6 +4,12 @@ A Telegram bot for managing team schedules, availability polling, and match coor
 
 Cursor AI auto-completion and Claude Code AI agent have been used to develop this bot.
 
+## Future plans and ideas
+
+- Add support for multiple teams (bot as a service)
+- Automation through faceit integration
+- Possible other integrations (discord, calendar, etc.)
+
 ## Features
 
 - **Season Management**: Start/end seasons, track multiple seasons
