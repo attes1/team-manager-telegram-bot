@@ -239,7 +239,7 @@ export const fi: Translations = {
     addplayerUsage: 'Käyttö: /addplayer <käyttäjänimi>',
   },
   captain: {
-    promoted: (name) => `${name} ylennetty kapteniksi.`,
+    promoted: (name) => `${name} ylennetty kapteeniksi.`,
     demoted: (name) => `${name} alennettu pelaajaksi.`,
     alreadyCaptain: (name) => `${name} on jo kapteeni.`,
     notACaptain: (name) => `${name} ei ole kapteeni.`,
@@ -299,7 +299,7 @@ export const fi: Translations = {
     },
   },
   week: {
-    setPractice: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty treeniviioksi.`,
+    setPractice: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty treeniviikoksi.`,
     setMatch: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty matsiviikoksi.`,
     usage: 'Käyttö: /setweek <viikko> practice|match',
     invalidWeek: 'Virheellinen viikkonumero.',
@@ -309,7 +309,7 @@ export const fi: Translations = {
     title: (week, dateRange) =>
       `Vko ${week} (${dateRange}) - treeniviikko!\nMerkkaa milloin pääset peleille.`,
     matchWeekTitle: (week, dateRange) =>
-      `Vko ${week} (${dateRange}) - matsiviikko!\nOletusaika su 20:00. Merkkaa milloin pääset.`,
+      `Vko ${week} (${dateRange}) - matsiviikko!\nOletusaika su 20:00. Merkkaa milloin pääset peleille.`,
     legend: '✅ Vapaa | 🏋️ Vain treeni | 🏆 Vain matsi | ⚠️ Jos tarve | ❌ Ei pääse',
     notInRoster: 'Valikko on vain rosterissa oleville pelaajille.',
     invalidWeek: 'Virheellinen viikkonumero (1-53).',
@@ -403,7 +403,7 @@ export const fi: Translations = {
       ],
       addplayer: 'Lisää pelaaja rosteriin @player',
       removeplayer: 'Poista pelaaja rosterista @player',
-      promote: 'Ylennä pelaaja kapteniksi @player',
+      promote: 'Ylennä pelaaja kapteeniksi @player',
       demote: 'Alenna kapteeni pelaajaksi @player',
     },
   },
