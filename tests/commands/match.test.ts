@@ -3,7 +3,7 @@ import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { up } from '@/db/migrations/001_initial';
 import type { DB } from '@/types/db';
-import { createCommandUpdate, createTestBot } from './helpers';
+import { createCommandUpdate, createMultiMentionUpdate, createTestBot } from './helpers';
 
 const mockDb = vi.hoisted(() => ({ db: null as unknown as Kysely<DB> }));
 const mockEnv = vi.hoisted(() => ({
@@ -22,6 +22,7 @@ vi.mock('@/env', () => mockEnv);
 
 const { registerMatchCommands } = await import('@/commands/admin/match');
 const { startSeason } = await import('@/services/season');
+const { addPlayerToRoster } = await import('@/services/roster');
 
 describe('/setmatch command', () => {
   beforeEach(async () => {
@@ -156,5 +157,119 @@ describe('/setmatch command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].payload.text).toContain('Invalid time');
+  });
+});
+
+describe('/setlineup command', () => {
+  let seasonId: number;
+
+  beforeEach(async () => {
+    const db = new Kysely<DB>({
+      dialect: new SqliteDialect({
+        database: new Database(':memory:'),
+      }),
+      plugins: [new CamelCasePlugin()],
+    });
+    await up(db);
+    mockDb.db = db;
+
+    const season = await startSeason(mockDb.db, 'Test Season');
+    seasonId = season.id;
+  });
+
+  afterEach(async () => {
+    await mockDb.db.destroy();
+  });
+
+  test('admin can set lineup with mentions', async () => {
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: 111,
+      displayName: 'Player One',
+      username: 'player1',
+    });
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: 222,
+      displayName: 'Player Two',
+      username: 'player2',
+    });
+
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createMultiMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+      { id: 111, firstName: 'Player', lastName: 'One', username: 'player1' },
+      { id: 222, firstName: 'Player', lastName: 'Two', username: 'player2' },
+    ]);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.text).toContain('Lineup set');
+    expect(calls[0].payload.text).toContain('2 players');
+  });
+
+  test('non-admin cannot set lineup', async () => {
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createMultiMentionUpdate('/setlineup', TEST_USER_ID, TEST_CHAT_ID, [
+      { id: 111, firstName: 'Player', lastName: 'One' },
+    ]);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('permission');
+  });
+
+  test('requires active season', async () => {
+    await mockDb.db.updateTable('seasons').set({ status: 'ended' }).execute();
+
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createMultiMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+      { id: 111, firstName: 'Player', lastName: 'One' },
+    ]);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('No active season');
+  });
+
+  test('shows usage when no mentions', async () => {
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createCommandUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('Usage');
+  });
+
+  test('admin can clear lineup', async () => {
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createCommandUpdate('/setlineup clear', TEST_ADMIN_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('cleared');
+  });
+
+  test('rejects player not in roster', async () => {
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createMultiMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+      { id: 999, firstName: 'Unknown', lastName: 'Player' },
+    ]);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('not in the roster');
   });
 });

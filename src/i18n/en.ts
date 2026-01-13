@@ -89,4 +89,11 @@ export const en: Translations = {
     invalidDay: 'Invalid day. Use: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Invalid time format. Use HH:MM (e.g. 20:00)',
   },
+  lineup: {
+    set: (count, players) => `Lineup set (${count} players):\n${players}`,
+    cleared: 'Lineup cleared.',
+    usage: 'Usage: /setlineup @player1 @player2 ...\nOr /setlineup clear to clear',
+    noMentions: 'Mention players in the command (e.g. /setlineup @player1 @player2)',
+    playerNotInRoster: (name) => `${name} is not in the roster.`,
+  },
 };

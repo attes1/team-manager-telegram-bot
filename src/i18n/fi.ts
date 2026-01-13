@@ -84,6 +84,13 @@ export interface Translations {
     invalidDay: string;
     invalidTime: string;
   };
+  lineup: {
+    set: (count: number, players: string) => string;
+    cleared: string;
+    usage: string;
+    noMentions: string;
+    playerNotInRoster: (name: string) => string;
+  };
 }
 
 export const fi: Translations = {
@@ -175,5 +182,12 @@ export const fi: Translations = {
     usage: 'Käyttö: /setmatch <päivä> <aika>\nEsim: /setmatch sun 20:00',
     invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Virheellinen aika. Käytä muotoa HH:MM (esim. 20:00)',
+  },
+  lineup: {
+    set: (count, players) => `Kokoonpano asetettu (${count} pelaajaa):\n${players}`,
+    cleared: 'Kokoonpano tyhjennetty.',
+    usage: 'Käyttö: /setlineup @pelaaja1 @pelaaja2 ...\nTai /setlineup clear tyhjentääksesi',
+    noMentions: 'Mainitse pelaajat komennossa (esim. /setlineup @pelaaja1 @pelaaja2)',
+    playerNotInRoster: (name) => `${name} ei ole rosterissa.`,
   },
 };

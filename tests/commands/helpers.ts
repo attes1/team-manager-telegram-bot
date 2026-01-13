@@ -1,5 +1,5 @@
 import { Bot } from 'grammy';
-import type { Update, UserFromGetMe } from 'grammy/types';
+import type { MessageEntity, Update, UserFromGetMe } from 'grammy/types';
 import type { Kysely } from 'kysely';
 import type { DB } from '@/types/db';
 
@@ -84,6 +84,53 @@ export const createMentionUpdate = (
           },
         },
       ],
+    },
+  };
+};
+
+export const createMultiMentionUpdate = (
+  command: string,
+  userId: number,
+  chatId: number,
+  mentionedUsers: Array<{ id: number; firstName: string; lastName?: string; username?: string }>,
+): Update => {
+  const mentionTexts = mentionedUsers.map(
+    (u) => `${u.firstName}${u.lastName ? ` ${u.lastName}` : ''}`,
+  );
+  const fullText = `${command} ${mentionTexts.join(' ')}`;
+
+  const entities: MessageEntity[] = [
+    { type: 'bot_command', offset: 0, length: command.split(' ')[0].length },
+  ];
+
+  let offset = command.length + 1;
+  for (let i = 0; i < mentionedUsers.length; i++) {
+    const user = mentionedUsers[i];
+    const text = mentionTexts[i];
+    entities.push({
+      type: 'text_mention',
+      offset,
+      length: text.length,
+      user: {
+        id: user.id,
+        is_bot: false,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        username: user.username,
+      },
+    });
+    offset += text.length + 1;
+  }
+
+  return {
+    update_id: 1,
+    message: {
+      message_id: 1,
+      date: Math.floor(Date.now() / 1000),
+      chat: { id: chatId, type: 'group', title: 'Test Group' },
+      from: { id: userId, is_bot: false, first_name: 'Test' },
+      text: fullText,
+      entities,
     },
   };
 };
