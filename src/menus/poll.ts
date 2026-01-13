@@ -3,13 +3,14 @@ import type { Context } from 'grammy';
 import { db } from '../db';
 import { t } from '../i18n';
 import { formatDateRange } from '../lib/format';
+import type { AvailabilityStatus } from '../lib/schemas';
+import { daysListSchema, languageSchema } from '../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { getPlayerWeekAvailability, setDayAvailability } from '../services/availability';
 import { getConfig } from '../services/config';
 import { isPlayerInRoster } from '../services/roster';
 import { getActiveSeason } from '../services/season';
 import { getWeek } from '../services/week';
-import type { AvailabilityStatus, Day } from '../validation';
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   available: '✅',
@@ -54,7 +55,7 @@ export const pollMenu = new Menu<Context>('poll').dynamic(async (ctx, range) => 
   }
 
   const { week, year } = getCurrentWeek();
-  const days = config.pollDays.split(',') as Day[];
+  const days = daysListSchema.parse(config.pollDays);
   const times = config.pollTimes.split(',');
 
   const availability = await getPlayerWeekAvailability(db, {
@@ -69,9 +70,8 @@ export const pollMenu = new Menu<Context>('poll').dynamic(async (ctx, range) => 
     const currentStatus: AvailabilityStatus = dayData?.status ?? 'available';
     const currentSlots = dayData?.timeSlots ?? [];
 
-    range.text(t(config.language as 'fi' | 'en').poll.days[day], (ctx) =>
-      ctx.answerCallbackQuery(),
-    );
+    const lang = languageSchema.catch('fi').parse(config.language);
+    range.text(t(lang).poll.days[day], (ctx) => ctx.answerCallbackQuery());
 
     for (const time of times) {
       const hasSlot = currentSlots.includes(time);
@@ -117,7 +117,7 @@ export const pollMenu = new Menu<Context>('poll').dynamic(async (ctx, range) => 
 
 export const getPollMessage = async (seasonId: number): Promise<string> => {
   const config = await getConfig(db, seasonId);
-  const lang = (config?.language ?? 'fi') as 'fi' | 'en';
+  const lang = languageSchema.catch('fi').parse(config?.language);
 
   const { week, year } = getCurrentWeek();
   const { start, end } = getWeekDateRange(year, week);

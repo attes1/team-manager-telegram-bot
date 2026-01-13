@@ -25,24 +25,20 @@ export const remindersModeSchema = z.enum(['ping', 'quiet', 'off']);
 
 export const seasonStatusSchema = z.enum(['active', 'ended']);
 
+export const languageSchema = z.enum(['fi', 'en']);
+
 export const daysListSchema = z
   .string()
   .transform((val) => val.split(',').map((v) => v.trim()))
-  .refine(
-    (arr): arr is Day[] => arr.every((d) => daySchema.safeParse(d).success),
-    'Invalid day in list',
-  );
+  .pipe(z.array(daySchema));
 
 export const hoursListSchema = z
   .string()
-  .transform((val) => val.split(',').map((v) => Number(v.trim())))
-  .refine(
-    (arr): arr is number[] => arr.every((h) => hourSchema.safeParse(h).success),
-    'Invalid hour in list',
-  );
+  .transform((val) => val.split(',').map((v) => hourSchema.parse(v.trim())));
 
 export type Day = z.infer<typeof daySchema>;
 export type AvailabilityStatus = z.infer<typeof availabilityStatusSchema>;
 export type WeekType = z.infer<typeof weekTypeSchema>;
 export type RemindersMode = z.infer<typeof remindersModeSchema>;
 export type SeasonStatus = z.infer<typeof seasonStatusSchema>;
+export type Language = z.infer<typeof languageSchema>;

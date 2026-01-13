@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import type { Day } from '../validation';
+import type { Day } from './schemas';
 
 const DAY_NAMES_FI: Record<Day, string> = {
   mon: 'maanantai',

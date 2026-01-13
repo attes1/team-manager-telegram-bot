@@ -1,6 +1,6 @@
 import type { Kysely } from 'kysely';
+import type { AvailabilityStatus, Day } from '../lib/schemas';
 import type { DB } from '../types/db';
-import type { AvailabilityStatus, Day } from '../validation';
 
 export interface DayAvailability {
   day: Day;

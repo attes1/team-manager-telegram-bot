@@ -2,12 +2,12 @@ import type { Bot, Context } from 'grammy';
 import { db } from '../../db';
 import { t } from '../../i18n';
 import { formatDateRange } from '../../lib/format';
+import type { AvailabilityStatus, Day } from '../../lib/schemas';
+import { daySchema, daysListSchema, languageSchema } from '../../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../../lib/week';
 import { getWeekAvailability } from '../../services/availability';
 import { getConfig } from '../../services/config';
 import { getActiveSeason } from '../../services/season';
-import type { AvailabilityStatus, Day } from '../../validation';
-import { daySchema } from '../../validation';
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   available: '✅',
@@ -30,7 +30,7 @@ export const registerPracticeCommand = (bot: Bot) => {
     }
 
     const config = await getConfig(db, season.id);
-    const lang = (config?.language ?? 'en') as 'fi' | 'en';
+    const lang = languageSchema.catch('en').parse(config?.language);
 
     const args = ctx.match?.toString().trim().toLowerCase() ?? '';
     const { week, year } = getCurrentWeek();
@@ -61,15 +61,9 @@ export const registerPracticeCommand = (bot: Bot) => {
 
     const lines: string[] = [t(lang).practice.title(week, dateRange), ''];
 
-    const days = (config?.pollDays.split(',') ?? [
-      'mon',
-      'tue',
-      'wed',
-      'thu',
-      'fri',
-      'sat',
-      'sun',
-    ]) as Day[];
+    const days = daysListSchema
+      .catch(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])
+      .parse(config?.pollDays);
 
     for (const day of days) {
       const dayHeader = t(lang).poll.days[day];

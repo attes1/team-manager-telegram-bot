@@ -1,5 +1,11 @@
 import type { Generated, Selectable } from 'kysely';
-import type { AvailabilityStatus, Day, RemindersMode, SeasonStatus, WeekType } from '../validation';
+import type {
+  AvailabilityStatus,
+  Day,
+  RemindersMode,
+  SeasonStatus,
+  WeekType,
+} from '../lib/schemas';
 
 export interface SeasonsTable {
   id: Generated<number>;

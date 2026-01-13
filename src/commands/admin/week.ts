@@ -3,10 +3,10 @@ import { db } from '../../db';
 import { t } from '../../i18n';
 import { isAdmin } from '../../lib/admin';
 import { formatDateRange } from '../../lib/format';
+import type { WeekType } from '../../lib/schemas';
 import { getWeekDateRange, getWeekYear } from '../../lib/week';
 import { getActiveSeason } from '../../services/season';
 import { setWeekType } from '../../services/week';
-import type { WeekType } from '../../validation';
 
 const isValidWeekType = (type: string): type is WeekType => type === 'practice' || type === 'match';
 

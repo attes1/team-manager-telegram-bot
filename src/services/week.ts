@@ -1,6 +1,6 @@
 import type { Kysely } from 'kysely';
+import type { WeekType } from '../lib/schemas';
 import type { DB, Week } from '../types/db';
-import type { WeekType } from '../validation';
 
 export type { Week };
 
