@@ -79,8 +79,12 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
 
       range.text(icon, async (ctx) => {
         const newSlots = hasSlot ? currentSlots.filter((s) => s !== time) : [...currentSlots, time];
-        // When adding first timeslot without prior response, default to 'available'
-        const status = hasResponse ? currentStatus : 'available';
+        // When adding a timeslot: default to 'available' if no response or if currently 'unavailable'
+        const isAdding = !hasSlot;
+        const status =
+          isAdding && (!hasResponse || currentStatus === 'unavailable')
+            ? 'available'
+            : currentStatus;
 
         await setDayAvailability(db, {
           seasonId: season.id,
