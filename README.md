@@ -9,7 +9,7 @@ A Telegram bot for managing team schedules, availability polling, and match coor
 - **Availability Polling**: Weekly polls for player availability with time slots
 - **Match Scheduling**: Set match times, manage lineups
 - **Automated Reminders**: Scheduled weekly polls and mid-week reminders
-- **Public Announcements**: Auto-announce lineup and match changes to a public channel
+- **Public Group Support**: Optional public group with restricted commands and auto-announcements
 - **Multi-language**: Finnish and English support
 
 ## Prerequisites
@@ -88,6 +88,19 @@ pnpm dev
 ## Bot Commands
 
 The bot uses a hierarchical permission system: **Admin > Captain > Player > Public**
+
+### Public Group Restrictions
+
+When `PUBLIC_GROUP_ID` is configured, the bot can operate in two groups:
+- **Team Group** (`TEAM_GROUP_ID`): Full functionality for all commands
+- **Public Group** (`PUBLIC_GROUP_ID`): Limited to public commands only
+
+In the public group:
+- **Public commands** work for everyone (`/help`, `/roster`, `/nextmatch`)
+- **Player/Captain commands** return "Command not available in public group"
+- **Admin commands** work normally (admins bypass the restriction)
+
+This allows friends/spectators to view match info without accessing team management features.
 
 ### Public Commands
 Available to everyone:
