@@ -28,7 +28,7 @@ export interface ConfigTable {
   matchDay: Generated<string>;
   matchTime: Generated<string>;
   lineupSize: Generated<number>;
-  matchDayReminderEnabled: Generated<boolean>;
+  matchDayReminderEnabled: Generated<number>;
   matchDayReminderTime: Generated<string>;
 }
 

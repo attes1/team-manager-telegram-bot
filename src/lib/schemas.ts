@@ -56,7 +56,7 @@ export const configSchema = z.object({
   matchDay: daySchema.catch('sun'),
   matchTime: timeSchema.catch('20:00'),
   lineupSize: z.number().catch(5),
-  matchDayReminderEnabled: z.boolean().catch(true),
+  matchDayReminderEnabled: z.coerce.boolean().catch(true),
   matchDayReminderTime: timeSchema.catch('18:00'),
 });
 

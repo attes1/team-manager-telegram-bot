@@ -32,7 +32,7 @@ export const startSeason = async (db: Kysely<DB>, name: string): Promise<Season>
       remindersMode: env.DEFAULT_REMINDERS_MODE,
       matchDay: env.DEFAULT_MATCH_DAY,
       matchTime: env.DEFAULT_MATCH_TIME,
-      matchDayReminderEnabled: env.DEFAULT_MATCH_DAY_REMINDER_ENABLED,
+      matchDayReminderEnabled: env.DEFAULT_MATCH_DAY_REMINDER_ENABLED ? 1 : 0,
       matchDayReminderTime: env.DEFAULT_MATCH_DAY_REMINDER_TIME,
       lineupSize: env.DEFAULT_LINEUP_SIZE,
     })
