@@ -145,6 +145,6 @@ describe('sendWeeklyPoll', () => {
     await sendWeeklyPoll(bot, CHAT_ID);
 
     const message = calls[0].payload.text as string;
-    expect(message).toContain('Week 2');
+    expect(message).toContain('week 2');
   });
 });

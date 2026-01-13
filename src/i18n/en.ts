@@ -127,6 +127,8 @@ export const en: Translations = {
       sun: 'Sun',
     },
     openPollButton: '📊 Open Poll',
+    scheduledPollPrompt: (week, dateRange) =>
+      `📋 Fill in your availability for week ${week} (${dateRange})!`,
   },
   avail: {
     title: (week, dateRange) => `Week ${week} (${dateRange}) availability:`,

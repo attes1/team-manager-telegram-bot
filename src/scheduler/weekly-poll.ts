@@ -3,8 +3,8 @@ import { InlineKeyboard } from 'grammy';
 import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
 import { getTranslations } from '@/i18n';
-import { getSchedulingWeek } from '@/lib/temporal';
-import { getPollMessage } from '@/menus/poll';
+import { formatDateRange } from '@/lib/format';
+import { getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
 import { getConfig } from '@/services/config';
 import { getActiveSeason } from '@/services/season';
 
@@ -31,8 +31,10 @@ export const sendWeeklyPoll = async (bot: Bot<BotContext>, chatId: number): Prom
   }
 
   const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
-  const message = await getPollMessage(season.id, schedulingWeek);
   const i18n = await getTranslations(db, season.id);
+  const { start, end } = getWeekDateRange(schedulingWeek.year, schedulingWeek.week);
+  const dateRange = formatDateRange(start, end);
+  const message = i18n.poll.scheduledPollPrompt(schedulingWeek.week, dateRange);
 
   const keyboard = createOpenPollKeyboard(
     schedulingWeek.week,
