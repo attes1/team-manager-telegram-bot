@@ -47,6 +47,13 @@ export interface Translations {
       lineup_size: string;
     };
   };
+  week: {
+    setPractice: (week: number, dateRange: string) => string;
+    setMatch: (week: number, dateRange: string) => string;
+    usage: string;
+    invalidWeek: string;
+    invalidType: string;
+  };
 }
 
 export const fi: Translations = {
@@ -97,5 +104,12 @@ export const fi: Translations = {
       match_time: 'Oletusmatsin aika',
       lineup_size: 'Kokoonpanon koko',
     },
+  },
+  week: {
+    setPractice: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty treeniviioksi.`,
+    setMatch: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty matsiviikoksi.`,
+    usage: 'Käyttö: /setweek <viikko> practice|match',
+    invalidWeek: 'Virheellinen viikkonumero.',
+    invalidType: 'Virheellinen tyyppi. Käytä "practice" tai "match".',
   },
 };

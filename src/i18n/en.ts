@@ -49,4 +49,11 @@ export const en: Translations = {
       lineup_size: 'Lineup size',
     },
   },
+  week: {
+    setPractice: (week, dateRange) => `Week ${week} (${dateRange}) set as practice week.`,
+    setMatch: (week, dateRange) => `Week ${week} (${dateRange}) set as match week.`,
+    usage: 'Usage: /setweek <week> practice|match',
+    invalidWeek: 'Invalid week number.',
+    invalidType: 'Invalid type. Use "practice" or "match".',
+  },
 };
