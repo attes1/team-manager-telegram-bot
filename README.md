@@ -117,6 +117,7 @@ Available to roster members, captains, and admins:
 - `/avail match` - View match availability only
 - `/avail today` - View today's availability
 - `/avail <day>` - View specific day (mon, tue, wed, etc.)
+- `/avail <day> <week>` - View specific day for specific week
 - `/avail practice mon` - Combine filters
 - `/poll` - View/respond to availability poll for target week
 - `/poll <week>` - Poll for specific future week (e.g., `/poll 5`)
