@@ -4,13 +4,13 @@ import type { Day } from '../../../lib/schemas';
 import { daySchema } from '../../../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
 import { getLineup, getMatchInfo } from '../../../services/match';
-import type { BotContext, SeasonContext } from '../../context';
-import { seasonCommand } from '../../middleware';
+import type { BotContext, RosterContext } from '../../context';
+import { rosterCommand } from '../../middleware';
 
 export const registerMatchInfoCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'match',
-    seasonCommand(async (ctx: SeasonContext) => {
+    rosterCommand(async (ctx: RosterContext) => {
       const { db, season, config, i18n } = ctx;
       const { week, year } = getCurrentWeek();
       const { start, end } = getWeekDateRange(year, week);

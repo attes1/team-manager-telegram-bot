@@ -72,6 +72,16 @@ describe('/practice command', () => {
 
     await mockDb.db.insertInto('config').values({ seasonId: season.id, language: 'en' }).execute();
 
+    await mockDb.db
+      .insertInto('players')
+      .values({ telegramId: ADMIN_ID, displayName: 'Admin', username: 'admin' })
+      .execute();
+
+    await mockDb.db
+      .insertInto('seasonRoster')
+      .values({ seasonId: season.id, playerId: ADMIN_ID })
+      .execute();
+
     const update = createCommandUpdate('/practice', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
@@ -94,12 +104,18 @@ describe('/practice command', () => {
 
     await mockDb.db
       .insertInto('players')
-      .values({ telegramId: 111, displayName: 'Player One', username: 'playerone' })
+      .values([
+        { telegramId: ADMIN_ID, displayName: 'Admin', username: 'admin' },
+        { telegramId: 111, displayName: 'Player One', username: 'playerone' },
+      ])
       .execute();
 
     await mockDb.db
       .insertInto('seasonRoster')
-      .values({ seasonId: season.id, playerId: 111 })
+      .values([
+        { seasonId: season.id, playerId: ADMIN_ID },
+        { seasonId: season.id, playerId: 111 },
+      ])
       .execute();
 
     const dayResponse = await mockDb.db
@@ -143,6 +159,16 @@ describe('/practice command', () => {
 
     await mockDb.db.insertInto('config').values({ seasonId: season.id }).execute();
 
+    await mockDb.db
+      .insertInto('players')
+      .values({ telegramId: ADMIN_ID, displayName: 'Admin', username: 'admin' })
+      .execute();
+
+    await mockDb.db
+      .insertInto('seasonRoster')
+      .values({ seasonId: season.id, playerId: ADMIN_ID })
+      .execute();
+
     const update = createCommandUpdate('/practice mon', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
@@ -161,6 +187,16 @@ describe('/practice command', () => {
       .executeTakeFirstOrThrow();
 
     await mockDb.db.insertInto('config').values({ seasonId: season.id, language: 'en' }).execute();
+
+    await mockDb.db
+      .insertInto('players')
+      .values({ telegramId: ADMIN_ID, displayName: 'Admin', username: 'admin' })
+      .execute();
+
+    await mockDb.db
+      .insertInto('seasonRoster')
+      .values({ seasonId: season.id, playerId: ADMIN_ID })
+      .execute();
 
     const update = createCommandUpdate('/practice invalid', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);

@@ -1,5 +1,11 @@
 import type { NextFunction } from 'grammy';
-import type { AdminContext, AdminSeasonContext, BotContext, SeasonContext } from '../context';
+import type {
+  AdminContext,
+  AdminSeasonContext,
+  BotContext,
+  RosterContext,
+  SeasonContext,
+} from '../context';
 
 export const requireAdmin = async (ctx: BotContext, next: NextFunction): Promise<void> => {
   if (!ctx.isAdmin) {
@@ -33,6 +39,9 @@ export const isAdminContext = (ctx: BotContext): ctx is AdminContext => ctx.isAd
 
 export const isSeasonContext = (ctx: BotContext): ctx is SeasonContext =>
   ctx.season !== undefined && ctx.config !== undefined;
+
+export const isRosterContext = (ctx: BotContext): ctx is RosterContext =>
+  ctx.season !== undefined && ctx.config !== undefined && ctx.isInRoster;
 
 export const isAdminSeasonContext = (ctx: BotContext): ctx is AdminSeasonContext =>
   ctx.isAdmin && ctx.season !== undefined && ctx.config !== undefined;

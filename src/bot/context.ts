@@ -7,6 +7,7 @@ export interface BotContext extends Context {
   db: Kysely<DB>;
   userId: number;
   isAdmin: boolean;
+  isInRoster: boolean;
   season?: Season;
   config?: Config;
   i18n: Translations;
@@ -15,6 +16,10 @@ export interface BotContext extends Context {
 export type SeasonContext = BotContext & {
   season: Season;
   config: Config;
+};
+
+export type RosterContext = SeasonContext & {
+  isInRoster: true;
 };
 
 export type AdminContext = BotContext & {

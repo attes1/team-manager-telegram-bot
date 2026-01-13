@@ -310,6 +310,12 @@ describe('/match command', () => {
   test('shows match info when scheduled', async () => {
     const { week, year } = getCurrentWeek();
 
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: TEST_USER_ID,
+      displayName: 'Test User',
+    });
+
     await setMatchTime(mockDb.db, {
       seasonId,
       weekNumber: week,
@@ -330,6 +336,12 @@ describe('/match command', () => {
 
   test('shows lineup when set', async () => {
     const { week, year } = getCurrentWeek();
+
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: TEST_USER_ID,
+      displayName: 'Test User',
+    });
 
     await addPlayerToRoster(mockDb.db, {
       seasonId,

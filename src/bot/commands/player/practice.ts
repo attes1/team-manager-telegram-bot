@@ -5,8 +5,8 @@ import type { AvailabilityStatus, Day } from '../../../lib/schemas';
 import { daySchema, daysListSchema } from '../../../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
 import { getWeekAvailability } from '../../../services/availability';
-import type { BotContext, SeasonContext } from '../../context';
-import { seasonCommand } from '../../middleware';
+import type { BotContext, RosterContext } from '../../context';
+import { rosterCommand } from '../../middleware';
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   available: '✅',
@@ -22,7 +22,7 @@ const getTodayDay = (): Day => {
 };
 
 const showDayAvailability = async (
-  ctx: SeasonContext,
+  ctx: RosterContext,
   day: Day,
   i18n: Translations,
   week: number,
@@ -65,7 +65,7 @@ const showDayAvailability = async (
 export const registerPracticeCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'practice',
-    seasonCommand(async (ctx: SeasonContext) => {
+    rosterCommand(async (ctx: RosterContext) => {
       const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim().toLowerCase() ?? '';
       const { week, year } = getCurrentWeek();
