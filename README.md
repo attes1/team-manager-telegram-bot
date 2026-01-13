@@ -1,6 +1,8 @@
 # Team Manager Bot
 
-A Telegram bot for managing team schedules, availability polling, and match coordination.
+A Telegram bot for managing team schedules, availability polling, and match coordination. Developed for my Pappaliiga Counter-Strike team.
+
+Cursor AI auto-completion and Claude Code AI agent have been used to develop this bot.
 
 ## Features
 
