@@ -138,7 +138,7 @@ export const en: Translations = {
   lineup: {
     set: (count, players) => `Lineup set (${count} players):\n${players}`,
     cleared: 'Lineup cleared.',
-    usage: 'Usage: /setlineup @player1 @player2 ...\nOr /setlineup clear to clear',
+    usage: 'Usage: /setlineup @player1 @player2 ... [week]\nOr /setlineup clear [week] to clear',
     noMentions: 'Mention players in the command (e.g. /setlineup @player1 @player2)',
     playerNotInRoster: (name) => `${name} is not in the roster.`,
     menuTitle: (week, dateRange) => `Week ${week} (${dateRange}) lineup`,
@@ -190,7 +190,7 @@ export const en: Translations = {
       status: 'View status overview',
       setweek: 'Set week type &lt;week&gt; &lt;practice|match&gt;',
       setmatch: 'Schedule a match &lt;day&gt; &lt;time&gt;',
-      setlineup: ['Open lineup menu', 'Set lineup @players... | clear'],
+      setlineup: ['Open lineup menu', 'Set lineup @players... [week] | clear [week]'],
       setopponent: 'Set opponent &lt;name&gt; [url] | clear',
       remind: 'Send reminder to non-responders',
       startseason: 'Start a new season &lt;name&gt;',

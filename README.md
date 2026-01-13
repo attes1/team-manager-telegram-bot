@@ -126,7 +126,7 @@ Available to roster members, captains, and admins:
 Available to captains and admins:
 - `/setweek [week] practice|match` - Set week type (defaults to target week)
 - `/setmatch <day> <time>` - Schedule a match
-- `/setlineup @users...` - Set match lineup
+- `/setlineup @users... [week]` - Set match lineup (optional week, default: scheduling week)
 - `/setopponent <name> [url]` - Set opponent name and optional team profile link
 - `/remind` - Send reminder to non-responders
 

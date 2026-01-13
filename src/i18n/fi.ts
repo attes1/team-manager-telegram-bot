@@ -361,7 +361,8 @@ export const fi: Translations = {
   lineup: {
     set: (count, players) => `Linari asetettu (${count} pelaajaa):\n${players}`,
     cleared: 'Linari tyhjennetty.',
-    usage: 'Käyttö: /setlineup @pelaaja1 @pelaaja2 ...\nTai /setlineup clear tyhjentääksesi',
+    usage:
+      'Käyttö: /setlineup @pelaaja1 @pelaaja2 ... [viikko]\nTai /setlineup clear [viikko] tyhjentääksesi',
     noMentions: 'Mainitse pelaajat komennossa (esim. /setlineup @pelaaja1 @pelaaja2)',
     playerNotInRoster: (name) => `${name} ei ole rosterissa.`,
     menuTitle: (week, dateRange) => `Vko ${week} (${dateRange}) linari`,
@@ -413,7 +414,7 @@ export const fi: Translations = {
       status: 'Näytä tilannekatsaus',
       setweek: 'Aseta viikon tyyppi &lt;week&gt; &lt;practice|match&gt;',
       setmatch: 'Ajoita matsi &lt;day&gt; &lt;time&gt;',
-      setlineup: ['Avaa linarivalikko', 'Aseta linari @players... | clear'],
+      setlineup: ['Avaa linarivalikko', 'Aseta linari @players... [week] | clear [week]'],
       setopponent: 'Aseta vihu &lt;name&gt; [url] | clear',
       remind: 'Lähetä muistutus vastaamattomille',
       startseason: 'Aloita uusi kausi &lt;name&gt;',
