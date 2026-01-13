@@ -1,14 +1,14 @@
 import type { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { createTestDb } from '../../tests/integration/helpers';
-import type { DB } from '../types/db';
 import {
   addPlayerToRoster,
   getPlayerByTelegramId,
   getRoster,
   isPlayerInRoster,
   removePlayerFromRoster,
-} from './roster';
+} from '../../src/services/roster';
+import type { DB } from '../../src/types/db';
+import { createTestDb } from '../helpers';
 
 describe('roster service', () => {
   let db: Kysely<DB>;

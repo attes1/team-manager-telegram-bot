@@ -1,8 +1,8 @@
 import type { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { createTestDb } from '../../tests/integration/helpers';
-import type { DB } from '../types/db';
-import { endSeason, getActiveSeason, getSeasonById, startSeason } from './season';
+import { endSeason, getActiveSeason, getSeasonById, startSeason } from '../../src/services/season';
+import type { DB } from '../../src/types/db';
+import { createTestDb } from '../helpers';
 
 describe('season service', () => {
   let db: Kysely<DB>;

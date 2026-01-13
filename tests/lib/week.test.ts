@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { describe, expect, test } from 'vitest';
-import { getCurrentWeek, getWeekDateRange, getWeekNumber, getWeekYear } from './week';
+import { getCurrentWeek, getWeekDateRange, getWeekNumber, getWeekYear } from '../../src/lib/week';
 
 const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
