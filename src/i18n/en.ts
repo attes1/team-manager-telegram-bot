@@ -73,4 +73,13 @@ export const en: Translations = {
       sun: 'Sun',
     },
   },
+  practice: {
+    title: (week, dateRange) => `Week ${week} (${dateRange}) availability:`,
+    dayTitle: (day, date) => `${day} ${date} availability:`,
+    noResponses: 'No responses yet.',
+    noResponsesForDay: (day) => `No availability for ${day}.`,
+    playerLine: (name, times, status) => `• ${name}: ${times.join(', ')} ${status}`,
+    invalidDay: 'Invalid day. Use: mon, tue, wed, thu, fri, sat, sun',
+    usage: 'Usage: /practice [today|<day>]',
+  },
 };

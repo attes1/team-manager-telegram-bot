@@ -69,6 +69,15 @@ export interface Translations {
       sun: string;
     };
   };
+  practice: {
+    title: (week: number, dateRange: string) => string;
+    dayTitle: (day: string, date: string) => string;
+    noResponses: string;
+    noResponsesForDay: (day: string) => string;
+    playerLine: (name: string, times: string[], status: string) => string;
+    invalidDay: string;
+    usage: string;
+  };
 }
 
 export const fi: Translations = {
@@ -143,5 +152,15 @@ export const fi: Translations = {
       sat: 'La',
       sun: 'Su',
     },
+  },
+  practice: {
+    title: (week: number, dateRange: string) => `Vko ${week} (${dateRange}) saatavuudet:`,
+    dayTitle: (day: string, date: string) => `${day} ${date} saatavuudet:`,
+    noResponses: 'Ei vastauksia.',
+    noResponsesForDay: (day: string) => `Ei saatavuuksia päivälle ${day}.`,
+    playerLine: (name: string, times: string[], status: string) =>
+      `• ${name}: ${times.join(', ')} ${status}`,
+    invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
+    usage: 'Käyttö: /practice [today|<päivä>]',
   },
 };

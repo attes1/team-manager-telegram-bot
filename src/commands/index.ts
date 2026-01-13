@@ -4,6 +4,7 @@ import { registerPlayerCommands } from './admin/players';
 import { registerPollCommand } from './admin/poll';
 import { registerSeasonCommands } from './admin/season';
 import { registerWeekCommand } from './admin/week';
+import { registerPracticeCommand } from './player/practice';
 import { registerRosterCommand } from './player/roster';
 
 export const registerCommands = (bot: Bot) => {
@@ -13,4 +14,5 @@ export const registerCommands = (bot: Bot) => {
   registerConfigCommand(bot);
   registerWeekCommand(bot);
   registerRosterCommand(bot);
+  registerPracticeCommand(bot);
 };
