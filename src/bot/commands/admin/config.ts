@@ -39,25 +39,33 @@ const isValidUserKey = (key: string): boolean => USER_KEYS.includes(key);
 const toDbKey = (userKey: string): string => USER_TO_DB_KEY[userKey];
 const affectsScheduler = (key: string): boolean => SCHEDULER_KEYS.includes(key);
 
+const formatConfigLine = (label: string, key: string, value: string): string =>
+  `${label} (${key}): ${value}`;
+
 const formatConfigDisplay = (i18n: Translations, config: ParsedConfig): string => {
-  const keys = i18n.config.keys;
+  const labels = i18n.config.keys;
   const lines = [
-    i18n.config.line(keys.language, config.language),
-    i18n.config.line(keys.poll_day, config.pollDay),
-    i18n.config.line(keys.poll_time, config.pollTime),
-    i18n.config.line(keys.poll_days, config.pollDays.join(',')),
-    i18n.config.line(keys.poll_times, config.pollTimes),
-    i18n.config.line(keys.reminder_day, config.reminderDay),
-    i18n.config.line(keys.reminder_time, config.reminderTime),
-    i18n.config.line(keys.reminders_mode, config.remindersMode),
-    i18n.config.line(keys.match_day, config.matchDay),
-    i18n.config.line(keys.match_time, config.matchTime),
-    i18n.config.line(keys.lineup_size, String(config.lineupSize)),
-    i18n.config.line(
-      keys.match_day_reminder_enabled,
+    formatConfigLine(labels.language, 'language', config.language),
+    formatConfigLine(labels.poll_day, 'poll_day', config.pollDay),
+    formatConfigLine(labels.poll_time, 'poll_time', config.pollTime),
+    formatConfigLine(labels.poll_days, 'poll_days', config.pollDays.join(',')),
+    formatConfigLine(labels.poll_times, 'poll_times', config.pollTimes),
+    formatConfigLine(labels.reminder_day, 'reminder_day', config.reminderDay),
+    formatConfigLine(labels.reminder_time, 'reminder_time', config.reminderTime),
+    formatConfigLine(labels.reminders_mode, 'reminders_mode', config.remindersMode),
+    formatConfigLine(labels.match_day, 'match_day', config.matchDay),
+    formatConfigLine(labels.match_time, 'match_time', config.matchTime),
+    formatConfigLine(labels.lineup_size, 'lineup_size', String(config.lineupSize)),
+    formatConfigLine(
+      labels.match_day_reminder_enabled,
+      'match_day_reminder_enabled',
       config.matchDayReminderEnabled ? 'on' : 'off',
     ),
-    i18n.config.line(keys.match_day_reminder_time, config.matchDayReminderTime),
+    formatConfigLine(
+      labels.match_day_reminder_time,
+      'match_day_reminder_time',
+      config.matchDayReminderTime,
+    ),
   ];
   return `${i18n.config.title}\n${lines.join('\n')}\n\n${i18n.config.usage}`;
 };
