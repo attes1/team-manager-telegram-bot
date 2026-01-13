@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import { env } from '../../../env';
 import { formatDateRange, formatDay } from '../../../lib/format';
 import { daySchema, timeSchema } from '../../../lib/schemas';
-import { getCurrentWeek, getWeekDateRange, getWeekNumber, getWeekYear } from '../../../lib/week';
+import { getSchedulingWeek, getWeekDateRange } from '../../../lib/week';
 import { getLineupMenuMessage, lineupMenu } from '../../../menus/lineup';
 import {
   buildLineupAnnouncement,
@@ -63,9 +63,10 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.match.invalidTime);
       }
 
-      const now = new Date();
-      const weekNumber = getWeekNumber(now);
-      const year = getWeekYear(now);
+      const { week: weekNumber, year } = getSchedulingWeek(
+        config.weekChangeDay,
+        config.weekChangeTime,
+      );
 
       await setMatchTime(db, {
         seasonId: season.id,
@@ -96,9 +97,10 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const args = ctx.match?.toString().trim() ?? '';
 
       if (args.toLowerCase() === 'clear') {
-        const now = new Date();
-        const weekNumber = getWeekNumber(now);
-        const year = getWeekYear(now);
+        const { week: weekNumber, year } = getSchedulingWeek(
+          config.weekChangeDay,
+          config.weekChangeTime,
+        );
         await clearLineup(db, { seasonId: season.id, weekNumber, year });
         return ctx.reply(i18n.lineup.cleared);
       }
@@ -106,7 +108,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const mentionedUsers = getAllMentionedUsers(ctx);
 
       if (mentionedUsers.length === 0) {
-        const message = getLineupMenuMessage(i18n);
+        const message = getLineupMenuMessage(i18n, config);
         return ctx.reply(message, { reply_markup: lineupMenu });
       }
 
@@ -117,7 +119,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         }
       }
 
-      const { week, year } = getCurrentWeek();
+      const { week, year } = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       await setLineup(db, {
         seasonId: season.id,
@@ -142,13 +144,14 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
   bot.command(
     'setopponent',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
-      const { db, season, i18n } = ctx;
+      const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
 
       if (args.toLowerCase() === 'clear') {
-        const now = new Date();
-        const weekNumber = getWeekNumber(now);
-        const year = getWeekYear(now);
+        const { week: weekNumber, year } = getSchedulingWeek(
+          config.weekChangeDay,
+          config.weekChangeTime,
+        );
         await clearOpponent(db, { seasonId: season.id, weekNumber, year });
         return ctx.reply(i18n.opponent.cleared);
       }
@@ -172,9 +175,10 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.opponent.usage);
       }
 
-      const now = new Date();
-      const weekNumber = getWeekNumber(now);
-      const year = getWeekYear(now);
+      const { week: weekNumber, year } = getSchedulingWeek(
+        config.weekChangeDay,
+        config.weekChangeTime,
+      );
 
       await setOpponent(db, {
         seasonId: season.id,

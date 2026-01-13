@@ -2,7 +2,8 @@ import { Menu } from '@grammyjs/menu';
 import type { BotContext } from '../bot/context';
 import { env } from '../env';
 import { formatDateRange, formatPlayerName } from '../lib/format';
-import { getCurrentWeek, getWeekDateRange } from '../lib/week';
+import type { ParsedConfig } from '../lib/schemas';
+import { getSchedulingWeek, getWeekDateRange } from '../lib/week';
 import { buildLineupAnnouncement } from '../services/announcements';
 import { getLineup, setLineup } from '../services/match';
 import { getRoster } from '../services/roster';
@@ -21,7 +22,7 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
 
   const lineupSize = config.lineupSize;
 
-  const { week, year } = getCurrentWeek();
+  const { week, year } = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
   const roster = await getRoster(db, season.id);
   const currentLineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
   const selectedIds = new Set(currentLineup.map((p) => p.telegramId));
@@ -84,8 +85,8 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
     .row();
 });
 
-export const getLineupMenuMessage = (i18n: BotContext['i18n']): string => {
-  const { week, year } = getCurrentWeek();
+export const getLineupMenuMessage = (i18n: BotContext['i18n'], config: ParsedConfig): string => {
+  const { week, year } = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
   const { start, end } = getWeekDateRange(year, week);
   const dateRange = formatDateRange(start, end);
 
