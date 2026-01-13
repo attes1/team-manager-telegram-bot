@@ -49,6 +49,7 @@ export const registerHelpCommand = (bot: Bot<BotContext>) => {
       lines.push(...formatCommand('/removeplayer', cmds.removeplayer));
       lines.push(...formatCommand('/promote', cmds.promote));
       lines.push(...formatCommand('/demote', cmds.demote));
+      lines.push(...formatCommand('/setgrouptype', cmds.setgrouptype));
     }
 
     lines.push('');

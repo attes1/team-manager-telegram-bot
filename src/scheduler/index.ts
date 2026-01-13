@@ -8,6 +8,7 @@ import { sendReminder } from '@/scheduler/reminder';
 import { buildCronExpression, buildDailyCronExpression } from '@/scheduler/utils';
 import { sendWeeklyPoll } from '@/scheduler/weekly-poll';
 import { getConfig } from '@/services/config';
+import { getTeamGroupId } from '@/services/group';
 import { getActiveSeason } from '@/services/season';
 import type { BotContext } from '../bot/context';
 
@@ -61,7 +62,13 @@ const initScheduler = async (bot: Bot<BotContext>): Promise<void> => {
     return;
   }
 
-  const chatId = env.TEAM_GROUP_ID;
+  const teamGroupId = await getTeamGroupId(db);
+  if (!teamGroupId) {
+    console.log('Scheduler: No team group configured, tasks stopped');
+    return;
+  }
+
+  const chatId = teamGroupId;
 
   // Weekly poll
   const pollCron = buildCronExpression(config.pollDay, config.pollTime);

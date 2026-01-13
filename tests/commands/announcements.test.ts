@@ -1,7 +1,8 @@
 import { createTestDb } from '@tests/helpers';
-import { mockDb, mockEnv } from '@tests/setup';
+import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerMatchCommands } from '@/bot/commands/user/match';
+import { registerGroup, setGroupType } from '@/services/group';
 import { addPlayerToRoster } from '@/services/roster';
 import { createCommandUpdate, createMultiMentionUpdate, createTestBot } from './helpers';
 
@@ -12,7 +13,11 @@ const CHAT_ID = -100123456789;
 describe('public announcements config', () => {
   beforeEach(async () => {
     mockDb.db = await createTestDb();
-    mockEnv.env.PUBLIC_GROUP_ID = PUBLIC_GROUP_ID;
+    // Register team group and public group in database
+    await registerGroup(mockDb.db, CHAT_ID, 'Team Group');
+    await setGroupType(mockDb.db, CHAT_ID, 'team');
+    await registerGroup(mockDb.db, PUBLIC_GROUP_ID, 'Public Group');
+    // PUBLIC_GROUP_ID defaults to 'public' type
   });
 
   afterEach(async () => {

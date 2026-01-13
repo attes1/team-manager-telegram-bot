@@ -29,9 +29,6 @@ export const mockEnv = {
     DEFAULT_LINEUP_SIZE: 5,
     DEFAULT_MATCH_DAY_REMINDER_MODE: 'quiet' as const,
     DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
-    // Optional properties that some tests may need
-    TEAM_GROUP_ID: undefined as number | undefined,
-    PUBLIC_GROUP_ID: undefined as number | undefined,
   },
 };
 

@@ -2,6 +2,7 @@ import type { Generated, Selectable } from 'kysely';
 import type {
   AvailabilityStatus,
   Day,
+  GroupType,
   RemindersMode,
   RosterRole,
   SeasonStatus,
@@ -101,6 +102,15 @@ export interface ActiveMenusTable {
   createdAt: Generated<string>;
 }
 
+export interface GroupsTable {
+  id: Generated<number>;
+  telegramId: number;
+  type: Generated<GroupType>;
+  title: string | null;
+  addedAt: Generated<string>;
+  removedAt: string | null;
+}
+
 export interface DB {
   seasons: SeasonsTable;
   config: ConfigTable;
@@ -111,6 +121,7 @@ export interface DB {
   weeks: WeeksTable;
   lineups: LineupsTable;
   activeMenus: ActiveMenusTable;
+  groups: GroupsTable;
 }
 
 export type Season = Selectable<SeasonsTable>;
@@ -118,3 +129,4 @@ export type Config = Selectable<ConfigTable>;
 export type Player = Selectable<PlayersTable>;
 export type Week = Selectable<WeeksTable>;
 export type ActiveMenu = Selectable<ActiveMenusTable>;
+export type Group = Selectable<GroupsTable>;

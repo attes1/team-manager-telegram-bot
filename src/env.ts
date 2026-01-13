@@ -15,16 +15,6 @@ const commaSeparatedStrings = (defaultVal?: string) =>
 const envSchema = z.object({
   BOT_TOKEN: z.string().min(1),
 
-  TEAM_GROUP_ID: z.coerce.number(),
-  PUBLIC_GROUP_ID: z
-    .string()
-    .optional()
-    .transform((val) => {
-      if (!val || val.trim() === '') return undefined;
-      const num = Number(val);
-      return Number.isNaN(num) ? undefined : num;
-    }),
-
   ADMIN_IDS: commaSeparatedNumbers(),
 
   DEFAULT_LANGUAGE: z.enum(['fi', 'en']).default('fi'),

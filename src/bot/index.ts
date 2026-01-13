@@ -9,6 +9,7 @@ import { getActiveSeason } from '../services/season';
 import { registerCommands } from './commands';
 import { commandDefinitions } from './commands/definitions';
 import type { BotContext } from './context';
+import { registerChatMemberHandlers } from './handlers/chat-member';
 import { registerReactionHandlers } from './handlers/reactions';
 import { contextMiddleware } from './middleware';
 
@@ -23,6 +24,7 @@ export const createBot = () => {
 
   registerCommands(bot);
   registerReactionHandlers(bot);
+  registerChatMemberHandlers(bot);
 
   bot.catch((err) => {
     console.error('Bot error:', err);

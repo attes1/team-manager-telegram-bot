@@ -1,5 +1,5 @@
 import { createTestDb } from '@tests/helpers';
-import { mockDb, mockEnv } from '@tests/setup';
+import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerSeasonCommands } from '@/bot/commands/admin/season';
 import { registerHelpCommand } from '@/bot/commands/public/help';
@@ -7,6 +7,7 @@ import { registerNextMatchCommand } from '@/bot/commands/public/nextmatch';
 import { registerRosterCommand } from '@/bot/commands/public/roster';
 import { registerAvailCommand } from '@/bot/commands/user/avail';
 import { registerWeekCommand } from '@/bot/commands/user/week';
+import { registerGroup, setGroupType } from '@/services/group';
 import { addPlayerToRoster, setPlayerRole } from '@/services/roster';
 import { startSeason } from '@/services/season';
 import { createCommandUpdate, createTestBot } from './helpers';
@@ -21,8 +22,11 @@ const PUBLIC_GROUP_ID = -100456;
 describe('public group restrictions', () => {
   beforeEach(async () => {
     mockDb.db = await createTestDb();
-    mockEnv.env.TEAM_GROUP_ID = TEAM_GROUP_ID;
-    mockEnv.env.PUBLIC_GROUP_ID = PUBLIC_GROUP_ID;
+    // Register groups in database
+    await registerGroup(mockDb.db, TEAM_GROUP_ID, 'Team Group');
+    await setGroupType(mockDb.db, TEAM_GROUP_ID, 'team');
+    await registerGroup(mockDb.db, PUBLIC_GROUP_ID, 'Public Group');
+    // PUBLIC_GROUP_ID defaults to 'public' type
   });
 
   afterEach(async () => {

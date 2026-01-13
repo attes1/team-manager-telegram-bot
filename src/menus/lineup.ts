@@ -1,8 +1,8 @@
 import { Menu } from '@grammyjs/menu';
 import type { BotContext } from '@/bot/context';
-import { env } from '@/env';
 import { formatDateRange, formatPlayerName } from '@/lib/format';
 import { getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
+import { getPublicGroupIds } from '@/services/group';
 import { buildLineupMessage, getLineup, setLineup } from '@/services/match';
 import { getRoster } from '@/services/roster';
 
@@ -90,15 +90,20 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
 
       await ctx.answerCallbackQuery(ctx.i18n.lineup.saved(lineup.length));
 
-      if (
-        env.PUBLIC_GROUP_ID &&
-        config.publicAnnouncements === 'on' &&
-        lineup.length === lineupSize
-      ) {
-        const { start, end } = getWeekDateRange(year, week);
-        const dateRange = formatDateRange(start, end);
-        const announcement = buildLineupMessage(ctx.i18n, week, dateRange, lineup);
-        await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
+      if (config.publicAnnouncements === 'on' && lineup.length === lineupSize) {
+        const publicGroupIds = await getPublicGroupIds(db);
+        if (publicGroupIds.length > 0) {
+          const { start, end } = getWeekDateRange(year, week);
+          const dateRange = formatDateRange(start, end);
+          const announcement = buildLineupMessage(ctx.i18n, week, dateRange, lineup);
+          for (const groupId of publicGroupIds) {
+            try {
+              await ctx.api.sendMessage(groupId, announcement);
+            } catch (error) {
+              console.error(`Failed to send lineup announcement to group ${groupId}:`, error);
+            }
+          }
+        }
       }
 
       const playerList = lineup.map((p) => `• ${formatPlayerName(p)}`).join('\n');

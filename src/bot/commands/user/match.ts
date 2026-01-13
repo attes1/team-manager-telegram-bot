@@ -1,11 +1,11 @@
 import type { Bot } from 'grammy';
 import type { BotContext, CaptainSeasonContext } from '@/bot/context';
 import { captainSeasonCommand } from '@/bot/middleware';
-import { env } from '@/env';
 import { formatDateRange, formatDay } from '@/lib/format';
 import { daySchema, timeSchema } from '@/lib/schemas';
 import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/temporal';
 import { getLineupMenuMessage, lineupMenu } from '@/menus/lineup';
+import { getPublicGroupIds } from '@/services/group';
 import {
   buildLineupMessage,
   buildMatchScheduledMessage,
@@ -88,9 +88,18 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const dayName = i18n.poll.days[dayResult.data];
       const dayFormatted = formatDay(dayResult.data, config.language);
 
-      if (env.PUBLIC_GROUP_ID && config.publicAnnouncements === 'on') {
-        const announcement = buildMatchScheduledMessage(i18n, dayFormatted, timeResult.data);
-        await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
+      if (config.publicAnnouncements === 'on') {
+        const publicGroupIds = await getPublicGroupIds(db);
+        if (publicGroupIds.length > 0) {
+          const announcement = buildMatchScheduledMessage(i18n, dayFormatted, timeResult.data);
+          for (const groupId of publicGroupIds) {
+            try {
+              await ctx.api.sendMessage(groupId, announcement);
+            } catch (error) {
+              console.error(`Failed to send match announcement to group ${groupId}:`, error);
+            }
+          }
+        }
       }
 
       return ctx.reply(i18n.match.scheduled(dayName, timeResult.data, weekNumber, dateRange));
@@ -255,12 +264,21 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         }
       }
 
-      if (env.PUBLIC_GROUP_ID && config.publicAnnouncements === 'on') {
-        const { start, end } = getWeekDateRange(year, week);
-        const dateRange = formatDateRange(start, end);
-        const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
-        const announcement = buildLineupMessage(i18n, week, dateRange, lineup);
-        await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
+      if (config.publicAnnouncements === 'on') {
+        const publicGroupIds = await getPublicGroupIds(db);
+        if (publicGroupIds.length > 0) {
+          const { start, end } = getWeekDateRange(year, week);
+          const dateRange = formatDateRange(start, end);
+          const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
+          const announcement = buildLineupMessage(i18n, week, dateRange, lineup);
+          for (const groupId of publicGroupIds) {
+            try {
+              await ctx.api.sendMessage(groupId, announcement);
+            } catch (error) {
+              console.error(`Failed to send lineup announcement to group ${groupId}:`, error);
+            }
+          }
+        }
       }
 
       const playerList = mentionedUsers.map((u) => `• ${u.name}`).join('\n');

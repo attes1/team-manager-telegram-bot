@@ -11,7 +11,7 @@ Cursor AI auto-completion and Claude Code AI agent have been used to develop thi
 - **Availability Polling**: Weekly polls for player availability with time slots
 - **Match Scheduling**: Set match times, manage lineups
 - **Automated Reminders**: Scheduled weekly polls and mid-week reminders
-- **Public Group Support**: Optional public group with restricted commands and auto-announcements
+- **Group Auto-Discovery**: Automatically registers groups when bot is invited, with configurable types (team/public)
 - **Menu Lifecycle Management**: Auto-delete old menus when new ones are created, daily cleanup of expired menus
 - **Multi-language**: Finnish and English support
 
@@ -37,11 +37,9 @@ pnpm install
 ```env
 # Required
 BOT_TOKEN=your_telegram_bot_token
-TEAM_GROUP_ID=-1001234567890
 ADMIN_IDS=123456789,987654321
 
 # Optional
-PUBLIC_GROUP_ID=-1001234567890
 DEFAULT_LANGUAGE=fi
 TZ=Europe/Helsinki
 DB_PATH=./data/bot.db
@@ -96,13 +94,20 @@ pnpm dev
 
 The bot uses a hierarchical permission system: **Admin > Captain > Player > Public**
 
-### Public Group Restrictions
+### Group Auto-Discovery
 
-When `PUBLIC_GROUP_ID` is configured, the bot can operate in two groups:
-- **Team Group** (`TEAM_GROUP_ID`): Full functionality for all commands
-- **Public Group** (`PUBLIC_GROUP_ID`): Limited to public commands only
+The bot automatically registers groups when invited. Groups can be either "team" or "public" type:
 
-In the public group:
+**Setup:**
+1. Invite the bot to your group(s)
+2. Use `/setgrouptype team` in your main team group
+3. Other groups default to "public" type
+
+**Group Types:**
+- **Team Group**: Full functionality - polls, reminders, and all commands sent here. Only one group can be "team" at a time.
+- **Public Groups**: Limited to public commands only. Receives match/lineup announcements when `public_announcements` is enabled.
+
+**Restrictions in Public Groups:**
 - **Public commands** work for everyone (`/help`, `/roster`, `/nextmatch`)
 - **Player/Captain commands** return "Command not available in public group"
 - **Admin commands** work normally (admins bypass the restriction)
@@ -147,6 +152,7 @@ Available to captains and admins:
 - `/removeplayer @user` - Remove player from roster
 - `/promote @user` - Promote player to captain
 - `/demote @user` - Demote captain to player
+- `/setgrouptype <public|team>` - Set group type (auto-discovered groups default to public)
 
 ### Adding Players
 

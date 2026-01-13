@@ -203,6 +203,7 @@ export interface Translations {
       removeplayer: string;
       promote: string;
       demote: string;
+      setgrouptype: string;
     };
   };
   announcements: {
@@ -227,6 +228,14 @@ export interface Translations {
     cleared: string;
     usage: string;
     noOpponentSet: string;
+  };
+  group: {
+    notInGroup: string;
+    notRegistered: string;
+    usage: string;
+    setTeam: string;
+    setPublic: string;
+    noTeamGroup: string;
   };
 }
 
@@ -447,6 +456,7 @@ export const fi: Translations = {
       removeplayer: 'Poista pelaaja rosterista @player',
       promote: 'Ylennä pelaaja kapteeniksi @player',
       demote: 'Alenna kapteeni pelaajaksi @player',
+      setgrouptype: 'Aseta ryhmätyyppi &lt;public|team&gt;',
     },
   },
   announcements: {
@@ -472,5 +482,13 @@ export const fi: Translations = {
     usage:
       'Käyttö: /setopponent <nimi> [url]\nEsim: /setopponent EC Myyrylit https://example.com/team',
     noOpponentSet: 'Vihua ei ole asetettu.',
+  },
+  group: {
+    notInGroup: 'Tätä komentoa voi käyttää vain ryhmässä.',
+    notRegistered: 'Ryhmää ei ole rekisteröity. Poista ja lisää botti uudelleen.',
+    usage: 'Käyttö: /setgrouptype <public|team>',
+    setTeam: 'Tämä ryhmä on nyt tiimin ryhmä. Kyselyt ja muistutukset lähetetään tänne.',
+    setPublic: 'Ryhmän tyyppi muutettu julkiseksi.',
+    noTeamGroup: 'Tiimin ryhmää ei ole asetettu.',
   },
 };

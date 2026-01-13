@@ -1,10 +1,10 @@
 import type { NextFunction } from 'grammy';
 import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
-import { env } from '@/env';
 import { t } from '@/i18n';
 import { isAdmin } from '@/lib/admin';
 import { getConfig } from '@/services/config';
+import { getGroup } from '@/services/group';
 import { isCaptain, isPlayerInRoster } from '@/services/roster';
 import { getActiveSeason } from '@/services/season';
 
@@ -14,7 +14,16 @@ export const contextMiddleware = async (ctx: BotContext, next: NextFunction) => 
   ctx.isAdmin = ctx.userId !== 0 && isAdmin(ctx.userId);
   ctx.isCaptain = ctx.isAdmin;
   ctx.isInRoster = false;
-  ctx.isInPublicGroup = env.PUBLIC_GROUP_ID !== undefined && ctx.chat?.id === env.PUBLIC_GROUP_ID;
+
+  // Determine if in public group based on database
+  const chatId = ctx.chat?.id;
+  const chatType = ctx.chat?.type;
+  if (chatId && (chatType === 'group' || chatType === 'supergroup')) {
+    const group = await getGroup(db, chatId);
+    ctx.isInPublicGroup = group?.type === 'public';
+  } else {
+    ctx.isInPublicGroup = false;
+  }
 
   const season = await getActiveSeason(db);
   if (season) {

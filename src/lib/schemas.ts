@@ -33,6 +33,8 @@ export const seasonStatusSchema = z.enum(['active', 'ended']);
 
 export const rosterRoleSchema = z.enum(['player', 'captain']);
 
+export const groupTypeSchema = z.enum(['public', 'team']);
+
 export const languageSchema = z.enum(['fi', 'en']);
 
 export const daysListSchema = z
@@ -154,6 +156,7 @@ export type RemindersMode = z.infer<typeof remindersModeSchema>;
 export type OnOff = z.infer<typeof onOffSchema>;
 export type SeasonStatus = z.infer<typeof seasonStatusSchema>;
 export type RosterRole = z.infer<typeof rosterRoleSchema>;
+export type GroupType = z.infer<typeof groupTypeSchema>;
 export type Language = z.infer<typeof languageSchema>;
 
 export const configSchema = z.object({

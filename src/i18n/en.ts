@@ -217,6 +217,7 @@ export const en: Translations = {
       removeplayer: 'Remove player from roster @player',
       promote: 'Promote player to captain @player',
       demote: 'Demote captain to player @player',
+      setgrouptype: 'Set group type &lt;public|team&gt;',
     },
   },
   announcements: {
@@ -242,5 +243,13 @@ export const en: Translations = {
     usage:
       'Usage: /setopponent <name> [url]\nExample: /setopponent EC Myyrylit https://example.com/team',
     noOpponentSet: 'Opponent not set.',
+  },
+  group: {
+    notInGroup: 'This command can only be used in a group.',
+    notRegistered: 'Group is not registered. Remove and re-add the bot.',
+    usage: 'Usage: /setgrouptype <public|team>',
+    setTeam: 'This group is now the team group. Polls and reminders will be sent here.',
+    setPublic: 'Group type changed to public.',
+    noTeamGroup: 'No team group configured.',
   },
 };
