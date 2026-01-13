@@ -141,7 +141,6 @@ export const en: Translations = {
     lineup: 'Lineup',
   },
   help: {
-    title: 'Pappaliiga Bot - Commands',
     publicCommands: 'Public Commands',
     playerCommands: 'Player Commands',
     adminCommands: 'Admin Commands',

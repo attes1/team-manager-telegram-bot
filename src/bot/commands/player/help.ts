@@ -6,8 +6,6 @@ export const registerHelpCommand = (bot: Bot<BotContext>) => {
     const { i18n, isAdmin, isInRoster } = ctx;
 
     const lines: string[] = [
-      `<b>${i18n.help.title}</b>`,
-      '',
       `<b>${i18n.help.publicCommands}</b>`,
       `• /help - ${i18n.help.commands.help}`,
       `• /roster - ${i18n.help.commands.roster}`,

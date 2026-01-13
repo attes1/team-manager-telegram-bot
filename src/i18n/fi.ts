@@ -135,7 +135,6 @@ export interface Translations {
     lineup: string;
   };
   help: {
-    title: string;
     publicCommands: string;
     playerCommands: string;
     adminCommands: string;
@@ -315,7 +314,6 @@ export const fi: Translations = {
     lineup: 'Linari',
   },
   help: {
-    title: 'Pappaliiga Bot - Komennot',
     publicCommands: 'Julkiset komennot',
     playerCommands: 'Pelaajan komennot',
     adminCommands: 'Admin-komennot',
