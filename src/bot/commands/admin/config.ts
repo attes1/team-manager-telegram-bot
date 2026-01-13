@@ -14,6 +14,8 @@ const USER_TO_DB_KEY: Record<string, string> = {
   poll_time: 'pollTime',
   poll_days: 'pollDays',
   poll_times: 'pollTimes',
+  poll_cutoff_day: 'pollCutoffDay',
+  poll_cutoff_time: 'pollCutoffTime',
   reminder_day: 'reminderDay',
   reminder_time: 'reminderTime',
   reminders_mode: 'remindersMode',
@@ -22,6 +24,7 @@ const USER_TO_DB_KEY: Record<string, string> = {
   lineup_size: 'lineupSize',
   match_day_reminder_mode: 'matchDayReminderMode',
   match_day_reminder_time: 'matchDayReminderTime',
+  public_announcements: 'publicAnnouncements',
 };
 
 const SCHEDULER_KEYS = [
@@ -52,6 +55,8 @@ const formatConfigDisplay = (i18n: Translations, config: ParsedConfig): string =
     formatConfigLine(labels.poll_time, 'poll_time', config.pollTime),
     formatConfigLine(labels.poll_days, 'poll_days', config.pollDays.join(',')),
     formatConfigLine(labels.poll_times, 'poll_times', config.pollTimes),
+    formatConfigLine(labels.poll_cutoff_day, 'poll_cutoff_day', config.pollCutoffDay),
+    formatConfigLine(labels.poll_cutoff_time, 'poll_cutoff_time', config.pollCutoffTime),
     formatConfigLine(labels.reminder_day, 'reminder_day', config.reminderDay),
     formatConfigLine(labels.reminder_time, 'reminder_time', config.reminderTime),
     formatConfigLine(labels.reminders_mode, 'reminders_mode', config.remindersMode),
@@ -67,6 +72,11 @@ const formatConfigDisplay = (i18n: Translations, config: ParsedConfig): string =
       labels.match_day_reminder_time,
       'match_day_reminder_time',
       config.matchDayReminderTime,
+    ),
+    formatConfigLine(
+      labels.public_announcements,
+      'public_announcements',
+      config.publicAnnouncements,
     ),
   ];
   return `${i18n.config.title}\n${lines.join('\n')}\n\n${i18n.config.usage}`;
