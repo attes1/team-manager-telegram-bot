@@ -327,8 +327,9 @@ export const fi: Translations = {
   week: {
     setPractice: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty treeniviikoksi.`,
     setMatch: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty matsiviikoksi.`,
-    usage: 'Käyttö: /setweek [week] <practice|match>',
-    invalidWeek: 'Virheellinen viikkonumero.',
+    usage:
+      'Käyttö: /setweek [week[/year]] <practice|match>\nEsim: /setweek 5 practice tai /setweek 5/2026 match',
+    invalidWeek: 'Virheellinen viikko. Käytä: 5 tai 5/2026',
     invalidType: 'Virheellinen tyyppi. Käytä "practice" tai "match".',
   },
   poll: {
@@ -339,7 +340,7 @@ export const fi: Translations = {
     legend: '✅ Vapaa | 🏋️ Vain treeni | 🏆 Vain matsi | ⚠️ Jos tarve | ❌ Ei pääse',
     practiceLegend: '🏋️ Pääsee treeneihin | ❌ Ei pääse',
     notInRoster: 'Valikko on vain rosterissa oleville pelaajille.',
-    invalidWeek: 'Virheellinen viikkonumero (1-53).',
+    invalidWeek: 'Virheellinen viikko. Käytä: 5 tai 5/2026',
     weekInPast: (schedulingWeek) => `Viikon pitää olla ${schedulingWeek} tai myöhempi.`,
     days: {
       mon: 'Ma',
@@ -358,7 +359,7 @@ export const fi: Translations = {
     dayTitle: (day, date, week) => `Vko ${week}: ${day} ${date} aikataulut:`,
     noResponses: 'Ei vastauksia.',
     noResponsesForDay: (day) => `Ei vastauksia päivälle ${day}.`,
-    usage: 'Käyttö: /avail [practice|match] [today|<day>] [week]',
+    usage: 'Käyttö: /avail [practice|match] [today|day[/week[/year]]] [week[/year]]',
   },
   match: {
     scheduled: (day, time, week, dateRange) =>
@@ -371,7 +372,7 @@ export const fi: Translations = {
     set: (count, players) => `Linari asetettu (${count} pelaajaa):\n${players}`,
     cleared: 'Linari tyhjennetty.',
     usage:
-      'Käyttö: /setlineup @pelaaja1 @pelaaja2 ... [week]\nTai /setlineup clear [week] tyhjentääksesi',
+      'Käyttö: /setlineup @pelaaja1 @pelaaja2 ... [week[/year]]\nTai /setlineup clear [week[/year]] tyhjentääksesi',
     noMentions: 'Mainitse pelaajat komennossa (esim. /setlineup @pelaaja1 @pelaaja2)',
     playerNotInRoster: (name) => `${name} ei ole rosterissa.`,
     menuTitle: (week, dateRange) => `Vko ${week} (${dateRange}) linari`,
@@ -381,7 +382,7 @@ export const fi: Translations = {
     saved: (count) => `Linari tallennettu (${count} pelaajaa).`,
     notCaptain: 'Valikko on vain kapteeneille.',
     practiceWeek: 'Linaria ei voi asettaa treeniviikolla.',
-    invalidWeek: 'Virheellinen viikkonumero.',
+    invalidWeek: 'Virheellinen viikko. Käytä: 5 tai 5/2026',
     weekInPast: (schedulingWeek) => `Viikon pitää olla ${schedulingWeek} tai myöhemmin.`,
   },
   reminder: {
@@ -419,12 +420,15 @@ export const fi: Translations = {
       help: 'Näytä komennot',
       roster: 'Näytä joukkueen rosteri',
       nextmatch: 'Näytä seuraavan matsin tiedot',
-      avail: 'Näytä aikataulut [practice|match] [today|day] [week]',
-      poll: 'Näytä aikataulukysely [week]',
+      avail: 'Näytä aikataulut [practice|match] [today|day[/week[/year]]] [week[/year]]',
+      poll: 'Näytä aikataulukysely [week[/year]]',
       status: 'Näytä tilannekatsaus',
-      setweek: 'Aseta viikon tyyppi &lt;week&gt; &lt;practice|match&gt;',
+      setweek: 'Aseta viikon tyyppi [week[/year]] &lt;practice|match&gt;',
       setmatch: 'Ajoita matsi &lt;day&gt; &lt;time&gt;',
-      setlineup: ['Avaa linarivalikko', 'Aseta linari @players... [week] | clear [week]'],
+      setlineup: [
+        'Avaa linarivalikko [week[/year]]',
+        'Aseta linari @players... [week[/year]] | clear [week[/year]]',
+      ],
       setopponent: 'Aseta vihu &lt;name&gt; [url] | clear',
       remind: 'Lähetä muistutus vastaamattomille',
       startseason: 'Aloita uusi kausi &lt;name&gt;',

@@ -144,3 +144,17 @@ export const getCaptains = async (db: Kysely<DB>, seasonId: number): Promise<Pla
 
   return rows;
 };
+
+export const getPlayerByUsername = async (
+  db: Kysely<DB>,
+  seasonId: number,
+  username: string,
+): Promise<Player | undefined> => {
+  return db
+    .selectFrom('seasonRoster')
+    .innerJoin('players', 'players.telegramId', 'seasonRoster.playerId')
+    .selectAll('players')
+    .where('seasonRoster.seasonId', '=', seasonId)
+    .where('players.username', '=', username)
+    .executeTakeFirst();
+};

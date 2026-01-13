@@ -104,15 +104,15 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const args = ctx.match?.toString().trim() ?? '';
       const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
-      // Parse optional week number from args (last word if it's a number)
+      // Parse optional week number from args (last word if it matches week or week/year format)
       const parseWeekFromArgs = (
         argsStr: string,
       ): { week: number; year: number; remainingArgs: string } | null => {
         const parts = argsStr.trim().split(/\s+/);
         const lastPart = parts[parts.length - 1];
 
-        if (parts.length > 0 && /^\d+$/.test(lastPart)) {
-          const result = parseWeekInput(lastPart, schedulingWeek, { allowPast: false });
+        if (parts.length > 0 && /^\d+(\/\d+)?$/.test(lastPart)) {
+          const result = parseWeekInput(lastPart, { allowPast: false, schedulingWeek });
           if (result.success) {
             return {
               week: result.week,
@@ -124,14 +124,14 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         return null;
       };
 
-      // Check for clear command (with optional week)
-      const clearMatch = args.toLowerCase().match(/^clear(?:\s+(\d+))?$/);
+      // Check for clear command (with optional week or week/year)
+      const clearMatch = args.toLowerCase().match(/^clear(?:\s+(\d+(?:\/\d+)?))?$/);
       if (clearMatch) {
         let week: number;
         let year: number;
 
         if (clearMatch[1]) {
-          const result = parseWeekInput(clearMatch[1], schedulingWeek, { allowPast: false });
+          const result = parseWeekInput(clearMatch[1], { allowPast: false, schedulingWeek });
           if (!result.success) {
             return ctx.reply(i18n.lineup.invalidWeek);
           }
@@ -170,12 +170,12 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       }
 
       if (mentionedUsers.length === 0) {
-        // Check for optional week parameter
-        const weekArg = args.match(/^(\d+)$/);
+        // Check for optional week parameter (supports 5 or 5/2026 format)
+        const weekArg = args.match(/^(\d+(?:\/\d+)?)$/);
         let lineupWeek = schedulingWeek;
 
         if (weekArg) {
-          const result = parseWeekInput(weekArg[1], schedulingWeek, { allowPast: false });
+          const result = parseWeekInput(weekArg[1], { allowPast: false, schedulingWeek });
           if (!result.success) {
             if (result.error === 'past') {
               return ctx.reply(i18n.lineup.weekInPast(schedulingWeek.week));

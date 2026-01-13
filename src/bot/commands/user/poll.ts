@@ -22,7 +22,7 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
       let pollWeek = schedulingWeek;
 
       if (args.length > 0) {
-        const weekResult = parseWeekInput(args[0], schedulingWeek, { allowPast: false });
+        const weekResult = parseWeekInput(args[0], { allowPast: false, schedulingWeek });
 
         if (!weekResult.success) {
           if (weekResult.error === 'past') {

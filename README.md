@@ -122,17 +122,19 @@ Available to roster members, captains, and admins:
 - `/avail match` - View match availability only
 - `/avail today` - View today's availability
 - `/avail <day>` - View specific day (mon, tue, wed, etc.)
-- `/avail <day> <week>` - View specific day for specific week
+- `/avail <day>/<week>` - View specific day for specific week (e.g., `/avail tue/5`)
+- `/avail <day>/<week>/<year>` - View specific day with explicit year (e.g., `/avail tue/5/2026`)
 - `/avail practice mon` - Combine filters
 - `/poll` - View/respond to availability poll for target week
-- `/poll <week>` - Poll for specific future week (e.g., `/poll 5`)
+- `/poll <week>` - Poll for specific week (e.g., `/poll 5`)
+- `/poll <week>/<year>` - Poll with explicit year (e.g., `/poll 5/2026`)
 - `/status` - View status overview
 
 ### Captain Commands
 Available to captains and admins:
-- `/setweek [week] practice|match` - Set week type (defaults to target week)
+- `/setweek [week[/year]] practice|match` - Set week type (e.g., `/setweek 5 practice` or `/setweek 5/2026 match`)
 - `/setmatch <day> <time>` - Schedule a match
-- `/setlineup @users... [week]` - Set match lineup (optional week, default: scheduling week)
+- `/setlineup @users... [week[/year]]` - Set match lineup (e.g., `/setlineup @user1 @user2 5` or `/setlineup @user1 5/2026`)
 - `/setopponent <name> [url]` - Set opponent name and optional team profile link
 - `/remind` - Send reminder to non-responders
 

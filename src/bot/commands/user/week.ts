@@ -36,8 +36,8 @@ export const registerWeekCommand = (bot: Bot<BotContext>) => {
         weekNumber = schedulingWeek.week;
         year = schedulingWeek.year;
       } else if (parts.length === 2) {
-        // Two arguments: week number + type
-        const weekResult = parseWeekInput(parts[0], schedulingWeek);
+        // Two arguments: week (or week/year) + type
+        const weekResult = parseWeekInput(parts[0], { allowPast: false, schedulingWeek });
 
         if (!weekResult.success) {
           return ctx.reply(i18n.week.invalidWeek);

@@ -70,19 +70,18 @@ describe('/poll command', () => {
     expect(calls[0].payload.text).toContain('Week 5');
   });
 
-  test('week 1 when on week 2 infers next year (not past)', async () => {
+  test('rejects past week (week 1 when target is week 2)', async () => {
     await setupSeasonWithPlayer();
     const { bot, calls } = createTestBot();
     registerPollCommand(bot);
 
-    // Target week is 2/2025, week 1 infers to week 1/2026 (next year)
+    // Target week is 2/2025, week 1 is in the past
     const update = createCommandUpdate('/poll 1', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
-    expect(calls[0].payload.text).toContain('Week 1');
-    // Week 1 should infer to 2026 since target is week 2/2025
+    expect(calls[0].payload.text).toContain('must be 2 or later');
   });
 
   test('accepts current target week', async () => {
@@ -100,21 +99,36 @@ describe('/poll command', () => {
     expect(calls[0].payload.text).not.toContain('past');
   });
 
-  test('infers next year when week < target week', async () => {
+  test('rejects past week when on late year', async () => {
     // Set to week 51 of 2025
     vi.setSystemTime(new Date('2025-12-18T11:00:00'));
     await setupSeasonWithPlayer();
     const { bot, calls } = createTestBot();
     registerPollCommand(bot);
 
-    // Request week 2, should infer 2026
+    // Request week 2 (without year) - defaults to current year 2025 which is past
     const update = createCommandUpdate('/poll 2', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.text).toContain('must be 51 or later');
+  });
+
+  test('accepts explicit next year week', async () => {
+    // Set to week 51 of 2025
+    vi.setSystemTime(new Date('2025-12-18T11:00:00'));
+    await setupSeasonWithPlayer();
+    const { bot, calls } = createTestBot();
+    registerPollCommand(bot);
+
+    // Request week 2/2026 with explicit year
+    const update = createCommandUpdate('/poll 2/2026', PLAYER_ID, CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Week 2');
-    // Week 2 should infer to 2026 since we're at week 51/2025
   });
 
   test('uses current year when week >= target week', async () => {
@@ -180,20 +194,19 @@ describe('/poll command', () => {
     expect(calls[0].payload.text).toContain('Week 3');
   });
 
-  test('week 2 when target is week 3 infers next year', async () => {
+  test('rejects past week when target is next week', async () => {
     // Set to Sunday of week 2 at 11:00 (after Sunday 10:00 cutoff, target is week 3)
     vi.setSystemTime(new Date('2025-01-12T11:00:00'));
     await setupSeasonWithPlayer();
     const { bot, calls } = createTestBot();
     registerPollCommand(bot);
 
-    // Target is week 3/2025, week 2 infers to week 2/2026 (next year)
+    // Target is week 3/2025, week 2 is in the past
     const update = createCommandUpdate('/poll 2', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('Week 2');
-    // Week 2 should infer to 2026 since target is week 3/2025
+    expect(calls[0].payload.text).toContain('must be 3 or later');
   });
 
   test('returns error when no active season', async () => {

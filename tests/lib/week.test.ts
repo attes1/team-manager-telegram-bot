@@ -6,7 +6,7 @@ import {
   getWeekDateRange,
   getWeekNumber,
   getWeekYear,
-  inferWeekYear,
+  parseDayWeekInput,
   parseWeekInput,
 } from '@/lib/week';
 
@@ -240,151 +240,188 @@ describe('getSchedulingWeek', () => {
   });
 });
 
-describe('inferWeekYear', () => {
-  test('uses current year when requested week >= target week', () => {
-    const targetWeek = { week: 5, year: 2025 };
-    const result = inferWeekYear(8, targetWeek);
-    expect(result).toEqual({ week: 8, year: 2025 });
-  });
-
-  test('uses current year when requested week equals target week', () => {
-    const targetWeek = { week: 5, year: 2025 };
-    const result = inferWeekYear(5, targetWeek);
-    expect(result).toEqual({ week: 5, year: 2025 });
-  });
-
-  test('uses next year when requested week < target week', () => {
-    const targetWeek = { week: 51, year: 2025 };
-    const result = inferWeekYear(2, targetWeek);
-    expect(result).toEqual({ week: 2, year: 2026 });
-  });
-
-  test('uses next year when on week 52 requesting week 1', () => {
-    const targetWeek = { week: 52, year: 2025 };
-    const result = inferWeekYear(1, targetWeek);
-    expect(result).toEqual({ week: 1, year: 2026 });
-  });
-
-  test('uses current year when on week 1 requesting week 2', () => {
-    const targetWeek = { week: 1, year: 2026 };
-    const result = inferWeekYear(2, targetWeek);
-    expect(result).toEqual({ week: 2, year: 2026 });
-  });
-
-  test('handles week 53 years', () => {
-    // 2026 has 53 weeks
-    const targetWeek = { week: 53, year: 2026 };
-    const result = inferWeekYear(2, targetWeek);
-    expect(result).toEqual({ week: 2, year: 2027 });
-  });
-});
-
 describe('parseWeekInput', () => {
-  const targetWeek = { week: 5, year: 2025 };
+  const currentYear = new Date().getFullYear();
 
-  describe('valid input', () => {
-    test('parses valid week number', () => {
-      const result = parseWeekInput('10', targetWeek);
-      expect(result).toEqual({ success: true, week: 10, year: 2025 });
-    });
-
-    test('infers next year when week < target week', () => {
-      const result = parseWeekInput('2', targetWeek);
-      expect(result).toEqual({ success: true, week: 2, year: 2026 });
+  describe('week only format', () => {
+    test('parses week number and uses current year', () => {
+      const result = parseWeekInput('10');
+      expect(result).toEqual({ success: true, week: 10, year: currentYear });
     });
 
     test('accepts week 1', () => {
-      const result = parseWeekInput('1', targetWeek);
-      expect(result).toEqual({ success: true, week: 1, year: 2026 });
+      const result = parseWeekInput('1');
+      expect(result).toEqual({ success: true, week: 1, year: currentYear });
     });
 
     test('accepts week 53', () => {
-      const result = parseWeekInput('53', targetWeek);
-      expect(result).toEqual({ success: true, week: 53, year: 2025 });
+      const result = parseWeekInput('53');
+      expect(result).toEqual({ success: true, week: 53, year: currentYear });
     });
 
-    test('uses current year when week equals target week', () => {
-      const result = parseWeekInput('5', targetWeek);
-      expect(result).toEqual({ success: true, week: 5, year: 2025 });
+    test('coerces string with leading zeros', () => {
+      const result = parseWeekInput('05');
+      expect(result).toEqual({ success: true, week: 5, year: currentYear });
+    });
+  });
+
+  describe('week/year format', () => {
+    test('parses week/year format', () => {
+      const result = parseWeekInput(`5/${currentYear}`);
+      expect(result).toEqual({ success: true, week: 5, year: currentYear });
+    });
+
+    test('accepts next year', () => {
+      const result = parseWeekInput(`10/${currentYear + 1}`);
+      expect(result).toEqual({ success: true, week: 10, year: currentYear + 1 });
     });
   });
 
   describe('invalid input', () => {
     test('rejects non-numeric input', () => {
-      const result = parseWeekInput('abc', targetWeek);
+      const result = parseWeekInput('abc');
       expect(result).toEqual({ success: false, error: 'invalid' });
     });
 
     test('rejects week 0', () => {
-      const result = parseWeekInput('0', targetWeek);
+      const result = parseWeekInput('0');
       expect(result).toEqual({ success: false, error: 'invalid' });
     });
 
     test('rejects week 54', () => {
-      const result = parseWeekInput('54', targetWeek);
+      const result = parseWeekInput('54');
       expect(result).toEqual({ success: false, error: 'invalid' });
     });
 
     test('rejects negative week', () => {
-      const result = parseWeekInput('-1', targetWeek);
+      const result = parseWeekInput('-1');
       expect(result).toEqual({ success: false, error: 'invalid' });
     });
 
     test('rejects empty string', () => {
-      const result = parseWeekInput('', targetWeek);
+      const result = parseWeekInput('');
       expect(result).toEqual({ success: false, error: 'invalid' });
     });
 
     test('rejects floating point number', () => {
-      const result = parseWeekInput('5.5', targetWeek);
+      const result = parseWeekInput('5.5');
+      expect(result).toEqual({ success: false, error: 'invalid' });
+    });
+
+    test('rejects year in the past', () => {
+      const result = parseWeekInput(`5/${currentYear - 1}`);
+      expect(result).toEqual({ success: false, error: 'invalid' });
+    });
+
+    test('rejects year too far in future', () => {
+      const result = parseWeekInput(`5/${currentYear + 2}`);
+      expect(result).toEqual({ success: false, error: 'invalid' });
+    });
+
+    test('rejects malformed week/year format', () => {
+      const result = parseWeekInput('5/20/26');
       expect(result).toEqual({ success: false, error: 'invalid' });
     });
   });
 
   describe('allowPast option', () => {
+    const schedulingWeek = { week: 10, year: currentYear };
+
     test('allows past weeks by default', () => {
-      // Week 3 < week 10, so inferred as next year (2026) - always allowed
-      const result = parseWeekInput('3', { week: 10, year: 2025 });
-      expect(result).toEqual({ success: true, week: 3, year: 2026 });
+      const result = parseWeekInput('5');
+      expect(result).toEqual({ success: true, week: 5, year: currentYear });
     });
 
-    test('week inference always results in future when week < target', () => {
-      // Week 8 < week 10, inferred as 2026 (next year)
-      const result = parseWeekInput('8', { week: 10, year: 2025 }, { allowPast: false });
-      // With inference, this becomes week 8 of 2026 which is future, so it's allowed
-      expect(result).toEqual({ success: true, week: 8, year: 2026 });
+    test('rejects past week when allowPast is false', () => {
+      const result = parseWeekInput('5', { allowPast: false, schedulingWeek });
+      expect(result).toEqual({ success: false, error: 'past' });
     });
 
     test('allows current week when allowPast is false', () => {
-      const result = parseWeekInput('10', { week: 10, year: 2025 }, { allowPast: false });
-      expect(result).toEqual({ success: true, week: 10, year: 2025 });
+      const result = parseWeekInput('10', { allowPast: false, schedulingWeek });
+      expect(result).toEqual({ success: true, week: 10, year: currentYear });
     });
 
     test('allows future weeks when allowPast is false', () => {
-      const result = parseWeekInput('15', { week: 10, year: 2025 }, { allowPast: false });
-      expect(result).toEqual({ success: true, week: 15, year: 2025 });
+      const result = parseWeekInput('15', { allowPast: false, schedulingWeek });
+      expect(result).toEqual({ success: true, week: 15, year: currentYear });
     });
 
-    test('allows next year weeks when allowPast is false (inferred as future)', () => {
-      const result = parseWeekInput('2', { week: 50, year: 2025 }, { allowPast: false });
-      expect(result).toEqual({ success: true, week: 2, year: 2026 });
+    test('allows next year weeks when allowPast is false', () => {
+      const result = parseWeekInput(`2/${currentYear + 1}`, { allowPast: false, schedulingWeek });
+      expect(result).toEqual({ success: true, week: 2, year: currentYear + 1 });
+    });
+
+    test('rejects past year when allowPast is false', () => {
+      // Even with explicit year, can't specify a past year (schema rejects it)
+      const result = parseWeekInput(`50/${currentYear - 1}`, { allowPast: false, schedulingWeek });
+      expect(result).toEqual({ success: false, error: 'invalid' });
+    });
+  });
+});
+
+describe('parseDayWeekInput', () => {
+  const currentYear = new Date().getFullYear();
+  const defaultWeek = { week: 5, year: currentYear };
+
+  describe('day only format', () => {
+    test('parses day and uses default week', () => {
+      const result = parseDayWeekInput('tue', defaultWeek);
+      expect(result).toEqual({ success: true, day: 'tue', week: 5, year: currentYear });
+    });
+
+    test('handles all days', () => {
+      const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+      for (const day of days) {
+        const result = parseDayWeekInput(day, defaultWeek);
+        expect(result).toEqual({ success: true, day, week: 5, year: currentYear });
+      }
+    });
+
+    test('handles uppercase day', () => {
+      const result = parseDayWeekInput('TUE', defaultWeek);
+      expect(result).toEqual({ success: true, day: 'tue', week: 5, year: currentYear });
     });
   });
 
-  describe('edge cases', () => {
-    test('handles target week at year boundary - week 52', () => {
-      const result = parseWeekInput('1', { week: 52, year: 2025 });
-      expect(result).toEqual({ success: true, week: 1, year: 2026 });
+  describe('day/week format', () => {
+    test('parses day/week and uses current year', () => {
+      const result = parseDayWeekInput('tue/10', defaultWeek);
+      expect(result).toEqual({ success: true, day: 'tue', week: 10, year: currentYear });
+    });
+  });
+
+  describe('day/week/year format', () => {
+    test('parses full day/week/year format', () => {
+      const result = parseDayWeekInput(`tue/10/${currentYear}`, defaultWeek);
+      expect(result).toEqual({ success: true, day: 'tue', week: 10, year: currentYear });
     });
 
-    test('handles target week at year boundary - week 1', () => {
-      const result = parseWeekInput('52', { week: 1, year: 2026 });
-      expect(result).toEqual({ success: true, week: 52, year: 2026 });
+    test('accepts next year', () => {
+      const result = parseDayWeekInput(`mon/5/${currentYear + 1}`, defaultWeek);
+      expect(result).toEqual({ success: true, day: 'mon', week: 5, year: currentYear + 1 });
+    });
+  });
+
+  describe('invalid input', () => {
+    test('rejects invalid day', () => {
+      const result = parseDayWeekInput('abc', defaultWeek);
+      expect(result).toEqual({ success: false, error: 'invalid' });
     });
 
-    test('coerces string with leading zeros', () => {
-      const result = parseWeekInput('05', targetWeek);
-      expect(result).toEqual({ success: true, week: 5, year: 2025 });
+    test('rejects invalid week in day/week format', () => {
+      const result = parseDayWeekInput('tue/0', defaultWeek);
+      expect(result).toEqual({ success: false, error: 'invalid' });
+    });
+
+    test('rejects invalid year in day/week/year format', () => {
+      const result = parseDayWeekInput(`tue/5/${currentYear - 1}`, defaultWeek);
+      expect(result).toEqual({ success: false, error: 'invalid' });
+    });
+
+    test('rejects too many parts', () => {
+      const result = parseDayWeekInput('tue/5/2026/extra', defaultWeek);
+      expect(result).toEqual({ success: false, error: 'invalid' });
     });
   });
 });

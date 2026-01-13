@@ -99,8 +99,9 @@ export const en: Translations = {
   week: {
     setPractice: (week, dateRange) => `Week ${week} (${dateRange}) set as practice week.`,
     setMatch: (week, dateRange) => `Week ${week} (${dateRange}) set as match week.`,
-    usage: 'Usage: /setweek [week] <practice|match>',
-    invalidWeek: 'Invalid week number.',
+    usage:
+      'Usage: /setweek [week[/year]] <practice|match>\nExample: /setweek 5 practice or /setweek 5/2026 match',
+    invalidWeek: 'Invalid week. Use: 5 or 5/2026',
     invalidType: 'Invalid type. Use "practice" or "match".',
   },
   poll: {
@@ -111,7 +112,7 @@ export const en: Translations = {
     legend: '✅ Available | 🏋️ Practice only | 🏆 Match only | ⚠️ If needed | ❌ Unavailable',
     practiceLegend: '🏋️ Available for practice | ❌ Unavailable',
     notInRoster: 'Menu is only available for roster players.',
-    invalidWeek: 'Invalid week number (1-53).',
+    invalidWeek: 'Invalid week. Use: 5 or 5/2026',
     weekInPast: (schedulingWeek) => `Week must be ${schedulingWeek} or later.`,
     days: {
       mon: 'Mon',
@@ -130,7 +131,7 @@ export const en: Translations = {
     dayTitle: (day, date, week) => `Week ${week}: ${day} ${date} availability:`,
     noResponses: 'No responses yet.',
     noResponsesForDay: (day) => `No availability for ${day}.`,
-    usage: 'Usage: /avail [practice|match] [today|<day>] [week]',
+    usage: 'Usage: /avail [practice|match] [today|day[/week[/year]]] [week[/year]]',
   },
   match: {
     scheduled: (day, time, week, dateRange) =>
@@ -142,7 +143,8 @@ export const en: Translations = {
   lineup: {
     set: (count, players) => `Lineup set (${count} players):\n${players}`,
     cleared: 'Lineup cleared.',
-    usage: 'Usage: /setlineup @player1 @player2 ... [week]\nOr /setlineup clear [week] to clear',
+    usage:
+      'Usage: /setlineup @player1 @player2 ... [week[/year]]\nOr /setlineup clear [week[/year]] to clear',
     noMentions: 'Mention players in the command (e.g. /setlineup @player1 @player2)',
     playerNotInRoster: (name) => `${name} is not in the roster.`,
     menuTitle: (week, dateRange) => `Week ${week} (${dateRange}) lineup`,
@@ -152,7 +154,7 @@ export const en: Translations = {
     saved: (count) => `Lineup saved (${count} players).`,
     notCaptain: 'Menu is only available for captains.',
     practiceWeek: 'Cannot set lineup for a practice week.',
-    invalidWeek: 'Invalid week number.',
+    invalidWeek: 'Invalid week. Use: 5 or 5/2026',
     weekInPast: (schedulingWeek) => `Week must be ${schedulingWeek} or later.`,
   },
   reminder: {
@@ -190,12 +192,15 @@ export const en: Translations = {
       help: 'Show command list',
       roster: 'View team roster',
       nextmatch: 'Show upcoming match info',
-      avail: 'View availability [practice|match] [today|day] [week]',
-      poll: 'Show availability poll [week]',
+      avail: 'View availability [practice|match] [today|day[/week[/year]]] [week[/year]]',
+      poll: 'Show availability poll [week[/year]]',
       status: 'View status overview',
-      setweek: 'Set week type &lt;week&gt; &lt;practice|match&gt;',
+      setweek: 'Set week type [week[/year]] &lt;practice|match&gt;',
       setmatch: 'Schedule a match &lt;day&gt; &lt;time&gt;',
-      setlineup: ['Open lineup menu', 'Set lineup @players... [week] | clear [week]'],
+      setlineup: [
+        'Open lineup menu [week[/year]]',
+        'Set lineup @players... [week[/year]] | clear [week[/year]]',
+      ],
       setopponent: 'Set opponent &lt;name&gt; [url] | clear',
       remind: 'Send reminder to non-responders',
       startseason: 'Start a new season &lt;name&gt;',

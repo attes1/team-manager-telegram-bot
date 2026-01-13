@@ -8,7 +8,7 @@ import {
   startOfISOWeek,
 } from 'date-fns';
 import type { Day } from './schemas';
-import { weekNumberSchema } from './schemas';
+import { dayWeekInputSchema, weekInputSchema } from './schemas';
 
 const DAY_TO_ISO_WEEKDAY: Record<Day, number> = {
   mon: 1,
@@ -75,47 +75,67 @@ export const getSchedulingWeek = (
   return currentWeek;
 };
 
-export const inferWeekYear = (
-  requestedWeek: number,
-  schedulingWeek: { week: number; year: number },
-): { week: number; year: number } => {
-  // If requested week is less than target week, assume next year
-  if (requestedWeek < schedulingWeek.week) {
-    return { week: requestedWeek, year: schedulingWeek.year + 1 };
-  }
-  return { week: requestedWeek, year: schedulingWeek.year };
-};
-
 export type ParseWeekResult =
   | { success: true; week: number; year: number }
   | { success: false; error: 'invalid' | 'past' };
 
+/**
+ * Parse week input in format "5" or "5/2026".
+ * Week only: uses current year.
+ * Week/year: uses specified year.
+ */
 export const parseWeekInput = (
   input: string,
-  schedulingWeek: { week: number; year: number },
-  options: { allowPast?: boolean } = {},
+  options: { allowPast?: boolean; schedulingWeek?: { week: number; year: number } } = {},
 ): ParseWeekResult => {
-  const { allowPast = true } = options;
+  const { allowPast = true, schedulingWeek } = options;
 
-  const parsed = weekNumberSchema.safeParse(input);
+  const parsed = weekInputSchema.safeParse(input);
   if (!parsed.success) {
     return { success: false, error: 'invalid' };
   }
 
-  const weekNum = parsed.data;
-  const result = inferWeekYear(weekNum, schedulingWeek);
+  const { week, year } = parsed.data;
 
-  if (!allowPast) {
+  if (!allowPast && schedulingWeek) {
     const isInPast =
-      result.year < schedulingWeek.year ||
-      (result.year === schedulingWeek.year && result.week < schedulingWeek.week);
+      year < schedulingWeek.year || (year === schedulingWeek.year && week < schedulingWeek.week);
 
     if (isInPast) {
       return { success: false, error: 'past' };
     }
   }
 
-  return { success: true, week: result.week, year: result.year };
+  return { success: true, week, year };
+};
+
+export type ParseDayWeekResult =
+  | { success: true; day: Day; week: number; year: number }
+  | { success: false; error: 'invalid' };
+
+/**
+ * Parse day+week input in format "tue", "tue/5", or "tue/5/2026".
+ * Day only: uses provided defaults.
+ * Day/week: uses current year.
+ * Day/week/year: uses specified year.
+ */
+export const parseDayWeekInput = (
+  input: string,
+  defaultWeek: { week: number; year: number },
+): ParseDayWeekResult => {
+  const parsed = dayWeekInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: 'invalid' };
+  }
+
+  const { day, week, year } = parsed.data;
+
+  return {
+    success: true,
+    day,
+    week: week ?? defaultWeek.week,
+    year: year ?? (week !== null ? new Date().getFullYear() : defaultWeek.year),
+  };
 };
 
 /**

@@ -4,8 +4,8 @@ import { rosterCommand } from '@/bot/middleware';
 import type { Translations } from '@/i18n';
 import { formatDateRange, formatPlayerName } from '@/lib/format';
 import type { AvailabilityStatus, Day } from '@/lib/schemas';
-import { daySchema, weekNumberSchema } from '@/lib/schemas';
-import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/week';
+import { dayWeekInputSchema, weekInputSchema } from '@/lib/schemas';
+import { getSchedulingWeek, getWeekDateRange } from '@/lib/week';
 import { getWeekAvailability } from '@/services/availability';
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
@@ -87,7 +87,8 @@ const showDayAvailability = async (
 type ParsedArgs = {
   filter: AvailFilter;
   day: Day | 'today' | null;
-  weekInput: string | null;
+  week: number | null;
+  year: number | null;
 };
 
 const parseArgs = (args: string): ParsedArgs => {
@@ -95,32 +96,46 @@ const parseArgs = (args: string): ParsedArgs => {
 
   let filter: AvailFilter = 'all';
   let day: Day | 'today' | null = null;
-  let weekInput: string | null = null;
+  let week: number | null = null;
+  let year: number | null = null;
 
   for (const part of parts) {
     const lower = part.toLowerCase();
+
+    // Check for filter keywords
     if (lower === 'practice' || lower === 'treeni') {
       filter = 'practice';
-    } else if (lower === 'match' || lower === 'matsi') {
+      continue;
+    }
+    if (lower === 'match' || lower === 'matsi') {
       filter = 'match';
-    } else if (lower === 'today' || lower === 'tänään') {
+      continue;
+    }
+    if (lower === 'today' || lower === 'tänään') {
       day = 'today';
-    } else {
-      // Try parsing as day first
-      const dayResult = daySchema.safeParse(lower);
-      if (dayResult.success) {
-        day = dayResult.data;
-      } else {
-        // Try parsing as week number
-        const weekResult = weekNumberSchema.safeParse(part);
-        if (weekResult.success) {
-          weekInput = part;
-        }
+      continue;
+    }
+
+    // Try parsing as day/week format (tue, tue/5, tue/5/2026)
+    const dayWeekResult = dayWeekInputSchema.safeParse(lower);
+    if (dayWeekResult.success) {
+      day = dayWeekResult.data.day;
+      if (dayWeekResult.data.week !== null) {
+        week = dayWeekResult.data.week;
+        year = dayWeekResult.data.year ?? new Date().getFullYear();
       }
+      continue;
+    }
+
+    // Try parsing as week format (5, 5/2026)
+    const weekResult = weekInputSchema.safeParse(part);
+    if (weekResult.success) {
+      week = weekResult.data.week;
+      year = weekResult.data.year;
     }
   }
 
-  return { filter, day, weekInput };
+  return { filter, day, week, year };
 };
 
 export const registerAvailCommand = (bot: Bot<BotContext>) => {
@@ -133,20 +148,11 @@ export const registerAvailCommand = (bot: Bot<BotContext>) => {
       // Default to scheduling week
       const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
-      const { filter, day, weekInput } = parseArgs(args);
+      const { filter, day, week: parsedWeek, year: parsedYear } = parseArgs(args);
 
-      // Parse optional week parameter
-      let week = schedulingWeek.week;
-      let year = schedulingWeek.year;
-
-      if (weekInput) {
-        const weekResult = parseWeekInput(weekInput, schedulingWeek, { allowPast: true });
-        if (!weekResult.success) {
-          return ctx.reply(i18n.poll.invalidWeek);
-        }
-        week = weekResult.week;
-        year = weekResult.year;
-      }
+      // Use parsed week/year or fall back to scheduling week
+      const week = parsedWeek ?? schedulingWeek.week;
+      const year = parsedYear ?? schedulingWeek.year;
 
       const { start, end } = getWeekDateRange(year, week);
       const dateRange = formatDateRange(start, end);

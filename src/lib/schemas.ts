@@ -46,7 +46,106 @@ export const pollTimesSchema = z
   .string()
   .refine((val) => val.split(',').length <= 5, 'Maximum 5 time slots allowed');
 
+// Year schema: accepts current year or next year only
+export const yearSchema = z.coerce
+  .number()
+  .int()
+  .refine(
+    (year) => {
+      const currentYear = new Date().getFullYear();
+      return year >= currentYear && year <= currentYear + 1;
+    },
+    { message: 'Year must be current or next year' },
+  );
+
+// Week input: "5" or "5/2026" -> { week, year }
+export const weekInputSchema = z.string().transform((input, ctx) => {
+  const parts = input.split('/');
+
+  if (parts.length === 1) {
+    const weekResult = weekNumberSchema.safeParse(parts[0]);
+    if (!weekResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Invalid week number (1-53)' });
+      return z.NEVER;
+    }
+    return { week: weekResult.data, year: new Date().getFullYear() };
+  }
+
+  if (parts.length === 2) {
+    const weekResult = weekNumberSchema.safeParse(parts[0]);
+    const yearResult = yearSchema.safeParse(parts[1]);
+    if (!weekResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Invalid week number (1-53)' });
+      return z.NEVER;
+    }
+    if (!yearResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Year must be current or next year' });
+      return z.NEVER;
+    }
+    return { week: weekResult.data, year: yearResult.data };
+  }
+
+  ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Invalid format. Use: 5 or 5/2026' });
+  return z.NEVER;
+});
+
+// Day+week input: "tue", "tue/5", or "tue/5/2026" -> { day, week, year }
+// week and year are null if not specified (caller provides defaults)
+export const dayWeekInputSchema = z.string().transform((input, ctx) => {
+  const parts = input.toLowerCase().split('/');
+
+  if (parts.length === 1) {
+    const dayResult = daySchema.safeParse(parts[0]);
+    if (!dayResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Invalid day (mon-sun)' });
+      return z.NEVER;
+    }
+    return { day: dayResult.data, week: null as number | null, year: null as number | null };
+  }
+
+  if (parts.length === 2) {
+    const dayResult = daySchema.safeParse(parts[0]);
+    const weekResult = weekNumberSchema.safeParse(parts[1]);
+    if (!dayResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Invalid day (mon-sun)' });
+      return z.NEVER;
+    }
+    if (!weekResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Invalid week number (1-53)' });
+      return z.NEVER;
+    }
+    return { day: dayResult.data, week: weekResult.data, year: null as number | null };
+  }
+
+  if (parts.length === 3) {
+    const dayResult = daySchema.safeParse(parts[0]);
+    const weekResult = weekNumberSchema.safeParse(parts[1]);
+    const yearResult = yearSchema.safeParse(parts[2]);
+    if (!dayResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Invalid day (mon-sun)' });
+      return z.NEVER;
+    }
+    if (!weekResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Invalid week number (1-53)' });
+      return z.NEVER;
+    }
+    if (!yearResult.success) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Year must be current or next year' });
+      return z.NEVER;
+    }
+    return { day: dayResult.data, week: weekResult.data, year: yearResult.data };
+  }
+
+  ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    message: 'Invalid format. Use: tue, tue/5, or tue/5/2026',
+  });
+  return z.NEVER;
+});
+
 export type Day = z.infer<typeof daySchema>;
+export type WeekInput = z.infer<typeof weekInputSchema>;
+export type DayWeekInput = z.infer<typeof dayWeekInputSchema>;
 export type AvailabilityStatus = z.infer<typeof availabilityStatusSchema>;
 export type WeekType = z.infer<typeof weekTypeSchema>;
 export type RemindersMode = z.infer<typeof remindersModeSchema>;
