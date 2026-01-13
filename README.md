@@ -170,7 +170,7 @@ Use `/config` to view all settings. Available options:
 | `poll_time` | Time to send poll | `10:00` |
 | `poll_days` | Days shown in poll | `mon,tue,wed,thu,fri,sat,sun` |
 | `poll_times` | Time slots in poll | `19,20,21` |
-| `week_change_day` | Day for week change | `thu` |
+| `week_change_day` | Day for week change | `sun` |
 | `week_change_time` | Time for week change | `10:00` |
 | `reminder_day` | Day for reminders | `wed` |
 | `reminder_time` | Time for reminders | `18:00` |
@@ -182,7 +182,7 @@ Use `/config` to view all settings. Available options:
 | `match_day_reminder_time` | Time for match day reminder | `18:00` |
 | `public_announcements` | Auto-announce to public group (on/off) | `on` |
 
-**Week Change Logic**: After the week change (default: Thursday 10:00), polls and scheduling automatically target the next week. This ensures that when you send the Sunday poll, it asks about next week's availability (for the upcoming match), not the current week.
+**Week Change Logic**: After the week change (default: Sunday 10:00), polls and scheduling automatically target the next week. This ensures that when you send the Sunday poll, it asks about next week's availability (for the upcoming match), not the current week.
 
 ## Project Structure
 
@@ -190,8 +190,9 @@ Use `/config` to view all settings. Available options:
 src/
 ├── bot/                    # Bot setup and commands
 │   ├── commands/          # Command handlers
-│   │   ├── admin/        # Admin commands
-│   │   └── player/       # Player commands
+│   │   ├── public/       # Public commands (help, roster, nextmatch)
+│   │   ├── user/         # User commands (avail, poll, status, etc.)
+│   │   └── admin/        # Admin commands (season, config, players)
 │   ├── context.ts        # BotContext type
 │   └── middleware/       # Auth and context middleware
 ├── db/                    # Database setup

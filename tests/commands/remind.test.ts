@@ -60,13 +60,13 @@ describe('/remind command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
-    // Week 2 is target (before Thursday cutoff)
+    // Week 2 is target (before Sunday 10:00 cutoff)
     expect(calls[0].payload.text).toContain('Week 2');
   });
 
   test('targets next week when after cutoff', async () => {
-    // Set to Friday of week 2 (after Thursday cutoff)
-    vi.setSystemTime(new Date('2025-01-10T11:00:00'));
+    // Set to Sunday of week 2 at 11:00 (after Sunday 10:00 cutoff)
+    vi.setSystemTime(new Date('2025-01-12T11:00:00'));
     await setupSeasonWithRoster();
     const { bot, calls } = createTestBot();
     registerRemindCommand(bot);
@@ -75,7 +75,7 @@ describe('/remind command', () => {
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
-    // Week 3 is target (after Thursday cutoff)
+    // Week 3 is target (after Sunday 10:00 cutoff)
     expect(calls[0].payload.text).toContain('Week 3');
   });
 
@@ -173,8 +173,8 @@ describe('/remind command', () => {
       })
       .execute();
 
-    // Set to Friday (after Thursday cutoff, target is week 3)
-    vi.setSystemTime(new Date('2025-01-10T11:00:00'));
+    // Set to Sunday of week 2 at 11:00 (after Sunday 10:00 cutoff, target is week 3)
+    vi.setSystemTime(new Date('2025-01-12T11:00:00'));
 
     const { bot, calls } = createTestBot();
     registerRemindCommand(bot);
@@ -232,8 +232,8 @@ describe('/remind command', () => {
   test('year boundary - reminds for week 1 of new year', async () => {
     await setupSeasonWithRoster();
 
-    // Set to Friday of week 52, 2025 (after Thursday cutoff)
-    vi.setSystemTime(new Date('2025-12-26T11:00:00'));
+    // Set to Sunday of week 52, 2025 at 11:00 (after Sunday 10:00 cutoff)
+    vi.setSystemTime(new Date('2025-12-28T11:00:00'));
 
     const { bot, calls } = createTestBot();
     registerRemindCommand(bot);

@@ -53,7 +53,7 @@ describe('/poll command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
-    // Week 2 is target (before Thursday cutoff)
+    // Week 2 is target (before Sunday 10:00 cutoff)
     expect(calls[0].payload.text).toContain('Week 2');
     expect(calls[0].payload.text).toContain('href="w:2/2025"');
   });
@@ -181,8 +181,8 @@ describe('/poll command', () => {
   });
 
   test('targets next week when after cutoff', async () => {
-    // Set to Friday of week 2 (after Thursday cutoff)
-    vi.setSystemTime(new Date('2025-01-10T11:00:00'));
+    // Set to Sunday of week 2 at 11:00 (after Sunday 10:00 cutoff)
+    vi.setSystemTime(new Date('2025-01-12T11:00:00'));
     await setupSeasonWithPlayer();
     const { bot, calls } = createTestBot();
     registerPollCommand(bot);
@@ -196,8 +196,8 @@ describe('/poll command', () => {
   });
 
   test('week 2 when target is week 3 infers next year', async () => {
-    // Set to Friday of week 2 (after Thursday cutoff, target is week 3)
-    vi.setSystemTime(new Date('2025-01-10T11:00:00'));
+    // Set to Sunday of week 2 at 11:00 (after Sunday 10:00 cutoff, target is week 3)
+    vi.setSystemTime(new Date('2025-01-12T11:00:00'));
     await setupSeasonWithPlayer();
     const { bot, calls } = createTestBot();
     registerPollCommand(bot);
@@ -320,8 +320,8 @@ describe('/poll command', () => {
   });
 
   test('year boundary - week 52 to week 1 of next year', async () => {
-    // Set to Friday of week 52, 2025 (after Thursday cutoff)
-    vi.setSystemTime(new Date('2025-12-26T11:00:00'));
+    // Set to Sunday of week 52, 2025 at 11:00 (after Sunday 10:00 cutoff)
+    vi.setSystemTime(new Date('2025-12-28T11:00:00'));
     await setupSeasonWithPlayer();
     const { bot, calls } = createTestBot();
     registerPollCommand(bot);
