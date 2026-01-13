@@ -3,6 +3,7 @@ import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerMatchCommands } from '@/bot/commands/user/match';
 import { getSchedulingWeek } from '@/lib/temporal';
+import { registerGroup, setGroupType } from '@/services/group';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
 import { setWeekType } from '@/services/week';
@@ -355,5 +356,177 @@ describe('/setlineup command', () => {
     // Should show practice week error, NOT a menu
     expect(calls[0].payload.reply_markup).toBeUndefined();
     expect(calls[0].payload.text).toContain('practice');
+  });
+});
+
+const PUBLIC_GROUP_ID = -100999888777;
+
+describe('public announcements', () => {
+  beforeEach(async () => {
+    mockDb.db = await createTestDb();
+    // Register team group and public group in database
+    await registerGroup(mockDb.db, TEST_CHAT_ID, 'Team Group');
+    await setGroupType(mockDb.db, TEST_CHAT_ID, 'team');
+    await registerGroup(mockDb.db, PUBLIC_GROUP_ID, 'Public Group');
+    // PUBLIC_GROUP_ID defaults to 'public' type
+  });
+
+  afterEach(async () => {
+    await mockDb.db.destroy();
+  });
+
+  const setupSeasonWithRoster = async (publicAnnouncements: 'on' | 'off' = 'on') => {
+    const season = await mockDb.db
+      .insertInto('seasons')
+      .values({ name: 'Test Season' })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+
+    await mockDb.db
+      .insertInto('config')
+      .values({ seasonId: season.id, language: 'en', publicAnnouncements })
+      .execute();
+
+    await addPlayerToRoster(mockDb.db, {
+      seasonId: season.id,
+      telegramId: 111,
+      displayName: 'Player One',
+      username: 'player1',
+    });
+
+    await addPlayerToRoster(mockDb.db, {
+      seasonId: season.id,
+      telegramId: 222,
+      displayName: 'Player Two',
+      username: 'player2',
+    });
+
+    return season;
+  };
+
+  describe('/setmatch announcements', () => {
+    test('sends announcement to public group when enabled', async () => {
+      await setupSeasonWithRoster('on');
+      const { bot, calls } = createTestBot();
+      registerMatchCommands(bot);
+
+      const update = createCommandUpdate('/setmatch sun 20:00', TEST_ADMIN_ID, TEST_CHAT_ID);
+      await bot.handleUpdate(update);
+
+      // Should have 2 calls: announcement to public group + reply to user
+      expect(calls).toHaveLength(2);
+      expect(calls[0].payload.chat_id).toBe(PUBLIC_GROUP_ID);
+      expect(calls[0].payload.text).toContain('Match scheduled');
+      expect(calls[1].payload.chat_id).toBe(TEST_CHAT_ID);
+    });
+
+    test('does not send announcement when disabled', async () => {
+      await setupSeasonWithRoster('off');
+      const { bot, calls } = createTestBot();
+      registerMatchCommands(bot);
+
+      const update = createCommandUpdate('/setmatch sun 20:00', TEST_ADMIN_ID, TEST_CHAT_ID);
+      await bot.handleUpdate(update);
+
+      // Should only have 1 call: reply to user
+      expect(calls).toHaveLength(1);
+      expect(calls[0].payload.chat_id).toBe(TEST_CHAT_ID);
+    });
+  });
+
+  describe('/setlineup announcements', () => {
+    test('sends announcement to public group when enabled', async () => {
+      await setupSeasonWithRoster('on');
+      const { bot, calls } = createTestBot();
+      registerMatchCommands(bot);
+
+      const update = createMultiMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+        { id: 111, firstName: 'Player', lastName: 'One', username: 'player1' },
+        { id: 222, firstName: 'Player', lastName: 'Two', username: 'player2' },
+      ]);
+      await bot.handleUpdate(update);
+
+      // Should have 2 calls: announcement to public group + reply to user
+      expect(calls).toHaveLength(2);
+      expect(calls[0].payload.chat_id).toBe(PUBLIC_GROUP_ID);
+      expect(calls[0].payload.text).toContain('Lineup');
+      expect(calls[1].payload.chat_id).toBe(TEST_CHAT_ID);
+    });
+
+    test('does not send announcement when disabled', async () => {
+      await setupSeasonWithRoster('off');
+      const { bot, calls } = createTestBot();
+      registerMatchCommands(bot);
+
+      const update = createMultiMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+        { id: 111, firstName: 'Player', lastName: 'One', username: 'player1' },
+        { id: 222, firstName: 'Player', lastName: 'Two', username: 'player2' },
+      ]);
+      await bot.handleUpdate(update);
+
+      // Should only have 1 call: reply to user
+      expect(calls).toHaveLength(1);
+      expect(calls[0].payload.chat_id).toBe(TEST_CHAT_ID);
+    });
+  });
+
+  describe('config update', () => {
+    test('can toggle announcements on and off', async () => {
+      const season = await setupSeasonWithRoster('on');
+
+      // Check initial value
+      let config = await mockDb.db
+        .selectFrom('config')
+        .selectAll()
+        .where('seasonId', '=', season.id)
+        .executeTakeFirstOrThrow();
+      expect(config.publicAnnouncements).toBe('on');
+
+      // Update to off
+      await mockDb.db
+        .updateTable('config')
+        .set({ publicAnnouncements: 'off' })
+        .where('seasonId', '=', season.id)
+        .execute();
+
+      config = await mockDb.db
+        .selectFrom('config')
+        .selectAll()
+        .where('seasonId', '=', season.id)
+        .executeTakeFirstOrThrow();
+      expect(config.publicAnnouncements).toBe('off');
+
+      // Update back to on
+      await mockDb.db
+        .updateTable('config')
+        .set({ publicAnnouncements: 'on' })
+        .where('seasonId', '=', season.id)
+        .execute();
+
+      config = await mockDb.db
+        .selectFrom('config')
+        .selectAll()
+        .where('seasonId', '=', season.id)
+        .executeTakeFirstOrThrow();
+      expect(config.publicAnnouncements).toBe('on');
+    });
+
+    test('default value is on', async () => {
+      const season = await mockDb.db
+        .insertInto('seasons')
+        .values({ name: 'Test Season' })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      await mockDb.db.insertInto('config').values({ seasonId: season.id }).execute();
+
+      const config = await mockDb.db
+        .selectFrom('config')
+        .selectAll()
+        .where('seasonId', '=', season.id)
+        .executeTakeFirstOrThrow();
+
+      expect(config.publicAnnouncements).toBe('on');
+    });
   });
 });
