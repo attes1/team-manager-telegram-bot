@@ -51,7 +51,27 @@ export interface Translations {
     updated: (key: string, value: string) => string;
     line: (key: string, value: string) => string;
     usage: string;
+    currentValue: string;
+    availableOptions: string;
     keys: {
+      language: string;
+      poll_day: string;
+      poll_time: string;
+      poll_days: string;
+      poll_times: string;
+      poll_cutoff_day: string;
+      poll_cutoff_time: string;
+      reminder_day: string;
+      reminder_time: string;
+      reminders_mode: string;
+      match_day: string;
+      match_time: string;
+      lineup_size: string;
+      match_day_reminder_mode: string;
+      match_day_reminder_time: string;
+      public_announcements: string;
+    };
+    options: {
       language: string;
       poll_day: string;
       poll_time: string;
@@ -239,6 +259,8 @@ export const fi: Translations = {
     updated: (key, value) => `${key} = ${value}`,
     line: (key, value) => `${key}: ${value}`,
     usage: 'Käyttö: /config <asetus> <arvo>',
+    currentValue: 'Nykyinen arvo',
+    availableOptions: 'Vaihtoehdot',
     keys: {
       language: 'Kieli',
       poll_day: 'Kyselyn päivä',
@@ -256,6 +278,24 @@ export const fi: Translations = {
       match_day_reminder_mode: 'Matsipäivän muistutustila',
       match_day_reminder_time: 'Matsipäivän muistutusaika',
       public_announcements: 'Julkiset ilmoitukset',
+    },
+    options: {
+      language: 'fi, en',
+      poll_day: 'mon, tue, wed, thu, fri, sat, sun',
+      poll_time: 'HH:MM (esim. 10:00)',
+      poll_days: 'mon,tue,wed,thu,fri,sat,sun (pilkulla erotettuna)',
+      poll_times: '0-23 (pilkulla erotettuna, max 5)',
+      poll_cutoff_day: 'mon, tue, wed, thu, fri, sat, sun',
+      poll_cutoff_time: 'HH:MM (esim. 10:00)',
+      reminder_day: 'mon, tue, wed, thu, fri, sat, sun',
+      reminder_time: 'HH:MM (esim. 18:00)',
+      reminders_mode: 'ping, quiet, off',
+      match_day: 'mon, tue, wed, thu, fri, sat, sun',
+      match_time: 'HH:MM (esim. 20:00)',
+      lineup_size: '1-20',
+      match_day_reminder_mode: 'ping, quiet, off',
+      match_day_reminder_time: 'HH:MM (esim. 18:00)',
+      public_announcements: 'on, off',
     },
   },
   week: {

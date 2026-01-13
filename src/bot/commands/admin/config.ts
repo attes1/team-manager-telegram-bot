@@ -44,6 +44,15 @@ const isValidUserKey = (key: string): boolean => USER_KEYS.includes(key);
 const toDbKey = (userKey: string): string => USER_TO_DB_KEY[userKey];
 const affectsScheduler = (key: string): boolean => SCHEDULER_KEYS.includes(key);
 
+const getConfigValue = (config: ParsedConfig, userKey: string): string => {
+  const dbKey = USER_TO_DB_KEY[userKey];
+  const value = config[dbKey as keyof ParsedConfig];
+  if (Array.isArray(value)) {
+    return value.join(',');
+  }
+  return String(value);
+};
+
 const formatConfigLine = (label: string, key: string, value: string): string =>
   `${label} (${key}): ${value}`;
 
@@ -91,11 +100,27 @@ export const registerConfigCommand = (bot: Bot<BotContext>) => {
       const [key, ...rest] = args.split(/\s+/);
       const value = rest.join(' ').trim();
 
-      if (!key || !value || !isValidUserKey(key)) {
-        if (key && !isValidUserKey(key)) {
-          return ctx.reply(i18n.errors.invalidConfigKey);
-        }
+      // No args - show all config
+      if (!key) {
         return ctx.reply(formatConfigDisplay(i18n, config));
+      }
+
+      // Invalid key
+      if (!isValidUserKey(key)) {
+        return ctx.reply(i18n.errors.invalidConfigKey);
+      }
+
+      // Key only, no value - show current value and options
+      if (!value) {
+        const label = i18n.config.keys[key as keyof typeof i18n.config.keys];
+        const currentValue = getConfigValue(config, key);
+        const options = i18n.config.options[key as keyof typeof i18n.config.options];
+        const lines = [
+          `<b>${label}</b> (${key})`,
+          `${i18n.config.currentValue}: ${currentValue}`,
+          `${i18n.config.availableOptions}: ${options}`,
+        ];
+        return ctx.reply(lines.join('\n'), { parse_mode: 'HTML' });
       }
 
       try {

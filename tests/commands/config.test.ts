@@ -185,7 +185,7 @@ describe('/config command', () => {
       expect(calls[0].payload.text).toContain('Invalid time format');
     });
 
-    test('shows config when key provided without value', async () => {
+    test('shows current value and options when key provided without value', async () => {
       await startSeason(mockDb.db, 'Test Season');
 
       const { bot, calls } = createTestBot();
@@ -195,7 +195,9 @@ describe('/config command', () => {
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('Settings');
+      expect(calls[0].payload.text).toContain('Language');
+      expect(calls[0].payload.text).toContain('Current value');
+      expect(calls[0].payload.text).toContain('fi, en');
     });
 
     test('refreshes scheduler when updating poll_day', async () => {
