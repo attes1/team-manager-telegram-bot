@@ -170,6 +170,7 @@ export interface Translations {
     playerCommands: string;
     captainCommands: string;
     adminCommands: string;
+    legend: string;
     commands: {
       help: string;
       roster: string;
@@ -179,12 +180,12 @@ export interface Translations {
       status: string;
       setweek: string;
       setmatch: string;
-      setlineup: string;
+      setlineup: string[];
       remind: string;
       startseason: string;
       endseason: string;
       season: string;
-      config: string;
+      config: string[];
       addplayer: string;
       removeplayer: string;
       setcaptain: string;
@@ -381,25 +382,30 @@ export const fi: Translations = {
     playerCommands: 'Pelaajan komennot',
     captainCommands: 'Kapteenin komennot',
     adminCommands: 'Admin-komennot',
+    legend: '&lt;required&gt; [optional] a|b = valinta',
     commands: {
       help: 'Näytä komennot',
       roster: 'Näytä joukkueen rosteri',
       nextmatch: 'Näytä seuraavan matsin tiedot',
-      avail: 'Näytä aikataulut [practice|match] [today|päivä]',
-      poll: 'Näytä aikataulukysely [viikko]',
+      avail: 'Näytä aikataulut [practice|match] [today|day]',
+      poll: 'Näytä aikataulukysely [week]',
       status: 'Näytä tilannekatsaus',
-      setweek: 'Aseta viikon tyyppi <viikko> <practice|match>',
-      setmatch: 'Ajoita matsi <päivä> <aika>',
-      setlineup: 'Aseta linari [@pelaajat|clear]',
+      setweek: 'Aseta viikon tyyppi &lt;week&gt; &lt;practice|match&gt;',
+      setmatch: 'Ajoita matsi &lt;day&gt; &lt;time&gt;',
+      setlineup: ['Avaa linarivalikko', 'Aseta linari @players... | clear'],
       remind: 'Lähetä muistutus vastaamattomille',
-      startseason: 'Aloita uusi kausi <nimi>',
+      startseason: 'Aloita uusi kausi &lt;name&gt;',
       endseason: 'Päätä nykyinen kausi',
       season: 'Näytä kauden tiedot',
-      config: 'Näytä/muokkaa asetuksia [asetus] [arvo]',
-      addplayer: 'Lisää pelaaja rosteriin @pelaaja',
-      removeplayer: 'Poista pelaaja rosterista @pelaaja',
-      setcaptain: 'Ylennä pelaaja kapteniksi @pelaaja',
-      removecaptain: 'Alenna kapteeni pelaajaksi @pelaaja',
+      config: [
+        'Näytä kaikki asetukset',
+        'Näytä asetuksen asetukset [key]',
+        'Muokkaa asetusta &lt;key&gt; &lt;value&gt;',
+      ],
+      addplayer: 'Lisää pelaaja rosteriin @player',
+      removeplayer: 'Poista pelaaja rosterista @player',
+      setcaptain: 'Ylennä pelaaja kapteniksi @player',
+      removecaptain: 'Alenna kapteeni pelaajaksi @player',
     },
   },
   announcements: {

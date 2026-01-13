@@ -176,6 +176,7 @@ Use `/config` to view all settings. Available options:
 | `lineup_size` | Players in lineup | `5` |
 | `match_day_reminder_mode` | Match day reminder (ping/quiet/off) | `quiet` |
 | `match_day_reminder_time` | Time for match day reminder | `18:00` |
+| `public_announcements` | Auto-announce to public group (on/off) | `on` |
 
 **Poll Cutoff Logic**: After the cutoff (default: Thursday 10:00), polls and reminders automatically target the next week. This ensures that when you send the Sunday poll, it asks about next week's availability (for the upcoming match), not the current week.
 
