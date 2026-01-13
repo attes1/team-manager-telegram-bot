@@ -5,6 +5,7 @@ import { refreshScheduler } from '../../../scheduler';
 import { updateConfig } from '../../../services/config';
 import type { AdminSeasonContext, BotContext } from '../../context';
 import { adminSeasonCommand } from '../../middleware';
+import { commandDefinitions } from '../definitions';
 
 const USER_TO_DB_KEY: Record<string, string> = {
   language: 'language',
@@ -91,6 +92,10 @@ export const registerConfigCommand = (bot: Bot<BotContext>) => {
         await updateConfig(db, season.id, dbKey, value);
         if (affectsScheduler(key)) {
           await refreshScheduler();
+        }
+        // Update bot command descriptions when language changes
+        if (key === 'language' && (value === 'en' || value === 'fi')) {
+          await ctx.api.setMyCommands(commandDefinitions[value]);
         }
         return ctx.reply(i18n.config.updated(key, value));
       } catch {

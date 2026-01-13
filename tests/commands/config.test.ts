@@ -105,9 +105,10 @@ describe('/config command', () => {
       const update = createCommandUpdate('/config language en', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
-      expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('language');
-      expect(calls[0].payload.text).toContain('en');
+      expect(calls).toHaveLength(2);
+      expect(calls[0].method).toBe('setMyCommands');
+      expect(calls[1].payload.text).toContain('language');
+      expect(calls[1].payload.text).toContain('en');
     });
 
     test('admin can update poll_day', async () => {
