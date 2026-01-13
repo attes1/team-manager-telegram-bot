@@ -5,7 +5,10 @@ import { db } from '../db';
 import { env } from '../env';
 import { getConfig } from '../services/config';
 import { getActiveSeason } from '../services/season';
+import { sendMatchDayReminder } from './match-day';
+import { sendReminder } from './reminder';
 import { buildCronExpression } from './utils';
+import { sendWeeklyPoll } from './weekly-poll';
 
 export interface ScheduledTask {
   name: string;
@@ -102,3 +105,15 @@ export const refreshScheduler = async (
 };
 
 export const getScheduledTasks = (): ScheduledTask[] => [...tasks];
+
+export const startScheduler = async (bot: Bot<BotContext>): Promise<void> => {
+  await initScheduler(bot, {
+    onWeeklyPoll: sendWeeklyPoll,
+    onReminder: sendReminder,
+    onMatchDay: sendMatchDayReminder,
+  });
+};
+
+export { sendMatchDayReminder } from './match-day';
+export { sendReminder } from './reminder';
+export { sendWeeklyPoll } from './weekly-poll';

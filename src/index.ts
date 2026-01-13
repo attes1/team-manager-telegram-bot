@@ -1,4 +1,5 @@
 import { createBot, setCommands } from './bot/index';
+import { startScheduler } from './scheduler';
 
 const main = async () => {
   const bot = createBot();
@@ -9,6 +10,7 @@ const main = async () => {
       console.log(`Bot @${botInfo.username} started successfully`);
       await setCommands(bot);
       console.log('Commands registered');
+      await startScheduler(bot);
     },
   });
 };

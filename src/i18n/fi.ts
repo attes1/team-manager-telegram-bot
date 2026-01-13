@@ -103,6 +103,14 @@ export interface Translations {
     needExact: (count: number) => string;
     saved: (count: number) => string;
   };
+  reminder: {
+    title: (week: number, dateRange: string) => string;
+    allResponded: string;
+    missingResponses: (names: string) => string;
+    matchDayTitle: (day: string, time: string) => string;
+    matchDayLineup: (players: string) => string;
+    matchDayNoLineup: string;
+  };
 }
 
 export const fi: Translations = {
@@ -213,5 +221,13 @@ export const fi: Translations = {
     done: 'Valmis',
     needExact: (count) => `Valitse ${count} pelaajaa.`,
     saved: (count) => `Kokoonpano tallennettu (${count} pelaajaa).`,
+  },
+  reminder: {
+    title: (week, dateRange) => `📋 Muistutus: Vko ${week} (${dateRange}) saatavuuskysely`,
+    allResponded: 'Kaikki ovat vastanneet! 🎉',
+    missingResponses: (names) => `Puuttuu vastaus:\n${names}`,
+    matchDayTitle: (day, time) => `🎮 Matsi tänään! ${day} klo ${time}`,
+    matchDayLineup: (players) => `Kokoonpano:\n${players}`,
+    matchDayNoLineup: 'Kokoonpanoa ei ole asetettu!',
   },
 };

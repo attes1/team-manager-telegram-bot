@@ -108,4 +108,12 @@ export const en: Translations = {
     needExact: (count) => `Select exactly ${count} players.`,
     saved: (count) => `Lineup saved (${count} players).`,
   },
+  reminder: {
+    title: (week, dateRange) => `📋 Reminder: Week ${week} (${dateRange}) availability poll`,
+    allResponded: 'Everyone has responded! 🎉',
+    missingResponses: (names) => `Missing responses:\n${names}`,
+    matchDayTitle: (day, time) => `🎮 Match today! ${day} at ${time}`,
+    matchDayLineup: (players) => `Lineup:\n${players}`,
+    matchDayNoLineup: 'Lineup has not been set!',
+  },
 };
