@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import { env } from '../../../env';
 import { formatDateRange, formatDay } from '../../../lib/format';
 import { daySchema, timeSchema } from '../../../lib/schemas';
-import { getSchedulingWeek, getWeekDateRange } from '../../../lib/week';
+import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '../../../lib/week';
 import { getLineupMenuMessage, lineupMenu } from '../../../menus/lineup';
 import {
   buildLineupMessage,
@@ -93,13 +93,47 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
+      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
-      if (args.toLowerCase() === 'clear') {
-        const { week: weekNumber, year } = getSchedulingWeek(
-          config.weekChangeDay,
-          config.weekChangeTime,
-        );
-        await clearLineup(db, { seasonId: season.id, weekNumber, year });
+      // Parse optional week number from args (last word if it's a number)
+      const parseWeekFromArgs = (
+        argsStr: string,
+      ): { week: number; year: number; remainingArgs: string } | null => {
+        const parts = argsStr.trim().split(/\s+/);
+        const lastPart = parts[parts.length - 1];
+
+        if (parts.length > 0 && /^\d+$/.test(lastPart)) {
+          const result = parseWeekInput(lastPart, schedulingWeek, { allowPast: false });
+          if (result.success) {
+            return {
+              week: result.week,
+              year: result.year,
+              remainingArgs: parts.slice(0, -1).join(' '),
+            };
+          }
+        }
+        return null;
+      };
+
+      // Check for clear command (with optional week)
+      const clearMatch = args.toLowerCase().match(/^clear(?:\s+(\d+))?$/);
+      if (clearMatch) {
+        let week: number;
+        let year: number;
+
+        if (clearMatch[1]) {
+          const result = parseWeekInput(clearMatch[1], schedulingWeek, { allowPast: false });
+          if (!result.success) {
+            return ctx.reply(i18n.lineup.invalidWeek);
+          }
+          week = result.week;
+          year = result.year;
+        } else {
+          week = schedulingWeek.week;
+          year = schedulingWeek.year;
+        }
+
+        await clearLineup(db, { seasonId: season.id, weekNumber: week, year });
         return ctx.reply(i18n.lineup.cleared);
       }
 
@@ -117,14 +151,23 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         }
       }
 
-      const { week, year } = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+      // Parse week from args or use scheduling week
+      const weekParsed = parseWeekFromArgs(args);
+      const week = weekParsed?.week ?? schedulingWeek.week;
+      const year = weekParsed?.year ?? schedulingWeek.year;
 
-      await setLineup(db, {
+      const result = await setLineup(db, {
         seasonId: season.id,
         weekNumber: week,
         year,
         playerIds: mentionedUsers.map((u) => u.id),
       });
+
+      if (!result.success) {
+        if (result.reason === 'practice_week') {
+          return ctx.reply(i18n.lineup.practiceWeek);
+        }
+      }
 
       if (env.PUBLIC_GROUP_ID && config.publicAnnouncements === 'on') {
         const { start, end } = getWeekDateRange(year, week);

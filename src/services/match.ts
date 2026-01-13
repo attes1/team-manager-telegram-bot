@@ -135,9 +135,33 @@ export const removePlayerFromLineup = async (
   return result.numDeletedRows > 0n;
 };
 
-export const setLineup = async (db: Kysely<DB>, params: SetLineupParams): Promise<void> => {
+export type SetLineupResult = { success: true } | { success: false; reason: 'practice_week' };
+
+export const setLineup = async (
+  db: Kysely<DB>,
+  params: SetLineupParams,
+): Promise<SetLineupResult> => {
   const { seasonId, weekNumber, year, playerIds } = params;
 
+  // Check if week exists and is a practice week
+  const existingWeek = await db
+    .selectFrom('weeks')
+    .select(['type'])
+    .where('seasonId', '=', seasonId)
+    .where('weekNumber', '=', weekNumber)
+    .where('year', '=', year)
+    .executeTakeFirst();
+
+  if (existingWeek?.type === 'practice') {
+    return { success: false, reason: 'practice_week' };
+  }
+
+  // If no week entry exists, create one with type 'match'
+  if (!existingWeek) {
+    await db.insertInto('weeks').values({ seasonId, weekNumber, year, type: 'match' }).execute();
+  }
+
+  // Clear existing lineup and set new one
   await db
     .deleteFrom('lineups')
     .where('seasonId', '=', seasonId)
@@ -151,6 +175,8 @@ export const setLineup = async (db: Kysely<DB>, params: SetLineupParams): Promis
       .values(playerIds.map((playerId) => ({ seasonId, weekNumber, year, playerId })))
       .execute();
   }
+
+  return { success: true };
 };
 
 export const getLineup = async (db: Kysely<DB>, params: WeekParams): Promise<Player[]> => {

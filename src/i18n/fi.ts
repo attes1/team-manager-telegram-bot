@@ -142,6 +142,8 @@ export interface Translations {
     needExact: (count: number) => string;
     saved: (count: number) => string;
     notCaptain: string;
+    practiceWeek: string;
+    invalidWeek: string;
   };
   reminder: {
     title: (week: number, dateRange: string) => string;
@@ -368,6 +370,8 @@ export const fi: Translations = {
     needExact: (count) => `Valitse ${count} pelaajaa.`,
     saved: (count) => `Linari tallennettu (${count} pelaajaa).`,
     notCaptain: 'Valikko on vain kapteeneille.',
+    practiceWeek: 'Linaria ei voi asettaa treeniviikolla.',
+    invalidWeek: 'Virheellinen viikkonumero.',
   },
   reminder: {
     title: (week, dateRange) => `📋 Muistutus: Vko ${week} (${dateRange}) aikataulukysely`,

@@ -147,6 +147,8 @@ export const en: Translations = {
     needExact: (count) => `Select exactly ${count} players.`,
     saved: (count) => `Lineup saved (${count} players).`,
     notCaptain: 'Menu is only available for captains.',
+    practiceWeek: 'Cannot set lineup for a practice week.',
+    invalidWeek: 'Invalid week number.',
   },
   reminder: {
     title: (week, dateRange) => `📋 Reminder: Week ${week} (${dateRange}) availability poll`,

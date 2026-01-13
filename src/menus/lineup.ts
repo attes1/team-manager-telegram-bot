@@ -41,12 +41,16 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
         ? currentIds.filter((id) => id !== player.telegramId)
         : [...currentIds, player.telegramId];
 
-      await setLineup(db, {
+      const result = await setLineup(db, {
         seasonId: season.id,
         weekNumber: week,
         year,
         playerIds: newIds,
       });
+
+      if (!result.success && result.reason === 'practice_week') {
+        return ctx.answerCallbackQuery(i18n.lineup.practiceWeek);
+      }
 
       await ctx.menu.update();
     });
