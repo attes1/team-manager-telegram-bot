@@ -1,12 +1,12 @@
 import type { NextFunction } from 'grammy';
-import { db } from '../../db';
-import { env } from '../../env';
-import { t } from '../../i18n';
-import { isAdmin } from '../../lib/admin';
-import { getConfig } from '../../services/config';
-import { isCaptain, isPlayerInRoster } from '../../services/roster';
-import { getActiveSeason } from '../../services/season';
-import type { BotContext } from '../context';
+import type { BotContext } from '@/bot/context';
+import { db } from '@/db';
+import { env } from '@/env';
+import { t } from '@/i18n';
+import { isAdmin } from '@/lib/admin';
+import { getConfig } from '@/services/config';
+import { isCaptain, isPlayerInRoster } from '@/services/roster';
+import { getActiveSeason } from '@/services/season';
 
 export const contextMiddleware = async (ctx: BotContext, next: NextFunction) => {
   ctx.db = db;
