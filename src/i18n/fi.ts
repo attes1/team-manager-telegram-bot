@@ -413,7 +413,7 @@ export const fi: Translations = {
     matchTime: (day, time) => `📅 ${day} klo ${time}`,
     matchTimeDefault: (day, time) => `📅 Oletusaika: ${day} klo ${time}`,
     matchTimeNotSet: '📅 Aikaa ei vielä sovittu',
-    lineupTitle: '👥 Linari:',
+    lineupTitle: 'Linari:',
     lineupEmpty: 'Linaria ei ole vielä asetettu',
     lineupPlayer: (name) => `• ${name}`,
     lineupSet: (count) => `🎮 Linari asetettu (${count} pelaajaa)!`,

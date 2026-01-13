@@ -207,7 +207,7 @@ export const en: Translations = {
     matchTime: (day, time) => `📅 ${day} at ${time}`,
     matchTimeDefault: (day, time) => `📅 Default time: ${day} at ${time}`,
     matchTimeNotSet: '📅 Time not yet scheduled',
-    lineupTitle: '👥 Lineup:',
+    lineupTitle: 'Lineup:',
     lineupEmpty: 'Lineup not yet set',
     lineupPlayer: (name) => `• ${name}`,
     lineupSet: (count) => `🎮 Lineup set (${count} players)!`,

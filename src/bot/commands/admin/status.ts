@@ -51,9 +51,9 @@ export const registerStatusCommand = (bot: Bot<BotContext>) => {
       if (weekType === 'match') {
         lines.push('');
         lines.push(`<b>${i18n.status.matchTime}:</b> ${dayName} ${matchTime}`);
-        const lineupWarning = lineup.length < config.lineupSize ? ' ⚠️' : '';
+        const lineupIcon = lineup.length < config.lineupSize ? '⚠️' : '👥';
         lines.push(
-          `<b>${i18n.status.lineup}:</b> ${lineup.length}/${config.lineupSize} ${i18n.status.players}${lineupWarning}`,
+          `${lineupIcon} <b>${i18n.status.lineup}:</b> ${lineup.length}/${config.lineupSize} ${i18n.status.players}`,
         );
       }
 

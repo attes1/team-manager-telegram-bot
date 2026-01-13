@@ -37,8 +37,9 @@ export const buildMatchAnnouncement = (i18n: Translations, data: MatchAnnounceme
   }
 
   lines.push('');
-  const lineupWarning = data.lineup.length > 0 && data.lineup.length < data.lineupSize ? ' ⚠️' : '';
-  lines.push(`${i18n.announcements.lineupTitle}${lineupWarning}`);
+  const isPartialLineup = data.lineup.length > 0 && data.lineup.length < data.lineupSize;
+  const lineupIcon = isPartialLineup ? '⚠️' : '👥';
+  lines.push(`${lineupIcon} ${i18n.announcements.lineupTitle}`);
 
   if (data.lineup.length > 0) {
     for (const player of data.lineup) {
@@ -62,7 +63,7 @@ export const buildLineupAnnouncement = (
     '',
     i18n.announcements.nextMatch(week, dateRange),
     '',
-    i18n.announcements.lineupTitle,
+    `👥 ${i18n.announcements.lineupTitle}`,
   ];
 
   for (const player of lineup) {
