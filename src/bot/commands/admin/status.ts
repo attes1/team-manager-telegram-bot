@@ -1,6 +1,6 @@
 import type { Bot } from 'grammy';
 import { formatDateRange } from '../../../lib/format';
-import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
+import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '../../../lib/week';
 import { getWeekAvailability } from '../../../services/availability';
 import { getLineup, getMatchInfo } from '../../../services/match';
 import { getRoster } from '../../../services/roster';
@@ -13,7 +13,11 @@ export const registerStatusCommand = (bot: Bot<BotContext>) => {
     'status',
     rosterCommand(async (ctx: RosterContext) => {
       const { db, season, config, i18n } = ctx;
-      const { week, year } = getCurrentWeek();
+
+      // Use scheduling week for all status info
+      const currentWeek = getCurrentWeek();
+      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+      const { week, year } = schedulingWeek;
       const { start, end } = getWeekDateRange(year, week);
       const dateRange = formatDateRange(start, end);
 
@@ -41,12 +45,20 @@ export const registerStatusCommand = (bot: Bot<BotContext>) => {
         `📊 <b>${i18n.status.title}</b>`,
         '',
         `<b>${i18n.status.season}:</b> ${season.name}`,
+      ];
+
+      // Show scheduling week indicator when different from current week
+      if (currentWeek.week !== schedulingWeek.week || currentWeek.year !== schedulingWeek.year) {
+        lines.push(`<b>${i18n.status.schedulingFor}:</b> ${i18n.status.weekLabel(week)}`);
+      }
+
+      lines.push(
         `<b>${i18n.status.week}:</b> ${week} (${dateRange})`,
         `<b>${i18n.status.weekType}:</b> ${weekType === 'match' ? '🏆 ' : '🏋️ '}${i18n.status.weekTypes[weekType]}`,
         '',
         `<b>${i18n.status.roster}:</b> ${roster.length} ${i18n.status.players}`,
         `<b>${i18n.status.responses}:</b> ${respondedCount}/${roster.length} (${responseRate}%)`,
-      ];
+      );
 
       if (weekType === 'match') {
         lines.push('');

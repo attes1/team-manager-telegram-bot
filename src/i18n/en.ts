@@ -170,6 +170,8 @@ export const en: Translations = {
     responses: 'Responses',
     matchTime: 'Match time',
     lineup: 'Lineup',
+    schedulingFor: 'Scheduling for',
+    weekLabel: (week) => `Week ${week}`,
   },
   help: {
     publicCommands: 'Public Commands',

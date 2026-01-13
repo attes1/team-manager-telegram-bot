@@ -165,6 +165,8 @@ export interface Translations {
     responses: string;
     matchTime: string;
     lineup: string;
+    schedulingFor: string;
+    weekLabel: (week: number) => string;
   };
   help: {
     publicCommands: string;
@@ -387,6 +389,8 @@ export const fi: Translations = {
     responses: 'Vastauksia',
     matchTime: 'Seuraava matsi:',
     lineup: 'Linari',
+    schedulingFor: 'Suunnitellaan viikolle',
+    weekLabel: (week) => `Vko ${week}`,
   },
   help: {
     publicCommands: 'Julkiset komennot',
