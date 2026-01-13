@@ -178,7 +178,7 @@ describe('/config command', () => {
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('Invalid value');
+      expect(calls[0].payload.text).toContain('Invalid time format');
     });
 
     test('shows config when key provided without value', async () => {

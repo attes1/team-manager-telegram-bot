@@ -1,4 +1,5 @@
 import type { Bot } from 'grammy';
+import { ZodError } from 'zod';
 import type { Language, Translations } from '../../../i18n';
 import type { ParsedConfig } from '../../../lib/schemas';
 import { refreshScheduler } from '../../../scheduler';
@@ -104,8 +105,10 @@ export const registerConfigCommand = (bot: Bot<BotContext>) => {
           });
         }
         return ctx.reply(i18n.config.updated(key, value));
-      } catch {
-        return ctx.reply(i18n.errors.invalidConfigValue(key));
+      } catch (err) {
+        const message =
+          err instanceof ZodError ? err.issues[0]?.message : i18n.errors.invalidConfigValue(key);
+        return ctx.reply(message);
       }
     }),
   );
