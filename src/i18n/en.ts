@@ -88,6 +88,13 @@ export const en: Translations = {
     usage: 'Usage: /setmatch <day> <time>\nExample: /setmatch sun 20:00',
     invalidDay: 'Invalid day. Use: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Invalid time format. Use HH:MM (e.g. 20:00)',
+    info: (week, dateRange) => `📅 Week ${week} (${dateRange}) match`,
+    time: (day, time) => `Time: ${day} at ${time}`,
+    timeDefault: (day, time) => `Default time: ${day} at ${time}`,
+    notScheduled: 'Time not yet scheduled',
+    lineupTitle: 'Lineup:',
+    lineupEmpty: 'Lineup not yet set',
+    lineupPlayer: (name) => `• ${name}`,
   },
   lineup: {
     set: (count, players) => `Lineup set (${count} players):\n${players}`,

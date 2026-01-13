@@ -273,3 +273,89 @@ describe('/setlineup command', () => {
     expect(calls[0].payload.text).toContain('not in the roster');
   });
 });
+
+const { registerMatchInfoCommand } = await import('@/commands/player/match');
+const { setMatchTime, setLineup } = await import('@/services/match');
+const { getCurrentWeek } = await import('@/lib/week');
+
+describe('/match command', () => {
+  let seasonId: number;
+
+  beforeEach(async () => {
+    const db = new Kysely<DB>({
+      dialect: new SqliteDialect({
+        database: new Database(':memory:'),
+      }),
+      plugins: [new CamelCasePlugin()],
+    });
+    await up(db);
+    mockDb.db = db;
+
+    const season = await startSeason(mockDb.db, 'Test Season');
+    seasonId = season.id;
+  });
+
+  afterEach(async () => {
+    await mockDb.db.destroy();
+  });
+
+  test('shows match info when scheduled', async () => {
+    const { week, year } = getCurrentWeek();
+
+    await setMatchTime(mockDb.db, {
+      seasonId,
+      weekNumber: week,
+      year,
+      matchDay: 'sun',
+      matchTime: '20:00',
+    });
+
+    const { bot, calls } = createTestBot();
+    registerMatchInfoCommand(bot);
+
+    const update = createCommandUpdate('/match', TEST_USER_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].method).toBe('sendMessage');
+  });
+
+  test('shows lineup when set', async () => {
+    const { week, year } = getCurrentWeek();
+
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: 111,
+      displayName: 'Player One',
+    });
+
+    await setLineup(mockDb.db, {
+      seasonId,
+      weekNumber: week,
+      year,
+      playerIds: [111],
+    });
+
+    const { bot, calls } = createTestBot();
+    registerMatchInfoCommand(bot);
+
+    const update = createCommandUpdate('/match', TEST_USER_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('Player One');
+  });
+
+  test('requires active season', async () => {
+    await mockDb.db.updateTable('seasons').set({ status: 'ended' }).execute();
+
+    const { bot, calls } = createTestBot();
+    registerMatchInfoCommand(bot);
+
+    const update = createCommandUpdate('/match', TEST_USER_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('No active season');
+  });
+});

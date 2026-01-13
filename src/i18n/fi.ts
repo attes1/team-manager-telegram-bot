@@ -83,6 +83,13 @@ export interface Translations {
     usage: string;
     invalidDay: string;
     invalidTime: string;
+    info: (week: number, dateRange: string) => string;
+    time: (day: string, time: string) => string;
+    timeDefault: (day: string, time: string) => string;
+    notScheduled: string;
+    lineupTitle: string;
+    lineupEmpty: string;
+    lineupPlayer: (name: string) => string;
   };
   lineup: {
     set: (count: number, players: string) => string;
@@ -187,6 +194,13 @@ export const fi: Translations = {
     usage: 'Käyttö: /setmatch <päivä> <aika>\nEsim: /setmatch sun 20:00',
     invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Virheellinen aika. Käytä muotoa HH:MM (esim. 20:00)',
+    info: (week, dateRange) => `📅 Vko ${week} (${dateRange}) matsi`,
+    time: (day, time) => `Aika: ${day} klo ${time}`,
+    timeDefault: (day, time) => `Oletusaika: ${day} klo ${time}`,
+    notScheduled: 'Aikaa ei vielä sovittu',
+    lineupTitle: 'Kokoonpano:',
+    lineupEmpty: 'Kokoonpanoa ei ole vielä asetettu',
+    lineupPlayer: (name) => `• ${name}`,
   },
   lineup: {
     set: (count, players) => `Kokoonpano asetettu (${count} pelaajaa):\n${players}`,
