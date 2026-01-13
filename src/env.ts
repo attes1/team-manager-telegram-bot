@@ -16,10 +16,14 @@ const envSchema = z.object({
   BOT_TOKEN: z.string().min(1),
 
   TEAM_GROUP_ID: z.coerce.number(),
-  PUBLIC_CHANNEL_ID: z.preprocess(
-    (val) => (val === '' || val === undefined ? undefined : val),
-    z.coerce.number().optional(),
-  ),
+  PUBLIC_CHANNEL_ID: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val || val.trim() === '') return undefined;
+      const num = Number(val);
+      return Number.isNaN(num) ? undefined : num;
+    }),
 
   ADMIN_IDS: commaSeparatedNumbers(),
 
