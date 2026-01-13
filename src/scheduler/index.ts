@@ -6,8 +6,9 @@ import { env } from '../env';
 import { getConfig } from '../services/config';
 import { getActiveSeason } from '../services/season';
 import { sendMatchDayReminder } from './match-day';
+import { cleanupExpiredMenus } from './menu-cleanup';
 import { sendReminder } from './reminder';
-import { buildCronExpression } from './utils';
+import { buildCronExpression, buildDailyCronExpression } from './utils';
 import { sendWeeklyPoll } from './weekly-poll';
 
 export interface ScheduledTask {
@@ -84,6 +85,15 @@ const initScheduler = async (bot: Bot<BotContext>): Promise<void> => {
       `Scheduler: Match day reminder scheduled for ${config.matchDay} at ${config.matchDayReminderTime}`,
     );
   }
+
+  // Menu cleanup (daily)
+  const menuCleanupCron = buildDailyCronExpression(config.menuCleanupTime);
+  tasks.push(
+    scheduleTask('menu-cleanup', menuCleanupCron, () =>
+      cleanupExpiredMenus(bot, season.id, config.menuExpirationHours),
+    ),
+  );
+  console.log(`Scheduler: Menu cleanup scheduled daily at ${config.menuCleanupTime}`);
 
   console.log(`Scheduler: ${tasks.length} task(s) scheduled`);
 };

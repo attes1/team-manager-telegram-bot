@@ -52,3 +52,8 @@ export const buildCronExpression = (day: string, time: string, hourOffset = 0): 
 
   return `${minute} ${adjustedHour} * * ${adjustedWeekday}`;
 };
+
+export const buildDailyCronExpression = (time: string): string => {
+  const { minute, hour } = timeToCronTime(time);
+  return `${minute} ${hour} * * *`;
+};
