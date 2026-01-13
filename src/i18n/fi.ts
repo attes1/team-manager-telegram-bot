@@ -256,10 +256,10 @@ export const fi: Translations = {
     },
   },
   practice: {
-    title: (week: number, dateRange: string) => `Vko ${week} (${dateRange}) saatavuudet:`,
-    dayTitle: (day: string, date: string) => `${day} ${date} saatavuudet:`,
+    title: (week: number, dateRange: string) => `Vko ${week} (${dateRange}) aikataulut:`,
+    dayTitle: (day: string, date: string) => `${day} ${date} aikataulut:`,
     noResponses: 'Ei vastauksia.',
-    noResponsesForDay: (day: string) => `Ei saatavuuksia päivälle ${day}.`,
+    noResponsesForDay: (day: string) => `Ei vastauksia päivälle ${day}.`,
     playerLine: (name: string, times: string[], status: string) =>
       `• ${name}: ${times.join(', ')} ${status}`,
     invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
@@ -324,7 +324,7 @@ export const fi: Translations = {
       roster: 'Näytä joukkueen rosteri',
       nextmatch: 'Näytä seuraavan matsin tiedot',
       match: 'Näytä matsin tiedot ja linari',
-      practice: 'Näytä treenien saatavuudet',
+      practice: 'Näytä treenien mahdolliset aikataulut',
       startseason: 'Aloita uusi kausi',
       endseason: 'Päätä nykyinen kausi',
       season: 'Näytä kauden tiedot',
