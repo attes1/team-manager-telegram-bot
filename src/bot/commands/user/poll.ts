@@ -31,6 +31,9 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
         pollWeek = { week: weekResult.week, year: weekResult.year };
       }
 
+      // Set target week in context for menu's initial render
+      ctx.pollTargetWeek = pollWeek;
+
       const message = await getPollMessage(season.id, pollWeek);
       return ctx.reply(message, { reply_markup: pollMenu, parse_mode: 'HTML' });
     }),

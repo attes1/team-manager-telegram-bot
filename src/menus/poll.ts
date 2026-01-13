@@ -9,24 +9,20 @@ import { getPlayerWeekAvailability, setDayAvailability } from '../services/avail
 import { isPlayerInRoster } from '../services/roster';
 import { getWeek } from '../services/week';
 
-// Week marker: hidden in an invisible HTML link
-// Format: <a href="w:5/2025">​</a> - zero-width space as link text
-const WEEK_MARKER_REGEX = /href="w:(\d+)\/(\d+)"/;
+// Payload format for buttons: "week:year" e.g. "5:2025"
+// This is encoded in Telegram callback_data and always reliable
+const encodeWeekPayload = (week: number, year: number): string => `${week}:${year}`;
 
-const parseWeekFromMessage = (text: string | undefined): { week: number; year: number } | null => {
-  if (!text) {
-    return null;
-  }
-  const match = text.match(WEEK_MARKER_REGEX);
-  if (match) {
-    return { week: Number(match[1]), year: Number(match[2]) };
-  }
-  return null;
+export const decodeWeekPayload = (
+  payload: string | RegExpMatchArray | undefined,
+): { week: number; year: number } | null => {
+  if (!payload || typeof payload !== 'string') return null;
+  const [weekStr, yearStr] = payload.split(':');
+  const week = parseInt(weekStr, 10);
+  const year = parseInt(yearStr, 10);
+  if (Number.isNaN(week) || Number.isNaN(year)) return null;
+  return { week, year };
 };
-
-// Creates invisible marker using zero-width space in a link
-const createWeekMarker = (week: number, year: number): string =>
-  `<a href="w:${week}/${year}">\u200B</a>`;
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   available: '✅',
@@ -89,11 +85,13 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
     return;
   }
 
-  // Parse week from message, fall back to target week
-  const messageText = ctx.callbackQuery?.message?.text;
-  const parsedWeek = parseWeekFromMessage(messageText);
+  // Get week from: 1) payload (button click), 2) context (initial render from command), 3) scheduling week
+  const payloadWeek = decodeWeekPayload(ctx.match);
   const { week, year } =
-    parsedWeek ?? getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+    payloadWeek ??
+    ctx.pollTargetWeek ??
+    getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+  const weekPayload = encodeWeekPayload(week, year);
   const days = config.pollDays;
   const times = config.pollTimes.split(',');
 
@@ -129,7 +127,7 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
       const hasSlot = currentSlots.includes(time);
       const icon = hasSlot ? '✓' : '·';
 
-      range.text(icon, async (ctx) => {
+      range.text({ text: icon, payload: weekPayload }, async (ctx) => {
         const newSlots = hasSlot ? currentSlots.filter((s) => s !== time) : [...currentSlots, time];
         // When adding a timeslot: default to appropriate status if no response or if currently 'unavailable'
         const isAdding = !hasSlot;
@@ -158,7 +156,7 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
     const displayStatus = getDisplayStatus(currentStatus, isPracticeWeek);
     const statusIcon = hasResponse ? STATUS_ICONS[displayStatus] : NO_RESPONSE_ICON;
 
-    range.text(statusIcon, async (ctx) => {
+    range.text({ text: statusIcon, payload: weekPayload }, async (ctx) => {
       let nextStatus: AvailabilityStatus;
 
       if (!hasResponse && !hasTimeslots) {
@@ -212,8 +210,5 @@ export const getPollMessage = async (
   // Use appropriate legend based on week type
   const legend = isMatchWeek ? i18n.poll.legend : i18n.poll.practiceLegend;
 
-  // Append week marker for menu to parse
-  const weekMarker = createWeekMarker(week, year);
-
-  return `${title}\n\n${legend}\n${weekMarker}`;
+  return `${title}\n\n${legend}`;
 };

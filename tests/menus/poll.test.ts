@@ -1,7 +1,7 @@
 import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { getDisplayStatus, getNextStatus, getPollMessage } from '@/menus/poll';
+import { decodeWeekPayload, getDisplayStatus, getNextStatus, getPollMessage } from '@/menus/poll';
 
 describe('getPollMessage', () => {
   beforeEach(async () => {
@@ -28,69 +28,6 @@ describe('getPollMessage', () => {
     return season;
   };
 
-  test('includes week marker at end of message', async () => {
-    const season = await setupSeason();
-    const message = await getPollMessage(season.id);
-
-    expect(message).toMatch(/href="w:\d+\/\d+"/);
-  });
-
-  test('week marker contains correct week and year', async () => {
-    const season = await setupSeason();
-    const message = await getPollMessage(season.id, { week: 5, year: 2025 });
-
-    expect(message).toContain('href="w:5/2025"');
-  });
-
-  test('week marker uses provided target week', async () => {
-    const season = await setupSeason();
-    const message = await getPollMessage(season.id, { week: 10, year: 2026 });
-
-    expect(message).toContain('href="w:10/2026"');
-  });
-
-  test('uses current week when no target week provided', async () => {
-    const season = await setupSeason();
-    const message = await getPollMessage(season.id);
-
-    // Current week is 2 (from 2025-01-08)
-    expect(message).toContain('href="w:2/2025"');
-  });
-
-  test('week marker format is parseable', async () => {
-    const season = await setupSeason();
-    const message = await getPollMessage(season.id, { week: 15, year: 2025 });
-
-    // Extract the week marker and parse it
-    const match = message.match(/href="w:(\d+)\/(\d+)"/);
-    expect(match).not.toBeNull();
-    expect(Number(match?.[1])).toBe(15);
-    expect(Number(match?.[2])).toBe(2025);
-  });
-
-  test('handles year boundary week 1', async () => {
-    const season = await setupSeason();
-    const message = await getPollMessage(season.id, { week: 1, year: 2026 });
-
-    expect(message).toContain('href="w:1/2026"');
-    expect(message).toContain('Week 1');
-  });
-
-  test('handles week 52', async () => {
-    const season = await setupSeason();
-    const message = await getPollMessage(season.id, { week: 52, year: 2025 });
-
-    expect(message).toContain('href="w:52/2025"');
-  });
-
-  test('handles week 53 in years that have it', async () => {
-    const season = await setupSeason();
-    // 2026 has 53 weeks
-    const message = await getPollMessage(season.id, { week: 53, year: 2026 });
-
-    expect(message).toContain('href="w:53/2026"');
-  });
-
   test('includes legend in message', async () => {
     const season = await setupSeason();
     const message = await getPollMessage(season.id);
@@ -105,6 +42,20 @@ describe('getPollMessage', () => {
 
     // Week 2 of 2025 is Jan 6-12 (Finnish format: 6.1. - 12.1.)
     expect(message).toMatch(/6\.1\./);
+  });
+
+  test('includes week number in title', async () => {
+    const season = await setupSeason();
+    const message = await getPollMessage(season.id, { week: 5, year: 2025 });
+
+    expect(message).toContain('Week 5');
+  });
+
+  test('handles year boundary week 1', async () => {
+    const season = await setupSeason();
+    const message = await getPollMessage(season.id, { week: 1, year: 2026 });
+
+    expect(message).toContain('Week 1');
   });
 
   test('shows match week title for match week', async () => {
@@ -136,53 +87,51 @@ describe('getPollMessage', () => {
   });
 });
 
-describe('week marker parsing regex', () => {
-  // Test the regex pattern that will be used to parse week markers (hidden in HTML link)
-  const WEEK_MARKER_REGEX = /href="w:(\d+)\/(\d+)"/;
-
-  test('matches valid week marker in HTML link', () => {
-    const text = 'Some message text <a href="w:5/2025">\u200B</a>';
-    const match = text.match(WEEK_MARKER_REGEX);
-    expect(match).not.toBeNull();
-    expect(match?.[1]).toBe('5');
-    expect(match?.[2]).toBe('2025');
+describe('decodeWeekPayload', () => {
+  test('decodes valid payload', () => {
+    const result = decodeWeekPayload('5:2025');
+    expect(result).not.toBeNull();
+    expect(result?.week).toBe(5);
+    expect(result?.year).toBe(2025);
   });
 
-  test('matches double digit week', () => {
-    const text = 'Some message text <a href="w:52/2025">\u200B</a>';
-    const match = text.match(WEEK_MARKER_REGEX);
-    expect(match).not.toBeNull();
-    expect(match?.[1]).toBe('52');
+  test('decodes double digit week', () => {
+    const result = decodeWeekPayload('52:2025');
+    expect(result).not.toBeNull();
+    expect(result?.week).toBe(52);
+    expect(result?.year).toBe(2025);
   });
 
-  test('matches different years', () => {
-    const text = 'Some message text <a href="w:1/2026">\u200B</a>';
-    const match = text.match(WEEK_MARKER_REGEX);
-    expect(match).not.toBeNull();
-    expect(match?.[2]).toBe('2026');
+  test('decodes week 1 of different year', () => {
+    const result = decodeWeekPayload('1:2026');
+    expect(result).not.toBeNull();
+    expect(result?.week).toBe(1);
+    expect(result?.year).toBe(2026);
   });
 
-  test('matches anywhere in message', () => {
-    const text = '<a href="w:5/2025">\u200B</a> Some message text';
-    const match = text.match(WEEK_MARKER_REGEX);
-    expect(match).not.toBeNull();
+  test('returns null for undefined', () => {
+    const result = decodeWeekPayload(undefined);
+    expect(result).toBeNull();
   });
 
-  test('does not match invalid format', () => {
-    const text = 'Some message text <a href="w:abc/2025">\u200B</a>';
-    const match = text.match(WEEK_MARKER_REGEX);
-    expect(match).toBeNull();
+  test('returns null for empty string', () => {
+    const result = decodeWeekPayload('');
+    expect(result).toBeNull();
   });
 
-  test('extracts numbers correctly from complex message', () => {
-    const text = `📅 Week 5 (27.1.2025 – 2.2.2025)
+  test('returns null for invalid format - no colon', () => {
+    const result = decodeWeekPayload('52025');
+    expect(result).toBeNull();
+  });
 
-✅ Available | ❌ Unavailable
-<a href="w:5/2025">\u200B</a>`;
-    const match = text.match(WEEK_MARKER_REGEX);
-    expect(match).not.toBeNull();
-    expect(Number(match?.[1])).toBe(5);
-    expect(Number(match?.[2])).toBe(2025);
+  test('returns null for invalid format - non-numeric week', () => {
+    const result = decodeWeekPayload('abc:2025');
+    expect(result).toBeNull();
+  });
+
+  test('returns null for invalid format - non-numeric year', () => {
+    const result = decodeWeekPayload('5:abcd');
+    expect(result).toBeNull();
   });
 });
 

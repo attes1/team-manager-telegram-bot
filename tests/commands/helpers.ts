@@ -143,3 +143,29 @@ export const createMultiMentionUpdate = (
 export type MockDb = {
   db: Kysely<DB>;
 };
+
+export const createCallbackQueryUpdate = (
+  callbackData: string,
+  userId: number,
+  chatId: number,
+  message: {
+    text: string;
+    entities?: MessageEntity[];
+  },
+): Update => ({
+  update_id: 1,
+  callback_query: {
+    id: 'test-callback-id',
+    from: { id: userId, is_bot: false, first_name: 'Test' },
+    chat_instance: 'test-chat-instance',
+    data: callbackData,
+    message: {
+      message_id: 1,
+      date: Math.floor(Date.now() / 1000),
+      chat: { id: chatId, type: 'group', title: 'Test Group' },
+      from: { id: 1, is_bot: true, first_name: 'TestBot' },
+      text: message.text,
+      entities: message.entities,
+    },
+  },
+});
