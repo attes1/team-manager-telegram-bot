@@ -1,4 +1,5 @@
 import type { Day } from '../lib/schemas';
+import { daySchema } from '../lib/schemas';
 
 const DAY_TO_WEEKDAY: Record<Day, number> = {
   sun: 0,
@@ -11,7 +12,7 @@ const DAY_TO_WEEKDAY: Record<Day, number> = {
 };
 
 export const dayToCronWeekday = (day: string): number => {
-  const weekday = DAY_TO_WEEKDAY[day as Day];
+  const weekday = DAY_TO_WEEKDAY[daySchema.parse(day)];
   if (weekday === undefined) {
     throw new Error(`Invalid day: ${day}`);
   }

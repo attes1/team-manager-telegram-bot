@@ -1,6 +1,5 @@
 import type { Bot } from 'grammy';
 import { formatDateRange } from '../../../lib/format';
-import type { Day } from '../../../lib/schemas';
 import { daySchema } from '../../../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
 import { getLineup, getMatchInfo } from '../../../services/match';
@@ -25,7 +24,7 @@ export const registerMatchInfoCommand = (bot: Bot<BotContext>) => {
         const dayName = i18n.poll.days[matchInfo.matchDay];
         lines.push(i18n.match.time(dayName, matchInfo.matchTime));
       } else {
-        const defaultDay = daySchema.catch('sun').parse(config.matchDay) as Day;
+        const defaultDay = daySchema.catch('sun').parse(config.matchDay);
         const defaultTime = config.matchTime ?? '20:00';
         const dayName = i18n.poll.days[defaultDay];
         lines.push(i18n.match.timeDefault(dayName, defaultTime));
