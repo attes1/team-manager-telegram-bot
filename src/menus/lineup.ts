@@ -78,7 +78,8 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
       }
 
       const playerList = lineup.map((p) => `• ${formatPlayerName(p)}`).join('\n');
-      await ctx.editMessageText(ctx.i18n.lineup.set(lineup.length, playerList));
+      await ctx.deleteMessage();
+      await ctx.reply(ctx.i18n.lineup.set(lineup.length, playerList));
     })
     .row();
 });
