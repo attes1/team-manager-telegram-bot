@@ -7,6 +7,8 @@ import type { BotContext } from '@/bot/context';
 import { sendWeeklyPoll } from '@/scheduler/weekly-poll';
 
 const CHAT_ID = -100123456789;
+const PLAYER_ID = 111;
+const PLAYER_DM_CHAT_ID = 111;
 
 interface ApiCall {
   method: string;
@@ -40,6 +42,7 @@ const createMockBot = () => {
         chat: { id: CHAT_ID, type: 'group', title: 'Test Group' },
         from: { id: 1, is_bot: true, first_name: 'TestBot' },
         text: '',
+        username: 'test_bot',
       },
     } as ReturnType<typeof _prev>;
   });
@@ -59,7 +62,7 @@ describe('sendWeeklyPoll', () => {
     await mockDb.db.destroy();
   });
 
-  const setupSeason = async () => {
+  const setupSeason = async (options?: { addRosterWithDm?: boolean }) => {
     const season = await mockDb.db
       .insertInto('seasons')
       .values({ name: 'Test Season' })
@@ -76,6 +79,23 @@ describe('sendWeeklyPoll', () => {
       })
       .execute();
 
+    if (options?.addRosterWithDm) {
+      await mockDb.db
+        .insertInto('players')
+        .values({ telegramId: PLAYER_ID, displayName: 'Player', username: 'player' })
+        .execute();
+
+      await mockDb.db
+        .insertInto('seasonRoster')
+        .values({ seasonId: season.id, playerId: PLAYER_ID, role: 'player' })
+        .execute();
+
+      await mockDb.db
+        .insertInto('playerDmChats')
+        .values({ playerId: PLAYER_ID, dmChatId: PLAYER_DM_CHAT_ID, canDm: 1 })
+        .execute();
+    }
+
     return season;
   };
 
@@ -87,64 +107,57 @@ describe('sendWeeklyPoll', () => {
     expect(calls).toHaveLength(0);
   });
 
-  test('sends poll message with inline keyboard', async () => {
-    await setupSeason();
+  test('sends DM to roster players and summary to group', async () => {
+    await setupSeason({ addRosterWithDm: true });
     const { bot, calls } = createMockBot();
 
     await sendWeeklyPoll(bot, CHAT_ID);
 
-    expect(calls).toHaveLength(1);
-    expect(calls[0].method).toBe('sendMessage');
-    expect(calls[0].payload.chat_id).toBe(CHAT_ID);
-    expect(calls[0].payload.parse_mode).toBe('HTML');
+    // getMe + sendMessage to DM + sendMessage summary to group
+    expect(calls).toHaveLength(3);
+    expect(calls[0].method).toBe('getMe');
 
-    // Should have reply_markup with inline_keyboard
-    const replyMarkup = calls[0].payload.reply_markup as { inline_keyboard?: unknown[][] };
-    expect(replyMarkup).toBeDefined();
-    expect(replyMarkup.inline_keyboard).toBeDefined();
-    expect(Array.isArray(replyMarkup.inline_keyboard)).toBe(true);
+    // DM to player with poll menu
+    expect(calls[1].method).toBe('sendMessage');
+    expect(calls[1].payload.chat_id).toBe(PLAYER_DM_CHAT_ID);
+
+    // Summary to group
+    expect(calls[2].method).toBe('sendMessage');
+    expect(calls[2].payload.chat_id).toBe(CHAT_ID);
   });
 
-  test('keyboard has single Open Poll button', async () => {
-    await setupSeason();
+  test('summary shows sent players', async () => {
+    await setupSeason({ addRosterWithDm: true });
     const { bot, calls } = createMockBot();
 
     await sendWeeklyPoll(bot, CHAT_ID);
 
-    const replyMarkup = calls[0].payload.reply_markup as {
-      inline_keyboard: Array<Array<{ text: string; callback_data: string }>>;
-    };
-
-    // Should have 1 row with 1 button
-    expect(replyMarkup.inline_keyboard).toHaveLength(1);
-    expect(replyMarkup.inline_keyboard[0]).toHaveLength(1);
-
-    const button = replyMarkup.inline_keyboard[0][0];
-    expect(button.text).toBe('📊 Open Poll');
+    const summaryMessage = calls[2].payload.text as string;
+    expect(summaryMessage).toContain('Player'); // The player who received DM
+    expect(summaryMessage).toContain('Week 2');
   });
 
-  test('button has correct callback data format', async () => {
-    await setupSeason();
+  test('sends only summary when no roster has DM registered', async () => {
+    await setupSeason(); // No roster
     const { bot, calls } = createMockBot();
 
     await sendWeeklyPoll(bot, CHAT_ID);
 
-    const replyMarkup = calls[0].payload.reply_markup as {
-      inline_keyboard: Array<Array<{ text: string; callback_data: string }>>;
-    };
-
-    const button = replyMarkup.inline_keyboard[0][0];
-    // Week 2 of 2025 (based on fake time 2025-01-08)
-    expect(button.callback_data).toBe('open_poll:2:2025');
+    // getMe + sendMessage summary to group
+    expect(calls).toHaveLength(2);
+    expect(calls[0].method).toBe('getMe');
+    expect(calls[1].method).toBe('sendMessage');
+    expect(calls[1].payload.chat_id).toBe(CHAT_ID);
   });
 
-  test('message contains week information', async () => {
-    await setupSeason();
+  test('summary contains week information', async () => {
+    await setupSeason({ addRosterWithDm: true });
     const { bot, calls } = createMockBot();
 
     await sendWeeklyPoll(bot, CHAT_ID);
 
-    const message = calls[0].payload.text as string;
-    expect(message).toContain('week 2');
+    // Summary message is the last one
+    const summaryMessage = calls[calls.length - 1].payload.text as string;
+    expect(summaryMessage).toContain('Week 2');
   });
 });

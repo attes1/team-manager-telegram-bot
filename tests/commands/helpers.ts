@@ -73,6 +73,23 @@ export const createCommandUpdate = (
   },
 });
 
+export const createPrivateCommandUpdate = (
+  command: string,
+  userId: number,
+  extra?: Partial<Update['message']>,
+): Update => ({
+  update_id: 1,
+  message: {
+    message_id: 1,
+    date: Math.floor(Date.now() / 1000),
+    chat: { id: userId, type: 'private', first_name: 'Test' },
+    from: { id: userId, is_bot: false, first_name: 'Test' },
+    text: command,
+    entities: [{ type: 'bot_command', offset: 0, length: command.split(' ')[0].length }],
+    ...extra,
+  },
+});
+
 export const createMentionUpdate = (
   command: string,
   userId: number,

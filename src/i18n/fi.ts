@@ -123,6 +123,11 @@ export interface Translations {
     };
     openPollButton: string;
     scheduledPollPrompt: (week: number, dateRange: string) => string;
+    dmSent: string;
+    dmFailed: (botUsername: string) => string;
+    scheduledSummary: (week: number, dateRange: string) => string;
+    dmSentTo: (players: string) => string;
+    dmFailedTo: (players: string, botUsername: string) => string;
   };
   avail: {
     title: (week: number, dateRange: string) => string;
@@ -401,6 +406,14 @@ export const fi: Translations = {
     },
     openPollButton: '📊 Avaa polli',
     scheduledPollPrompt: (week, dateRange) => `📋 Täytä viikon ${week} (${dateRange}) aikataulut!`,
+    dmSent: '📬 Polli lähetetty yksityisviestinä!',
+    dmFailed: (botUsername) =>
+      `Aloita keskustelu botin kanssa saadaksesi pollin: t.me/${botUsername}`,
+    scheduledSummary: (week, dateRange) =>
+      `📋 Vko ${week} (${dateRange}) aikataulukysely lähetetty!`,
+    dmSentTo: (players) => `✅ Lähetetty: ${players}`,
+    dmFailedTo: (players, botUsername) =>
+      `❌ Ei voitu lähettää: ${players}\n👆 Aloita keskustelu: t.me/${botUsername}`,
   },
   avail: {
     title: (week, dateRange) => `Vko ${week} (${dateRange}) aikataulut:`,

@@ -129,6 +129,13 @@ export const en: Translations = {
     openPollButton: '📊 Open Poll',
     scheduledPollPrompt: (week, dateRange) =>
       `📋 Fill in your availability for week ${week} (${dateRange})!`,
+    dmSent: '📬 Poll sent to your DM!',
+    dmFailed: (botUsername) =>
+      `Start a conversation with the bot to receive polls: t.me/${botUsername}`,
+    scheduledSummary: (week, dateRange) => `📋 Week ${week} (${dateRange}) availability poll sent!`,
+    dmSentTo: (players) => `✅ Sent to: ${players}`,
+    dmFailedTo: (players, botUsername) =>
+      `❌ Couldn't send to: ${players}\n👆 Start conversation: t.me/${botUsername}`,
   },
   avail: {
     title: (week, dateRange) => `Week ${week} (${dateRange}) availability:`,

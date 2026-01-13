@@ -6,6 +6,7 @@ import { createCommandUpdate, createTestBot } from './helpers';
 
 const PLAYER_ID = 111;
 const CHAT_ID = -100123456789;
+const DM_CHAT_ID = 111; // DM chat ID equals user ID in Telegram
 
 describe('/poll command', () => {
   beforeEach(async () => {
@@ -21,7 +22,7 @@ describe('/poll command', () => {
     await mockDb.db.destroy();
   });
 
-  const setupSeasonWithPlayer = async () => {
+  const setupSeasonWithPlayer = async (registerDm = true) => {
     const season = await mockDb.db
       .insertInto('seasons')
       .values({ name: 'Test Season' })
@@ -40,10 +41,17 @@ describe('/poll command', () => {
       .values({ seasonId: season.id, playerId: PLAYER_ID, role: 'player' })
       .execute();
 
+    if (registerDm) {
+      await mockDb.db
+        .insertInto('playerDmChats')
+        .values({ playerId: PLAYER_ID, dmChatId: DM_CHAT_ID, canDm: 1 })
+        .execute();
+    }
+
     return season;
   };
 
-  test('sends poll for target week when no parameter provided', async () => {
+  test('sends poll to DM when used in group with DM registered', async () => {
     await setupSeasonWithPlayer();
     const { bot, calls } = createTestBot();
     registerPollCommand(bot);
@@ -51,10 +59,14 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // First call: poll sent to DM, second call: confirmation in group
+    expect(calls).toHaveLength(2);
     expect(calls[0].method).toBe('sendMessage');
-    // Week 2 is target (before Sunday 10:00 cutoff)
+    expect(calls[0].payload.chat_id).toBe(DM_CHAT_ID);
     expect(calls[0].payload.text).toContain('Week 2');
+    expect(calls[1].method).toBe('sendMessage');
+    expect(calls[1].payload.chat_id).toBe(CHAT_ID);
+    expect(calls[1].payload.text).toContain('DM');
   });
 
   test('sends poll for specified week when parameter provided', async () => {
@@ -65,7 +77,8 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll 5', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Poll sent to DM + confirmation in group
+    expect(calls).toHaveLength(2);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Week 5');
   });
@@ -93,7 +106,8 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll 2', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Poll sent to DM + confirmation
+    expect(calls).toHaveLength(2);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Week 2');
     expect(calls[0].payload.text).not.toContain('past');
@@ -126,7 +140,8 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll 2/2026', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Poll sent to DM + confirmation
+    expect(calls).toHaveLength(2);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Week 2');
   });
@@ -140,7 +155,8 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll 10', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Poll sent to DM + confirmation
+    expect(calls).toHaveLength(2);
     expect(calls[0].payload.text).toContain('Week 10');
   });
 
@@ -190,7 +206,8 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Poll sent to DM + confirmation
+    expect(calls).toHaveLength(2);
     expect(calls[0].payload.text).toContain('Week 3');
   });
 
@@ -263,6 +280,12 @@ describe('/poll command', () => {
       .values({ seasonId: season.id, playerId: PLAYER_ID, role: 'player' })
       .execute();
 
+    // Register DM
+    await mockDb.db
+      .insertInto('playerDmChats')
+      .values({ playerId: PLAYER_ID, dmChatId: DM_CHAT_ID, canDm: 1 })
+      .execute();
+
     // Set to Tuesday of week 2 (after Monday cutoff, so target is week 3)
     vi.setSystemTime(new Date('2025-01-07T11:00:00'));
 
@@ -272,7 +295,8 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Poll sent to DM + confirmation
+    expect(calls).toHaveLength(2);
     expect(calls[0].payload.text).toContain('Week 3');
   });
 
@@ -304,6 +328,12 @@ describe('/poll command', () => {
       .values({ seasonId: season.id, playerId: PLAYER_ID, role: 'player' })
       .execute();
 
+    // Register DM
+    await mockDb.db
+      .insertInto('playerDmChats')
+      .values({ playerId: PLAYER_ID, dmChatId: DM_CHAT_ID, canDm: 1 })
+      .execute();
+
     // Set to Thursday 09:00 (after 08:00 cutoff, so target is week 3)
     vi.setSystemTime(new Date('2025-01-09T09:00:00'));
 
@@ -313,7 +343,8 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Poll sent to DM + confirmation
+    expect(calls).toHaveLength(2);
     expect(calls[0].payload.text).toContain('Week 3');
   });
 
@@ -327,8 +358,24 @@ describe('/poll command', () => {
     const update = createCommandUpdate('/poll', PLAYER_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Poll sent to DM + confirmation
+    expect(calls).toHaveLength(2);
     expect(calls[0].payload.text).toContain('Week 1');
     // Week 1 should be 2026 since we crossed the year boundary
+  });
+
+  test('shows dmFailed message when no DM registered', async () => {
+    await setupSeasonWithPlayer(false); // Don't register DM
+    const { bot, calls } = createTestBot();
+    registerPollCommand(bot);
+
+    const update = createCommandUpdate('/poll', PLAYER_ID, CHAT_ID);
+    await bot.handleUpdate(update);
+
+    // getMe + sendMessage with dmFailed
+    expect(calls).toHaveLength(2);
+    expect(calls[0].method).toBe('getMe');
+    expect(calls[1].method).toBe('sendMessage');
+    expect(calls[1].payload.text).toContain('t.me/');
   });
 });

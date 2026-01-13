@@ -5,6 +5,7 @@ import { languageSchema } from '../lib/schemas';
 import { lineupMenu } from '../menus/lineup';
 import { pollMenu } from '../menus/poll';
 import { getConfig } from '../services/config';
+import { registerDmChat } from '../services/dm';
 import { getActiveSeason } from '../services/season';
 import { registerCommands } from './commands';
 import { commandDefinitions } from './commands/definitions';
@@ -21,7 +22,16 @@ export const createBot = () => {
   bot.use(pollMenu);
   bot.use(lineupMenu);
 
-  bot.command('start', (ctx) => ctx.reply(ctx.i18n.bot.started));
+  bot.command('start', async (ctx) => {
+    const userId = ctx.from?.id;
+    const chatId = ctx.chat?.id;
+
+    if (ctx.chat?.type === 'private' && userId && chatId) {
+      await registerDmChat(db, userId, chatId);
+    }
+
+    return ctx.reply(ctx.i18n.bot.started);
+  });
 
   registerCommands(bot);
   registerReactionHandlers(bot);

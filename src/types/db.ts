@@ -112,6 +112,14 @@ export interface GroupsTable {
   removedAt: string | null;
 }
 
+export interface PlayerDmChatsTable {
+  playerId: number;
+  dmChatId: number;
+  canDm: Generated<number>;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
+}
+
 export interface DB {
   seasons: SeasonsTable;
   config: ConfigTable;
@@ -123,6 +131,7 @@ export interface DB {
   lineups: LineupsTable;
   activeMenus: ActiveMenusTable;
   groups: GroupsTable;
+  playerDmChats: PlayerDmChatsTable;
 }
 
 export type Season = Selectable<SeasonsTable>;
@@ -131,3 +140,4 @@ export type Player = Selectable<PlayersTable>;
 export type Week = Selectable<WeeksTable>;
 export type ActiveMenu = Selectable<ActiveMenusTable>;
 export type Group = Selectable<GroupsTable>;
+export type PlayerDmChat = Selectable<PlayerDmChatsTable>;
