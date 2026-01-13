@@ -70,9 +70,14 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
     const week = parseInt(match[1], 10);
     const year = parseInt(match[2], 10);
 
-    // Send the interactive poll menu
-    await sendPollMenu(ctx as RosterContext, { week, year });
-    await ctx.answerCallbackQuery();
+    try {
+      // Send the interactive poll menu
+      await sendPollMenu(ctx as RosterContext, { week, year });
+      await ctx.answerCallbackQuery();
+    } catch (err) {
+      console.error('Error opening poll:', err);
+      await ctx.answerCallbackQuery({ text: 'Error opening poll', show_alert: true });
+    }
   });
 
   bot.command(
