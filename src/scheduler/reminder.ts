@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { getTranslations } from '@/i18n';
 import { formatDateRange, formatPlayerName, formatUserMention } from '@/lib/format';
 import { getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
+import { createOpenPollKeyboard } from '@/scheduler/weekly-poll';
 import { hasRespondedForWeek } from '@/services/availability';
 import { getConfig } from '@/services/config';
 import { getRoster } from '@/services/roster';
@@ -52,10 +53,13 @@ export const sendReminder = async (bot: Bot<BotContext>, chatId: number): Promis
     }
   }
 
+  const keyboard = createOpenPollKeyboard(week, year, i18n.poll.openPollButton);
+
   if (playersWithoutResponse.length === 0) {
     await bot.api.sendMessage(
       chatId,
       `${i18n.reminder.title(week, dateRange)}\n\n${i18n.reminder.allResponded}`,
+      { reply_markup: keyboard },
     );
     console.log('Reminder: All players have responded');
     return;
@@ -70,6 +74,7 @@ export const sendReminder = async (bot: Bot<BotContext>, chatId: number): Promis
 
   await bot.api.sendMessage(chatId, message, {
     parse_mode: 'HTML',
+    reply_markup: keyboard,
   });
 
   console.log(
