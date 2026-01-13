@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerSeasonCommands } from '@/commands/admin/season';
+import { registerSeasonCommands } from '@/bot/commands/admin/season';
 import { up } from '@/db/migrations/001_initial';
 import type { DB } from '@/types/db';
 import { createCommandUpdate, createTestBot } from './helpers';
@@ -21,7 +21,7 @@ const TEST_CHAT_ID = -100123;
 vi.mock('@/db', () => mockDb);
 vi.mock('@/env', () => mockEnv);
 
-describe('/season command', () => {
+describe('season commands', () => {
   beforeEach(async () => {
     const db = new Kysely<DB>({
       dialect: new SqliteDialect({
@@ -37,12 +37,12 @@ describe('/season command', () => {
     await mockDb.db.destroy();
   });
 
-  describe('/season start', () => {
+  describe('/startseason', () => {
     test('admin can start a season', async () => {
       const { bot, calls } = createTestBot();
       registerSeasonCommands(bot);
 
-      const update = createCommandUpdate('/season start Spring 2025', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/startseason Spring 2025', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
@@ -54,7 +54,7 @@ describe('/season command', () => {
       const { bot, calls } = createTestBot();
       registerSeasonCommands(bot);
 
-      const update = createCommandUpdate('/season start Test', TEST_USER_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/startseason Test', TEST_USER_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
@@ -66,7 +66,7 @@ describe('/season command', () => {
       const { bot, calls } = createTestBot();
       registerSeasonCommands(bot);
 
-      const update = createCommandUpdate('/season start', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/startseason', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
@@ -75,19 +75,19 @@ describe('/season command', () => {
     });
   });
 
-  describe('/season end', () => {
+  describe('/endseason', () => {
     test('admin can end an active season', async () => {
       const { bot, calls } = createTestBot();
       registerSeasonCommands(bot);
 
       // First start a season
-      const startUpdate = createCommandUpdate('/season start Test', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const startUpdate = createCommandUpdate('/startseason Test', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(startUpdate);
 
       calls.length = 0; // Clear previous calls
 
       // Then end it
-      const endUpdate = createCommandUpdate('/season end', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const endUpdate = createCommandUpdate('/endseason', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(endUpdate);
 
       expect(calls).toHaveLength(1);
@@ -100,7 +100,7 @@ describe('/season command', () => {
       const { bot, calls } = createTestBot();
       registerSeasonCommands(bot);
 
-      const update = createCommandUpdate('/season end', TEST_USER_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/endseason', TEST_USER_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
@@ -111,7 +111,7 @@ describe('/season command', () => {
       const { bot, calls } = createTestBot();
       registerSeasonCommands(bot);
 
-      const update = createCommandUpdate('/season end', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/endseason', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
@@ -126,7 +126,7 @@ describe('/season command', () => {
 
       // Start a season first
       const startUpdate = createCommandUpdate(
-        '/season start Test Season',
+        '/startseason Test Season',
         TEST_ADMIN_ID,
         TEST_CHAT_ID,
       );

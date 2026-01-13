@@ -3,7 +3,7 @@ import { getISOWeek } from 'date-fns';
 import type { Kysely } from 'kysely';
 import { CamelCasePlugin, Kysely as KyselyClass, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerPracticeCommand } from '@/commands/player/practice';
+import { registerPracticeCommand } from '@/bot/commands/player/practice';
 import { up } from '@/db/migrations/001_initial';
 import type { DB } from '@/types/db';
 import { createCommandUpdate, createTestBot } from './helpers';
@@ -51,7 +51,13 @@ describe('/practice command', () => {
     const { bot, calls } = createTestBot();
     registerPracticeCommand(bot);
 
-    await mockDb.db.insertInto('seasons').values({ name: 'Test Season' }).execute();
+    const season = await mockDb.db
+      .insertInto('seasons')
+      .values({ name: 'Test Season' })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+
+    await mockDb.db.insertInto('config').values({ seasonId: season.id, language: 'en' }).execute();
 
     const update = createCommandUpdate('/practice', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);
@@ -135,7 +141,13 @@ describe('/practice command', () => {
     const { bot, calls } = createTestBot();
     registerPracticeCommand(bot);
 
-    await mockDb.db.insertInto('seasons').values({ name: 'Test Season' }).execute();
+    const season = await mockDb.db
+      .insertInto('seasons')
+      .values({ name: 'Test Season' })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+
+    await mockDb.db.insertInto('config').values({ seasonId: season.id, language: 'en' }).execute();
 
     const update = createCommandUpdate('/practice invalid', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);

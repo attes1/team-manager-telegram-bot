@@ -1,9 +1,8 @@
 import type { Bot } from 'grammy';
-import { db } from '../../db';
-import { getTranslations, type Translations, t } from '../../i18n';
-import { isAdmin } from '../../lib/admin';
-import { getConfig, updateConfig } from '../../services/config';
-import { getActiveSeason } from '../../services/season';
+import type { Translations } from '../../../i18n';
+import { getConfig, updateConfig } from '../../../services/config';
+import type { AdminSeasonContext, BotContext } from '../../context';
+import { adminSeasonCommand } from '../../middleware';
 
 const USER_TO_DB_KEY: Record<string, string> = {
   language: 'language',
@@ -57,49 +56,42 @@ const formatConfigDisplay = (
   return `${i18n.config.title}\n${lines.join('\n')}\n\n${i18n.config.usage}`;
 };
 
-export const registerConfigCommand = (bot: Bot) => {
-  bot.command('config', async (ctx) => {
-    const userId = ctx.from?.id;
-    if (!userId || !isAdmin(userId)) {
-      return ctx.reply(t().errors.notAdmin);
-    }
+export const registerConfigCommand = (bot: Bot<BotContext>) => {
+  bot.command(
+    'config',
+    adminSeasonCommand(async (ctx: AdminSeasonContext) => {
+      const { db, season, i18n } = ctx;
+      const args = ctx.match?.toString().trim() ?? '';
+      const [key, ...rest] = args.split(/\s+/);
+      const value = rest.join(' ').trim();
 
-    const season = await getActiveSeason(db);
-    if (!season) {
-      return ctx.reply(t().errors.noActiveSeason);
-    }
-
-    const i18n = await getTranslations(db, season.id);
-    const args = ctx.match?.toString().trim() ?? '';
-    const [key, ...rest] = args.split(/\s+/);
-    const value = rest.join(' ').trim();
-
-    if (!key) {
-      const config = await getConfig(db, season.id);
-      if (!config) {
-        return ctx.reply(i18n.errors.noActiveSeason);
+      if (!key) {
+        const config = await getConfig(db, season.id);
+        if (!config) {
+          return ctx.reply(i18n.errors.noActiveSeason);
+        }
+        return ctx.reply(formatConfigDisplay(i18n, config));
       }
-      return ctx.reply(formatConfigDisplay(i18n, config));
-    }
 
-    if (!isValidUserKey(key)) {
-      return ctx.reply(i18n.errors.invalidConfigKey);
-    }
-
-    if (!value) {
-      const config = await getConfig(db, season.id);
-      if (!config) {
-        return ctx.reply(i18n.errors.noActiveSeason);
+      if (!isValidUserKey(key)) {
+        return ctx.reply(i18n.errors.invalidConfigKey);
       }
-      return ctx.reply(formatConfigDisplay(i18n, config));
-    }
 
-    try {
-      const dbKey = toDbKey(key);
-      await updateConfig(db, season.id, dbKey, value);
-      return ctx.reply(i18n.config.updated(key, value));
-    } catch {
-      return ctx.reply(i18n.errors.invalidConfigValue(key));
-    }
-  });
+      if (!value) {
+        const config = await getConfig(db, season.id);
+        if (!config) {
+          return ctx.reply(i18n.errors.noActiveSeason);
+        }
+        return ctx.reply(formatConfigDisplay(i18n, config));
+      }
+
+      try {
+        const dbKey = toDbKey(key);
+        await updateConfig(db, season.id, dbKey, value);
+        return ctx.reply(i18n.config.updated(key, value));
+      } catch {
+        return ctx.reply(i18n.errors.invalidConfigValue(key));
+      }
+    }),
+  );
 };

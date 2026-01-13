@@ -1,8 +1,7 @@
 import { Menu } from '@grammyjs/menu';
-import type { Context } from 'grammy';
+import type { BotContext } from '../bot/context';
 import { db } from '../db';
 import { getTranslations } from '../i18n';
-import { isAdmin } from '../lib/admin';
 import { formatDateRange } from '../lib/format';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { getConfig } from '../services/config';
@@ -10,9 +9,8 @@ import { getLineup, setLineup } from '../services/match';
 import { getRoster } from '../services/roster';
 import { getActiveSeason } from '../services/season';
 
-export const lineupMenu = new Menu<Context>('lineup').dynamic(async (ctx, range) => {
-  const userId = ctx.from?.id;
-  if (!userId || !isAdmin(userId)) {
+export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, range) => {
+  if (!ctx.isAdmin) {
     return;
   }
 

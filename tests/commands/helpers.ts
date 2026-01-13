@@ -1,6 +1,8 @@
 import { Bot } from 'grammy';
 import type { MessageEntity, Update, UserFromGetMe } from 'grammy/types';
 import type { Kysely } from 'kysely';
+import type { BotContext } from '@/bot/context';
+import { contextMiddleware } from '@/bot/middleware';
 import type { DB } from '@/types/db';
 
 export interface ApiCall {
@@ -11,7 +13,7 @@ export interface ApiCall {
 export const createTestBot = () => {
   const calls: ApiCall[] = [];
 
-  const bot = new Bot('test-token', {
+  const bot = new Bot<BotContext>('test-token', {
     botInfo: {
       id: 1,
       is_bot: true,
@@ -29,6 +31,8 @@ export const createTestBot = () => {
     calls.push({ method, payload: payload as Record<string, unknown> });
     return { ok: true, result: true } as ReturnType<typeof _prev>;
   });
+
+  bot.use(contextMiddleware);
 
   return { bot, calls };
 };

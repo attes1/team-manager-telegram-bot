@@ -1,8 +1,8 @@
 import Database from 'better-sqlite3';
 import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerMatchCommands } from '@/commands/admin/match';
-import { registerMatchInfoCommand } from '@/commands/player/match';
+import { registerMatchCommands } from '@/bot/commands/admin/match';
+import { registerMatchInfoCommand } from '@/bot/commands/player/match';
 import { up } from '@/db/migrations/001_initial';
 import { getCurrentWeek } from '@/lib/week';
 import { setLineup, setMatchTime } from '@/services/match';

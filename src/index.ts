@@ -1,12 +1,14 @@
-import { createBot } from './bot';
+import { createBot, setCommands } from './bot/index';
 
 const main = async () => {
   const bot = createBot();
 
   console.log('Starting bot...');
   await bot.start({
-    onStart: (botInfo) => {
+    onStart: async (botInfo) => {
       console.log(`Bot @${botInfo.username} started successfully`);
+      await setCommands(bot);
+      console.log('Commands registered');
     },
   });
 };

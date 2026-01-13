@@ -1,5 +1,5 @@
 import { Menu } from '@grammyjs/menu';
-import type { Context } from 'grammy';
+import type { BotContext } from '../bot/context';
 import { db } from '../db';
 import { getTranslations } from '../i18n';
 import { formatDateRange } from '../lib/format';
@@ -33,7 +33,7 @@ const getNextStatus = (current: AvailabilityStatus): AvailabilityStatus => {
   return STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
 };
 
-export const pollMenu = new Menu<Context>('poll').dynamic(async (ctx, range) => {
+export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) => {
   const userId = ctx.from?.id;
   if (!userId) {
     return;

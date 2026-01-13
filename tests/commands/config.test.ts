@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerConfigCommand } from '@/commands/admin/config';
+import { registerConfigCommand } from '@/bot/commands/admin/config';
 import { up } from '@/db/migrations/001_initial';
 import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';

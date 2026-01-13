@@ -1,8 +1,8 @@
 import Database from 'better-sqlite3';
 import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerPlayerCommands } from '@/commands/admin/players';
-import { registerRosterCommand } from '@/commands/player/roster';
+import { registerPlayerCommands } from '@/bot/commands/admin/players';
+import { registerRosterCommand } from '@/bot/commands/player/roster';
 import { up } from '@/db/migrations/001_initial';
 import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
