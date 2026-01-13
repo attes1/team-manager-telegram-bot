@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { registerPlayerCommands } from '@/bot/commands/admin/players';
 import { registerRosterCommand } from '@/bot/commands/player/roster';
 import { up } from '@/db/migrations/001_initial';
+import { clearAll } from '@/services/pending-invitations';
+import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
 import { createCommandUpdate, createMentionUpdate, createTestBot } from './helpers';
@@ -43,13 +45,15 @@ describe('/addplayer command', () => {
     });
     await up(db);
     mockDb.db = db;
+    clearAll();
   });
 
   afterEach(async () => {
     await mockDb.db.destroy();
+    clearAll();
   });
 
-  test('admin can add a player', async () => {
+  test('admin can send invitation with text_mention', async () => {
     await startSeason(mockDb.db, 'Test Season');
 
     const { bot, calls } = createTestBot();
@@ -63,10 +67,46 @@ describe('/addplayer command', () => {
     });
     await bot.handleUpdate(update);
 
-    expect(calls).toHaveLength(1);
+    // Should have 2 calls: invitation message, setMessageReaction
+    expect(calls.length).toBe(2);
+
+    // First call should be the invitation message
     expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.text).toContain('join the roster');
     expect(calls[0].payload.text).toContain('John Doe');
-    expect(calls[0].payload.text).toContain('added');
+
+    // Second call should be setMessageReaction
+    expect(calls[1].method).toBe('setMessageReaction');
+  });
+
+  test('admin can send invitation with username arg', async () => {
+    await startSeason(mockDb.db, 'Test Season');
+
+    const { bot, calls } = createTestBot();
+    registerPlayerCommands(bot);
+
+    const update = createCommandUpdate('/addplayer johndoe', TEST_ADMIN_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(update);
+
+    // Should have 2 calls: invitation message, setMessageReaction
+    expect(calls.length).toBe(2);
+    expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.text).toContain('@johndoe');
+    expect(calls[0].payload.text).toContain('join the roster');
+  });
+
+  test('admin can send invitation with @username arg', async () => {
+    await startSeason(mockDb.db, 'Test Season');
+
+    const { bot, calls } = createTestBot();
+    registerPlayerCommands(bot);
+
+    const update = createCommandUpdate('/addplayer @johndoe', TEST_ADMIN_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls.length).toBe(2);
+    expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.text).toContain('@johndoe');
   });
 
   test('non-admin cannot add a player', async () => {
@@ -99,7 +139,7 @@ describe('/addplayer command', () => {
     expect(calls[0].payload.text).toContain('No active season');
   });
 
-  test('requires user mention', async () => {
+  test('shows usage when no user specified', async () => {
     await startSeason(mockDb.db, 'Test Season');
 
     const { bot, calls } = createTestBot();
@@ -109,27 +149,7 @@ describe('/addplayer command', () => {
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('Mention');
-  });
-
-  test('prevents adding same player twice', async () => {
-    await startSeason(mockDb.db, 'Test Season');
-
-    const { bot, calls } = createTestBot();
-    registerPlayerCommands(bot);
-
-    const update = createMentionUpdate('/addplayer', TEST_ADMIN_ID, TEST_CHAT_ID, {
-      id: 111222,
-      firstName: 'John',
-    });
-
-    await bot.handleUpdate(update);
-    calls.length = 0;
-
-    await bot.handleUpdate(update);
-
-    expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('already');
+    expect(calls[0].payload.text).toContain('Usage');
   });
 });
 
@@ -149,21 +169,19 @@ describe('/removeplayer command', () => {
     await mockDb.db.destroy();
   });
 
-  test('admin can remove a player', async () => {
-    await startSeason(mockDb.db, 'Test Season');
+  test('admin can remove a player with text_mention', async () => {
+    const season = await startSeason(mockDb.db, 'Test Season');
+    // Directly add player to roster (bypassing invitation flow)
+    await addPlayerToRoster(mockDb.db, {
+      seasonId: season.id,
+      telegramId: 111222,
+      displayName: 'John',
+      username: 'johndoe',
+    });
 
     const { bot, calls } = createTestBot();
     registerPlayerCommands(bot);
 
-    // First add a player
-    const addUpdate = createMentionUpdate('/addplayer', TEST_ADMIN_ID, TEST_CHAT_ID, {
-      id: 111222,
-      firstName: 'John',
-    });
-    await bot.handleUpdate(addUpdate);
-    calls.length = 0;
-
-    // Then remove them
     const removeUpdate = createMentionUpdate('/removeplayer', TEST_ADMIN_ID, TEST_CHAT_ID, {
       id: 111222,
       firstName: 'John',
@@ -172,6 +190,26 @@ describe('/removeplayer command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].payload.text).toContain('John');
+    expect(calls[0].payload.text).toContain('removed');
+  });
+
+  test('admin can remove a player by username', async () => {
+    const season = await startSeason(mockDb.db, 'Test Season');
+    await addPlayerToRoster(mockDb.db, {
+      seasonId: season.id,
+      telegramId: 111222,
+      displayName: 'John Doe',
+      username: 'johndoe',
+    });
+
+    const { bot, calls } = createTestBot();
+    registerPlayerCommands(bot);
+
+    const removeUpdate = createCommandUpdate('/removeplayer johndoe', TEST_ADMIN_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(removeUpdate);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('John Doe');
     expect(calls[0].payload.text).toContain('removed');
   });
 
@@ -249,28 +287,23 @@ describe('/roster command', () => {
   });
 
   test('shows players in roster', async () => {
-    await startSeason(mockDb.db, 'Test Season');
-
-    const { bot, calls } = createTestBot();
-    registerPlayerCommands(bot);
-    registerRosterCommand(bot);
-
-    // Add players
-    const addUpdate1 = createMentionUpdate('/addplayer', TEST_ADMIN_ID, TEST_CHAT_ID, {
-      id: 111,
-      firstName: 'Alice',
+    const season = await startSeason(mockDb.db, 'Test Season');
+    // Directly add players (bypassing invitation flow)
+    await addPlayerToRoster(mockDb.db, {
+      seasonId: season.id,
+      telegramId: 111,
+      displayName: 'Alice',
       username: 'alice',
     });
-    const addUpdate2 = createMentionUpdate('/addplayer', TEST_ADMIN_ID, TEST_CHAT_ID, {
-      id: 222,
-      firstName: 'Bob',
+    await addPlayerToRoster(mockDb.db, {
+      seasonId: season.id,
+      telegramId: 222,
+      displayName: 'Bob',
     });
 
-    await bot.handleUpdate(addUpdate1);
-    await bot.handleUpdate(addUpdate2);
-    calls.length = 0;
+    const { bot, calls } = createTestBot();
+    registerRosterCommand(bot);
 
-    // Check roster
     const rosterUpdate = createCommandUpdate('/roster', TEST_USER_ID, TEST_CHAT_ID);
     await bot.handleUpdate(rosterUpdate);
 

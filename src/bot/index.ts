@@ -9,6 +9,7 @@ import { getActiveSeason } from '../services/season';
 import { registerCommands } from './commands';
 import { commandDefinitions } from './commands/definitions';
 import type { BotContext } from './context';
+import { registerReactionHandlers } from './handlers/reactions';
 import { contextMiddleware } from './middleware';
 
 export const createBot = () => {
@@ -21,6 +22,7 @@ export const createBot = () => {
   bot.command('start', (ctx) => ctx.reply(ctx.i18n.bot.started));
 
   registerCommands(bot);
+  registerReactionHandlers(bot);
 
   bot.catch((err) => {
     console.error('Bot error:', err);

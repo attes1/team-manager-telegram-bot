@@ -20,6 +20,12 @@ export interface Translations {
     empty: string;
     title: string;
     playerLine: (name: string, username: string | null) => string;
+    invitationPrompt: string;
+    invitationSent: (name: string) => string;
+    invitationAccepted: (name: string) => string;
+    invitationDeclined: (name: string) => string;
+    invitationExpired: string;
+    addplayerUsage: string;
   };
   season: {
     started: (name: string) => string;
@@ -187,6 +193,13 @@ export const fi: Translations = {
     empty: 'Rosteri on tyhjä.',
     title: 'Rosteri:',
     playerLine: (name, username) => (username ? `• ${name} (@${username})` : `• ${name}`),
+    invitationPrompt: 'Haluatko liittyä rosteriin? Reagoi 👍 hyväksyäksesi tai 👎 hylätäksesi.',
+    invitationSent: (name) => `Kutsu lähetetty: ${name}`,
+    invitationAccepted: (name) => `${name} lisätty rosteriin!`,
+    invitationDeclined: (name) => `${name} hylkäsi kutsun.`,
+    invitationExpired: 'Kutsu vanhentunut.',
+    addplayerUsage:
+      'Käyttö: /addplayer <käyttäjänimi>\nTai napauta käyttäjän nimeä viestissä ja kirjoita /addplayer',
   },
   season: {
     started: (name) => `Kausi "${name}" aloitettu!`,

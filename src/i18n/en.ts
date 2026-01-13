@@ -22,6 +22,13 @@ export const en: Translations = {
     empty: 'Roster is empty.',
     title: 'Roster:',
     playerLine: (name, username) => (username ? `• ${name} (@${username})` : `• ${name}`),
+    invitationPrompt: 'Do you want to join the roster? React 👍 to accept or 👎 to decline.',
+    invitationSent: (name) => `Invitation sent: ${name}`,
+    invitationAccepted: (name) => `${name} added to roster!`,
+    invitationDeclined: (name) => `${name} declined the invitation.`,
+    invitationExpired: 'Invitation expired.',
+    addplayerUsage:
+      'Usage: /addplayer <username>\nOr tap a user name in a message and type /addplayer',
   },
   season: {
     started: (name) => `Season "${name}" started!`,

@@ -103,8 +103,28 @@ Available to roster members only:
 - `/endseason` - End current season
 - `/season` - View season info
 - `/config [key] [value]` - View/edit settings
-- `/addplayer @user` - Add player to roster
+- `/addplayer <username>` - Invite player to roster (see below)
 - `/removeplayer @user` - Remove player from roster
+
+### Adding Players
+
+Due to Telegram API limitations, the bot cannot directly add players by username—Telegram doesn't provide user IDs from @mentions. Instead, `/addplayer` uses an invitation flow:
+
+**For users with a username:**
+1. Admin types `/addplayer username` (without @, to avoid pinging)
+2. Bot posts an invitation message with 👍/👎 reactions
+3. The mentioned user reacts 👍 to accept or 👎 to decline
+4. Bot verifies the reactor's username matches and adds them to roster
+
+**For users without a username:**
+1. Admin taps on the user's name in any message (creates a text_mention)
+2. Admin types `/addplayer` in the reply
+3. Bot posts an invitation with reaction buttons
+4. User reacts to accept/decline
+
+This approach ensures only the actual user can accept roster invitations.
+
+### Other Admin Commands
 - `/setweek <week> practice|match` - Set week type
 - `/setmatch <day> <time>` - Schedule a match
 - `/setlineup @users...` - Set match lineup
