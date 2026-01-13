@@ -1,0 +1,44 @@
+import type { Kysely } from 'kysely';
+import { vi } from 'vitest';
+import type { DB } from '@/types/db';
+
+/**
+ * Shared mock objects that tests can import and mutate in beforeEach hooks.
+ * These are set up globally via vi.mock() so all test files get the same mocks.
+ */
+
+// Mock for @/db - tests should set mockDb.db in beforeEach
+export const mockDb = {
+  db: null as unknown as Kysely<DB>,
+};
+
+// Default env values - tests can override specific properties
+export const mockEnv = {
+  env: {
+    ADMIN_IDS: [123456],
+    DEFAULT_LANGUAGE: 'en' as const,
+    DEFAULT_POLL_DAY: 'sun',
+    DEFAULT_POLL_TIME: '10:00',
+    DEFAULT_POLL_DAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+    DEFAULT_POLL_TIMES: [19, 20, 21],
+    DEFAULT_POLL_REMINDER_DAY: 'wed',
+    DEFAULT_POLL_REMINDER_TIME: '18:00',
+    DEFAULT_POLL_REMINDER_MODE: 'quiet' as const,
+    DEFAULT_MATCH_DAY: 'sun',
+    DEFAULT_MATCH_TIME: '20:00',
+    DEFAULT_LINEUP_SIZE: 5,
+    DEFAULT_MATCH_DAY_REMINDER_MODE: 'quiet' as const,
+    DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
+    // Optional properties that some tests may need
+    TEAM_GROUP_ID: undefined as number | undefined,
+    PUBLIC_GROUP_ID: undefined as number | undefined,
+  },
+};
+
+// Mock for @/scheduler
+export const mockRefreshScheduler = vi.fn();
+
+// Set up global mocks
+vi.mock('@/db', () => mockDb);
+vi.mock('@/env', () => mockEnv);
+vi.mock('@/scheduler', () => ({ refreshScheduler: mockRefreshScheduler }));

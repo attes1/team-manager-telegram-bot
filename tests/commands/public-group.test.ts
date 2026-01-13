@@ -1,6 +1,6 @@
 import { createTestDb } from '@tests/helpers';
-import type { Kysely } from 'kysely';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { mockDb, mockEnv } from '@tests/setup';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerSeasonCommands } from '@/bot/commands/admin/season';
 import { registerWeekCommand } from '@/bot/commands/admin/week';
 import { registerAvailCommand } from '@/bot/commands/player/avail';
@@ -9,32 +9,7 @@ import { registerNextMatchCommand } from '@/bot/commands/player/nextmatch';
 import { registerRosterCommand } from '@/bot/commands/player/roster';
 import { addPlayerToRoster, setPlayerRole } from '@/services/roster';
 import { startSeason } from '@/services/season';
-import type { DB } from '@/types/db';
 import { createCommandUpdate, createTestBot } from './helpers';
-
-const { mockDb, mockEnv } = vi.hoisted(() => ({
-  mockDb: { db: null as unknown as Kysely<DB> },
-  mockEnv: {
-    env: {
-      ADMIN_IDS: [123456],
-      TEAM_GROUP_ID: -100123,
-      PUBLIC_GROUP_ID: -100456,
-      DEFAULT_LANGUAGE: 'en' as const,
-      DEFAULT_POLL_DAY: 'sun',
-      DEFAULT_POLL_TIME: '10:00',
-      DEFAULT_POLL_DAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      DEFAULT_POLL_TIMES: [19, 20, 21],
-      DEFAULT_POLL_REMINDER_DAY: 'wed',
-      DEFAULT_POLL_REMINDER_TIME: '18:00',
-      DEFAULT_POLL_REMINDER_MODE: 'quiet' as const,
-      DEFAULT_MATCH_DAY: 'sun',
-      DEFAULT_MATCH_TIME: '20:00',
-      DEFAULT_LINEUP_SIZE: 5,
-      DEFAULT_MATCH_DAY_REMINDER_MODE: 'quiet' as const,
-      DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
-    },
-  },
-}));
 
 const TEST_ADMIN_ID = 123456;
 const TEST_CAPTAIN_ID = 111111;
@@ -43,12 +18,11 @@ const TEST_USER_ID = 999999;
 const TEAM_GROUP_ID = -100123;
 const PUBLIC_GROUP_ID = -100456;
 
-vi.mock('@/db', () => mockDb);
-vi.mock('@/env', () => mockEnv);
-
 describe('public group restrictions', () => {
   beforeEach(async () => {
     mockDb.db = await createTestDb();
+    mockEnv.env.TEAM_GROUP_ID = TEAM_GROUP_ID;
+    mockEnv.env.PUBLIC_GROUP_ID = PUBLIC_GROUP_ID;
   });
 
   afterEach(async () => {

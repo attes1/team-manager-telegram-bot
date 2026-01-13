@@ -1,40 +1,12 @@
 import { createTestDb } from '@tests/helpers';
-import type { Kysely } from 'kysely';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { mockDb, mockRefreshScheduler } from '@tests/setup';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerSeasonCommands } from '@/bot/commands/admin/season';
-import type { DB } from '@/types/db';
 import { createCommandUpdate, createTestBot } from './helpers';
-
-const { mockDb, mockEnv, mockRefreshScheduler } = vi.hoisted(() => ({
-  mockDb: { db: null as unknown as Kysely<DB> },
-  mockEnv: {
-    env: {
-      ADMIN_IDS: [123456],
-      DEFAULT_LANGUAGE: 'en' as const,
-      DEFAULT_POLL_DAY: 'sun',
-      DEFAULT_POLL_TIME: '10:00',
-      DEFAULT_POLL_DAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      DEFAULT_POLL_TIMES: [19, 20, 21],
-      DEFAULT_POLL_REMINDER_DAY: 'wed',
-      DEFAULT_POLL_REMINDER_TIME: '18:00',
-      DEFAULT_POLL_REMINDER_MODE: 'quiet' as const,
-      DEFAULT_MATCH_DAY: 'sun',
-      DEFAULT_MATCH_TIME: '20:00',
-      DEFAULT_LINEUP_SIZE: 5,
-      DEFAULT_MATCH_DAY_REMINDER_MODE: 'quiet' as const,
-      DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
-    },
-  },
-  mockRefreshScheduler: vi.fn(),
-}));
 
 const TEST_ADMIN_ID = 123456;
 const TEST_USER_ID = 999999;
 const TEST_CHAT_ID = -100123;
-
-vi.mock('@/db', () => mockDb);
-vi.mock('@/env', () => mockEnv);
-vi.mock('@/scheduler', () => ({ refreshScheduler: mockRefreshScheduler }));
 
 describe('season commands', () => {
   beforeEach(async () => {

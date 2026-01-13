@@ -1,38 +1,12 @@
 import { createTestDb } from '@tests/helpers';
-import type { Kysely } from 'kysely';
+import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { registerRemindCommand } from '@/bot/commands/admin/remind';
-import type { DB } from '@/types/db';
-import { createCommandUpdate, createTestBot, type MockDb } from './helpers';
-
-const { mockDb, mockEnv } = vi.hoisted(() => ({
-  mockDb: { db: null as unknown as Kysely<DB> } as MockDb,
-  mockEnv: {
-    env: {
-      ADMIN_IDS: [123456],
-      DEFAULT_LANGUAGE: 'en' as const,
-      DEFAULT_POLL_DAY: 'sun',
-      DEFAULT_POLL_TIME: '10:00',
-      DEFAULT_POLL_DAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      DEFAULT_POLL_TIMES: [19, 20, 21],
-      DEFAULT_POLL_REMINDER_DAY: 'wed',
-      DEFAULT_POLL_REMINDER_TIME: '18:00',
-      DEFAULT_POLL_REMINDER_MODE: 'quiet' as const,
-      DEFAULT_MATCH_DAY: 'sun',
-      DEFAULT_MATCH_TIME: '20:00',
-      DEFAULT_LINEUP_SIZE: 5,
-      DEFAULT_MATCH_DAY_REMINDER_MODE: 'quiet' as const,
-      DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
-    },
-  },
-}));
+import { createCommandUpdate, createTestBot } from './helpers';
 
 const ADMIN_ID = 123456;
 const PLAYER_ID = 111;
 const CHAT_ID = -100123456789;
-
-vi.mock('@/db', () => mockDb);
-vi.mock('@/env', () => mockEnv);
 
 describe('/remind command', () => {
   beforeEach(async () => {

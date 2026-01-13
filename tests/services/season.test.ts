@@ -1,10 +1,8 @@
-import { createTestDb, testEnv } from '@tests/helpers';
+import { createTestDb } from '@tests/helpers';
 import type { Kysely } from 'kysely';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { endSeason, getActiveSeason, getSeasonById, startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
-
-vi.mock('@/env', () => ({ env: testEnv }));
 
 describe('season service', () => {
   let db: Kysely<DB>;
