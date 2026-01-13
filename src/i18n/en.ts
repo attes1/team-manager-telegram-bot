@@ -123,6 +123,7 @@ export const en: Translations = {
       sat: 'Sat',
       sun: 'Sun',
     },
+    openPollButton: '📊 Open Poll',
   },
   avail: {
     title: (week, dateRange) => `Week ${week} (${dateRange}) availability:`,

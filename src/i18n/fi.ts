@@ -118,6 +118,7 @@ export interface Translations {
       sat: string;
       sun: string;
     };
+    openPollButton: string;
   };
   avail: {
     title: (week: number, dateRange: string) => string;
@@ -391,6 +392,7 @@ export const fi: Translations = {
       sat: 'La',
       sun: 'Su',
     },
+    openPollButton: '📊 Avaa aikataulu',
   },
   avail: {
     title: (week, dateRange) => `Vko ${week} (${dateRange}) aikataulut:`,
