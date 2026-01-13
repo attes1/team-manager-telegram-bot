@@ -1,13 +1,13 @@
 import { Menu } from '@grammyjs/menu';
-import type { BotContext } from '../bot/context';
-import { db } from '../db';
-import { getTranslations } from '../i18n';
-import { formatDateRange } from '../lib/format';
-import type { AvailabilityStatus } from '../lib/schemas';
-import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '../lib/week';
-import { getPlayerWeekAvailability, setDayAvailability } from '../services/availability';
-import { isPlayerInRoster } from '../services/roster';
-import { getWeek } from '../services/week';
+import type { BotContext } from '@/bot/context';
+import { db } from '@/db';
+import { getTranslations } from '@/i18n';
+import { formatDateRange } from '@/lib/format';
+import type { AvailabilityStatus } from '@/lib/schemas';
+import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { getPlayerWeekAvailability, setDayAvailability } from '@/services/availability';
+import { isPlayerInRoster } from '@/services/roster';
+import { getWeek } from '@/services/week';
 
 // Payload format for buttons: "week:year" e.g. "5:2025"
 // This is encoded in Telegram callback_data and always reliable

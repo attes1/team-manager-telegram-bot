@@ -1,10 +1,10 @@
 import { Menu } from '@grammyjs/menu';
-import type { BotContext } from '../bot/context';
-import { env } from '../env';
-import { formatDateRange, formatPlayerName } from '../lib/format';
-import { getSchedulingWeek, getWeekDateRange } from '../lib/week';
-import { buildLineupMessage, getLineup, setLineup } from '../services/match';
-import { getRoster } from '../services/roster';
+import type { BotContext } from '@/bot/context';
+import { env } from '@/env';
+import { formatDateRange, formatPlayerName } from '@/lib/format';
+import { getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { buildLineupMessage, getLineup, setLineup } from '@/services/match';
+import { getRoster } from '@/services/roster';
 
 // Payload format for buttons: "week:year" e.g. "5:2025"
 const encodeWeekPayload = (week: number, year: number): string => `${week}:${year}`;
