@@ -24,7 +24,7 @@ Cursor AI auto-completion and Claude Code AI agent have been used to develop thi
 1. Clone the repository:
 ```bash
 git clone <repo-url>
-cd team-manager-bot
+cd team-manager-telegram-bot
 ```
 
 2. Install dependencies:
