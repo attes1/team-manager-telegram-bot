@@ -38,16 +38,13 @@ const envSchema = z.object({
   DEFAULT_POLL_DAYS: commaSeparatedStrings('mon,tue,wed,thu,fri,sat,sun'),
   DEFAULT_POLL_TIMES: commaSeparatedNumbers('19,20,21'),
 
-  DEFAULT_REMINDER_DAY: z.string().default('wed'),
-  DEFAULT_REMINDER_TIME: z.string().default('18:00'),
-  DEFAULT_REMINDERS_MODE: z.enum(['ping', 'quiet', 'off']).default('quiet'),
+  DEFAULT_POLL_REMINDER_DAY: z.string().default('wed'),
+  DEFAULT_POLL_REMINDER_TIME: z.string().default('18:00'),
+  DEFAULT_POLL_REMINDER_MODE: z.enum(['ping', 'quiet', 'off']).default('quiet'),
 
   DEFAULT_MATCH_DAY: z.string().default('sun'),
   DEFAULT_MATCH_TIME: z.string().default('20:00'),
-  DEFAULT_MATCH_DAY_REMINDER_ENABLED: z
-    .enum(['true', 'false', '1', '0', 'on', 'off'])
-    .default('on')
-    .transform((v) => v === 'true' || v === '1' || v === 'on'),
+  DEFAULT_MATCH_DAY_REMINDER_MODE: z.enum(['ping', 'quiet', 'off']).default('quiet'),
   DEFAULT_MATCH_DAY_REMINDER_TIME: z.string().default('18:00'),
 
   DEFAULT_LINEUP_SIZE: z.coerce.number().default(5),

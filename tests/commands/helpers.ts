@@ -153,12 +153,14 @@ export type MockEnv = {
     DEFAULT_POLL_TIME: string;
     DEFAULT_POLL_DAYS: string[];
     DEFAULT_POLL_TIMES: number[];
-    DEFAULT_REMINDER_DAY: string;
-    DEFAULT_REMINDER_TIME: string;
-    DEFAULT_REMINDERS_MODE: 'ping' | 'quiet' | 'off';
+    DEFAULT_POLL_REMINDER_DAY: string;
+    DEFAULT_POLL_REMINDER_TIME: string;
+    DEFAULT_POLL_REMINDER_MODE: 'ping' | 'quiet' | 'off';
     DEFAULT_MATCH_DAY: string;
     DEFAULT_MATCH_TIME: string;
     DEFAULT_LINEUP_SIZE: number;
+    DEFAULT_MATCH_DAY_REMINDER_MODE: 'ping' | 'quiet' | 'off';
+    DEFAULT_MATCH_DAY_REMINDER_TIME: string;
   };
 };
 
@@ -170,11 +172,13 @@ export const createMockEnv = (adminIds: number[]): MockEnv => ({
     DEFAULT_POLL_TIME: '10:00',
     DEFAULT_POLL_DAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
     DEFAULT_POLL_TIMES: [19, 20, 21],
-    DEFAULT_REMINDER_DAY: 'wed',
-    DEFAULT_REMINDER_TIME: '18:00',
-    DEFAULT_REMINDERS_MODE: 'quiet',
+    DEFAULT_POLL_REMINDER_DAY: 'wed',
+    DEFAULT_POLL_REMINDER_TIME: '18:00',
+    DEFAULT_POLL_REMINDER_MODE: 'quiet',
     DEFAULT_MATCH_DAY: 'sun',
     DEFAULT_MATCH_TIME: '20:00',
     DEFAULT_LINEUP_SIZE: 5,
+    DEFAULT_MATCH_DAY_REMINDER_MODE: 'quiet',
+    DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
   },
 });

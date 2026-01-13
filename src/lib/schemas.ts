@@ -63,7 +63,7 @@ export const configSchema = z.object({
   matchDay: daySchema.catch('sun'),
   matchTime: timeSchema.catch('20:00'),
   lineupSize: z.number().catch(5),
-  matchDayReminderEnabled: z.coerce.boolean().catch(true),
+  matchDayReminderMode: remindersModeSchema.catch('quiet'),
   matchDayReminderTime: timeSchema.catch('18:00'),
 });
 

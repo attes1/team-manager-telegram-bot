@@ -65,7 +65,7 @@ export const en: Translations = {
       match_day: 'Default match day',
       match_time: 'Default match time',
       lineup_size: 'Lineup size',
-      match_day_reminder_enabled: 'Match day reminder',
+      match_day_reminder_mode: 'Match day reminder mode',
       match_day_reminder_time: 'Match day reminder time',
     },
   },

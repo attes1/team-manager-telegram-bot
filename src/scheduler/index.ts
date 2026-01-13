@@ -77,7 +77,7 @@ const initScheduler = async (bot: Bot<BotContext>): Promise<void> => {
   }
 
   // Match day reminder
-  if (config.matchDayReminderEnabled) {
+  if (config.matchDayReminderMode !== 'off') {
     const matchDayCron = buildCronExpression(config.matchDay, config.matchDayReminderTime);
     tasks.push(scheduleTask('match-day', matchDayCron, () => sendMatchDayReminder(bot, chatId)));
     console.log(

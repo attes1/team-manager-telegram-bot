@@ -43,7 +43,14 @@ export const sendMatchDayReminder = async (bot: Bot<BotContext>, chatId: number)
   let message = i18n.reminder.matchDayTitle(dayName, matchTime);
 
   if (lineup.length > 0) {
-    const players = lineup.map((p) => `• ${formatPlayerName(p)}`).join('\n');
+    const isPingMode = config.matchDayReminderMode === 'ping';
+    const players = lineup
+      .map((p) =>
+        isPingMode
+          ? `• <a href="tg://user?id=${p.telegramId}">${formatPlayerName(p)}</a>`
+          : `• ${formatPlayerName(p)}`,
+      )
+      .join('\n');
     message += `\n\n${i18n.reminder.matchDayLineup(players)}`;
   } else {
     message += `\n\n⚠️ ${i18n.reminder.matchDayNoLineup}`;

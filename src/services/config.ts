@@ -24,7 +24,7 @@ const configValidators: Record<string, z.ZodTypeAny> = {
   matchDay: daySchema,
   matchTime: timeSchema,
   lineupSize: z.coerce.number().int().min(1).max(20),
-  matchDayReminderEnabled: z.enum(['true', 'false', '1', '0', 'on', 'off']),
+  matchDayReminderMode: remindersModeSchema,
   matchDayReminderTime: timeSchema,
 };
 
@@ -42,7 +42,7 @@ const VALID_CONFIG_KEYS = [
   'matchDay',
   'matchTime',
   'lineupSize',
-  'matchDayReminderEnabled',
+  'matchDayReminderMode',
   'matchDayReminderTime',
 ] as const;
 
@@ -86,8 +86,6 @@ export const updateConfig = async (
   let updateValue: string | number = value;
   if (key === 'lineupSize') {
     updateValue = Number(value);
-  } else if (key === 'matchDayReminderEnabled') {
-    updateValue = value === 'true' || value === '1' || value === 'on' ? 1 : 0;
   }
 
   const result = await db

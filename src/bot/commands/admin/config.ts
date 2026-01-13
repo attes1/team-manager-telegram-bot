@@ -20,7 +20,7 @@ const USER_TO_DB_KEY: Record<string, string> = {
   match_day: 'matchDay',
   match_time: 'matchTime',
   lineup_size: 'lineupSize',
-  match_day_reminder_enabled: 'matchDayReminderEnabled',
+  match_day_reminder_mode: 'matchDayReminderMode',
   match_day_reminder_time: 'matchDayReminderTime',
 };
 
@@ -31,7 +31,7 @@ const SCHEDULER_KEYS = [
   'reminder_time',
   'reminders_mode',
   'match_day',
-  'match_day_reminder_enabled',
+  'match_day_reminder_mode',
   'match_day_reminder_time',
 ];
 
@@ -59,9 +59,9 @@ const formatConfigDisplay = (i18n: Translations, config: ParsedConfig): string =
     formatConfigLine(labels.match_time, 'match_time', config.matchTime),
     formatConfigLine(labels.lineup_size, 'lineup_size', String(config.lineupSize)),
     formatConfigLine(
-      labels.match_day_reminder_enabled,
-      'match_day_reminder_enabled',
-      config.matchDayReminderEnabled ? 'on' : 'off',
+      labels.match_day_reminder_mode,
+      'match_day_reminder_mode',
+      config.matchDayReminderMode,
     ),
     formatConfigLine(
       labels.match_day_reminder_time,

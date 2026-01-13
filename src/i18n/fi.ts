@@ -62,7 +62,7 @@ export interface Translations {
       match_day: string;
       match_time: string;
       lineup_size: string;
-      match_day_reminder_enabled: string;
+      match_day_reminder_mode: string;
       match_day_reminder_time: string;
     };
   };
@@ -244,7 +244,7 @@ export const fi: Translations = {
       match_day: 'Oletusmatsin päivä',
       match_time: 'Oletusmatsin aika',
       lineup_size: 'Linarin koko',
-      match_day_reminder_enabled: 'Matsipäivän muistutus',
+      match_day_reminder_mode: 'Matsipäivän muistutustila',
       match_day_reminder_time: 'Matsipäivän muistutusaika',
     },
   },

@@ -49,15 +49,15 @@ DEFAULT_POLL_TIME=10:00
 DEFAULT_POLL_DAYS=mon,tue,wed,thu,fri,sat,sun
 DEFAULT_POLL_TIMES=19,20,21
 
-# Reminder defaults
-DEFAULT_REMINDER_DAY=wed
-DEFAULT_REMINDER_TIME=18:00
-DEFAULT_REMINDERS_MODE=quiet
+# Poll reminder defaults
+DEFAULT_POLL_REMINDER_DAY=wed
+DEFAULT_POLL_REMINDER_TIME=18:00
+DEFAULT_POLL_REMINDER_MODE=quiet
 
 # Match defaults
 DEFAULT_MATCH_DAY=sun
 DEFAULT_MATCH_TIME=20:00
-DEFAULT_MATCH_DAY_REMINDER_ENABLED=on
+DEFAULT_MATCH_DAY_REMINDER_MODE=quiet
 DEFAULT_MATCH_DAY_REMINDER_TIME=18:00
 DEFAULT_LINEUP_SIZE=5
 ```
@@ -158,7 +158,7 @@ Use `/config` to view all settings. Available options:
 | `match_day` | Default match day | `sun` |
 | `match_time` | Default match time | `20:00` |
 | `lineup_size` | Players in lineup | `5` |
-| `match_day_reminder_enabled` | Enable match day reminder | `on` |
+| `match_day_reminder_mode` | Match day reminder (ping/quiet/off) | `quiet` |
 | `match_day_reminder_time` | Time for match day reminder | `18:00` |
 
 ## Project Structure
