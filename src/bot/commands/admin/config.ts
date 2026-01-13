@@ -1,6 +1,7 @@
 import type { Bot } from 'grammy';
 import type { Translations } from '../../../i18n';
-import { getConfig, updateConfig } from '../../../services/config';
+import { updateConfig } from '../../../services/config';
+import type { Config } from '../../../types/db';
 import type { AdminSeasonContext, BotContext } from '../../context';
 import { adminSeasonCommand } from '../../middleware';
 
@@ -16,6 +17,8 @@ const USER_TO_DB_KEY: Record<string, string> = {
   match_day: 'matchDay',
   match_time: 'matchTime',
   lineup_size: 'lineupSize',
+  match_day_reminder_enabled: 'matchDayReminderEnabled',
+  match_day_reminder_time: 'matchDayReminderTime',
 };
 
 const USER_KEYS = Object.keys(USER_TO_DB_KEY);
@@ -23,22 +26,7 @@ const USER_KEYS = Object.keys(USER_TO_DB_KEY);
 const isValidUserKey = (key: string): boolean => USER_KEYS.includes(key);
 const toDbKey = (userKey: string): string => USER_TO_DB_KEY[userKey];
 
-const formatConfigDisplay = (
-  i18n: Translations,
-  config: {
-    language: string;
-    pollDay: string;
-    pollTime: string;
-    pollDays: string;
-    pollTimes: string;
-    reminderDay: string;
-    reminderTime: string;
-    remindersMode: string;
-    matchDay: string;
-    matchTime: string;
-    lineupSize: number;
-  },
-): string => {
+const formatConfigDisplay = (i18n: Translations, config: Config): string => {
   const keys = i18n.config.keys;
   const lines = [
     i18n.config.line(keys.language, config.language),
@@ -52,6 +40,11 @@ const formatConfigDisplay = (
     i18n.config.line(keys.match_day, config.matchDay),
     i18n.config.line(keys.match_time, config.matchTime),
     i18n.config.line(keys.lineup_size, String(config.lineupSize)),
+    i18n.config.line(
+      keys.match_day_reminder_enabled,
+      config.matchDayReminderEnabled ? 'on' : 'off',
+    ),
+    i18n.config.line(keys.match_day_reminder_time, config.matchDayReminderTime),
   ];
   return `${i18n.config.title}\n${lines.join('\n')}\n\n${i18n.config.usage}`;
 };
@@ -60,27 +53,14 @@ export const registerConfigCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'config',
     adminSeasonCommand(async (ctx: AdminSeasonContext) => {
-      const { db, season, i18n } = ctx;
+      const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
       const [key, ...rest] = args.split(/\s+/);
       const value = rest.join(' ').trim();
 
-      if (!key) {
-        const config = await getConfig(db, season.id);
-        if (!config) {
-          return ctx.reply(i18n.errors.noActiveSeason);
-        }
-        return ctx.reply(formatConfigDisplay(i18n, config));
-      }
-
-      if (!isValidUserKey(key)) {
-        return ctx.reply(i18n.errors.invalidConfigKey);
-      }
-
-      if (!value) {
-        const config = await getConfig(db, season.id);
-        if (!config) {
-          return ctx.reply(i18n.errors.noActiveSeason);
+      if (!key || !value || !isValidUserKey(key)) {
+        if (key && !isValidUserKey(key)) {
+          return ctx.reply(i18n.errors.invalidConfigKey);
         }
         return ctx.reply(formatConfigDisplay(i18n, config));
       }
