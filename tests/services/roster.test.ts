@@ -1,3 +1,6 @@
+import { createTestDb } from '@tests/helpers';
+import type { Kysely } from 'kysely';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import {
   addPlayerToRoster,
   getPlayerByTelegramId,
@@ -6,9 +9,6 @@ import {
   removePlayerFromRoster,
 } from '@/services/roster';
 import type { DB } from '@/types/db';
-import { createTestDb } from '@tests/helpers';
-import type { Kysely } from 'kysely';
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('roster service', () => {
   let db: Kysely<DB>;

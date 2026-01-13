@@ -1,6 +1,6 @@
 import { env } from '../env';
 import { en } from './en';
-import { type Translations, fi } from './fi';
+import { fi, type Translations } from './fi';
 
 export type Language = 'fi' | 'en';
 
