@@ -6,6 +6,7 @@ export const en: Translations = {
   },
   errors: {
     notAdmin: 'You do not have permission for this command.',
+    notCaptain: 'You do not have captain permissions for this command.',
     noActiveSeason: 'No active season. Start one with /startseason <name>',
     noUserMentioned: 'Mention a user in the command (e.g. /addplayer @user)',
     playerNotFound: 'Player not found.',
@@ -22,6 +23,7 @@ export const en: Translations = {
     empty: 'Roster is empty.',
     title: 'Roster:',
     playerLine: (name, username) => (username ? `• ${name} (@${username})` : `• ${name}`),
+    captainLine: (name, username) => (username ? `⭐ ${name} (@${username})` : `⭐ ${name}`),
     invitationPrompt: 'Do you want to join the roster? React 👍 to accept or 👎 to decline.',
     invitationSent: (name) => `Invitation sent: ${name}`,
     invitationAccepted: (name) => `${name} added to roster!`,
@@ -29,6 +31,14 @@ export const en: Translations = {
     invitationExpired: 'Invitation expired.',
     addplayerUsage:
       'Usage: /addplayer <username>\nOr tap a user name in a message and type /addplayer',
+  },
+  captain: {
+    promoted: (name) => `${name} promoted to captain.`,
+    demoted: (name) => `${name} demoted to player.`,
+    alreadyCaptain: (name) => `${name} is already a captain.`,
+    notACaptain: (name) => `${name} is not a captain.`,
+    usage: 'Usage: /setcaptain @player',
+    removeUsage: 'Usage: /removecaptain @player',
   },
   season: {
     started: (name) => `Season "${name}" started!`,
@@ -72,6 +82,7 @@ export const en: Translations = {
     matchWeekTitle: (week, dateRange) =>
       `Week ${week} (${dateRange}) - MATCH WEEK!\nDefault: Sun 20:00. Mark your availability.`,
     legend: '✅ Available | 🏋️ Practice only | 🏆 Match only | ⚠️ If needed | ❌ Unavailable',
+    notInRoster: 'Menu is only available for roster players.',
     days: {
       mon: 'Mon',
       tue: 'Tue',
@@ -82,14 +93,14 @@ export const en: Translations = {
       sun: 'Sun',
     },
   },
-  practice: {
+  avail: {
     title: (week, dateRange) => `Week ${week} (${dateRange}) availability:`,
+    practiceTitle: (week, dateRange) => `Week ${week} (${dateRange}) practice availability:`,
+    matchTitle: (week, dateRange) => `Week ${week} (${dateRange}) match availability:`,
     dayTitle: (day, date) => `${day} ${date} availability:`,
     noResponses: 'No responses yet.',
     noResponsesForDay: (day) => `No availability for ${day}.`,
-    playerLine: (name, times, status) => `• ${name}: ${times.join(', ')} ${status}`,
-    invalidDay: 'Invalid day. Use: mon, tue, wed, thu, fri, sat, sun',
-    usage: 'Usage: /practice [today|<day>]',
+    usage: 'Usage: /avail [practice|match] [today|<day>]',
   },
   match: {
     scheduled: (day, time, week, dateRange) =>
@@ -97,13 +108,6 @@ export const en: Translations = {
     usage: 'Usage: /setmatch <day> <time>\nExample: /setmatch sun 20:00',
     invalidDay: 'Invalid day. Use: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Invalid time format. Use HH:MM (e.g. 20:00)',
-    info: (week, dateRange) => `📅 Week ${week} (${dateRange}) match`,
-    time: (day, time) => `Time: ${day} at ${time}`,
-    timeDefault: (day, time) => `Default time: ${day} at ${time}`,
-    notScheduled: 'Time not yet scheduled',
-    lineupTitle: 'Lineup:',
-    lineupEmpty: 'Lineup not yet set',
-    lineupPlayer: (name) => `• ${name}`,
   },
   lineup: {
     set: (count, players) => `Lineup set (${count} players):\n${players}`,
@@ -116,6 +120,7 @@ export const en: Translations = {
     done: 'Done',
     needExact: (count) => `Select exactly ${count} players.`,
     saved: (count) => `Lineup saved (${count} players).`,
+    notCaptain: 'Menu is only available for captains.',
   },
   reminder: {
     title: (week, dateRange) => `📋 Reminder: Week ${week} (${dateRange}) availability poll`,
@@ -143,25 +148,27 @@ export const en: Translations = {
   help: {
     publicCommands: 'Public Commands',
     playerCommands: 'Player Commands',
+    captainCommands: 'Captain Commands',
     adminCommands: 'Admin Commands',
     commands: {
       help: 'Show command list',
       roster: 'View team roster',
       nextmatch: 'Show upcoming match info',
-      match: 'View match info and lineup',
-      practice: 'View practice availability',
+      avail: 'View player availability',
+      poll: 'View availability poll',
+      status: 'View status overview',
+      setweek: 'Set week type',
+      setmatch: 'Schedule a match',
+      setlineup: 'Set match lineup',
+      remind: 'Send reminder to non-responders',
       startseason: 'Start a new season',
       endseason: 'End current season',
       season: 'View season info',
       config: 'View/edit settings',
       addplayer: 'Add player to roster',
       removeplayer: 'Remove player from roster',
-      setweek: 'Set week type',
-      setmatch: 'Schedule a match',
-      setlineup: 'Set match lineup',
-      poll: 'Send availability poll',
-      remind: 'Send reminder to non-responders',
-      status: 'View status overview',
+      setcaptain: 'Promote player to captain',
+      removecaptain: 'Demote captain to player',
     },
   },
   announcements: {

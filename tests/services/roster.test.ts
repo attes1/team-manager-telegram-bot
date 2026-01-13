@@ -3,10 +3,14 @@ import type { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import {
   addPlayerToRoster,
+  getCaptains,
   getPlayerByTelegramId,
+  getPlayerRole,
   getRoster,
+  isCaptain,
   isPlayerInRoster,
   removePlayerFromRoster,
+  setPlayerRole,
 } from '@/services/roster';
 import type { DB } from '@/types/db';
 
@@ -281,6 +285,149 @@ describe('roster service', () => {
     test('returns undefined if player does not exist', async () => {
       const player = await getPlayerByTelegramId(db, 999999);
       expect(player).toBeUndefined();
+    });
+  });
+
+  describe('getPlayerRole', () => {
+    test('returns player role for player in roster', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 123456,
+        displayName: 'Test Player',
+      });
+
+      const role = await getPlayerRole(db, seasonId, 123456);
+      expect(role).toBe('player');
+    });
+
+    test('returns null for player not in roster', async () => {
+      const role = await getPlayerRole(db, seasonId, 999999);
+      expect(role).toBeNull();
+    });
+
+    test('returns captain role after promotion', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 123456,
+        displayName: 'Test Player',
+      });
+      await setPlayerRole(db, seasonId, 123456, 'captain');
+
+      const role = await getPlayerRole(db, seasonId, 123456);
+      expect(role).toBe('captain');
+    });
+  });
+
+  describe('isCaptain', () => {
+    test('returns false for regular player', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 123456,
+        displayName: 'Test Player',
+      });
+
+      const result = await isCaptain(db, seasonId, 123456);
+      expect(result).toBe(false);
+    });
+
+    test('returns true for captain', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 123456,
+        displayName: 'Test Player',
+      });
+      await setPlayerRole(db, seasonId, 123456, 'captain');
+
+      const result = await isCaptain(db, seasonId, 123456);
+      expect(result).toBe(true);
+    });
+
+    test('returns false for player not in roster', async () => {
+      const result = await isCaptain(db, seasonId, 999999);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('setPlayerRole', () => {
+    test('promotes player to captain', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 123456,
+        displayName: 'Test Player',
+      });
+
+      const result = await setPlayerRole(db, seasonId, 123456, 'captain');
+      expect(result).toBe(true);
+
+      const role = await getPlayerRole(db, seasonId, 123456);
+      expect(role).toBe('captain');
+    });
+
+    test('demotes captain to player', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 123456,
+        displayName: 'Test Player',
+      });
+      await setPlayerRole(db, seasonId, 123456, 'captain');
+      await setPlayerRole(db, seasonId, 123456, 'player');
+
+      const role = await getPlayerRole(db, seasonId, 123456);
+      expect(role).toBe('player');
+    });
+
+    test('returns false for player not in roster', async () => {
+      const result = await setPlayerRole(db, seasonId, 999999, 'captain');
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('getCaptains', () => {
+    test('returns empty array when no captains', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 111,
+        displayName: 'Player 1',
+      });
+
+      const captains = await getCaptains(db, seasonId);
+      expect(captains).toEqual([]);
+    });
+
+    test('returns only captains', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 111,
+        displayName: 'Captain',
+      });
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 222,
+        displayName: 'Regular Player',
+      });
+      await setPlayerRole(db, seasonId, 111, 'captain');
+
+      const captains = await getCaptains(db, seasonId);
+      expect(captains).toHaveLength(1);
+      expect(captains[0].telegramId).toBe(111);
+    });
+
+    test('returns captains sorted by display name', async () => {
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 111,
+        displayName: 'Zebra Captain',
+      });
+      await addPlayerToRoster(db, {
+        seasonId,
+        telegramId: 222,
+        displayName: 'Alpha Captain',
+      });
+      await setPlayerRole(db, seasonId, 111, 'captain');
+      await setPlayerRole(db, seasonId, 222, 'captain');
+
+      const captains = await getCaptains(db, seasonId);
+      expect(captains.map((c) => c.displayName)).toEqual(['Alpha Captain', 'Zebra Captain']);
     });
   });
 });

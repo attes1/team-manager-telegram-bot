@@ -10,7 +10,12 @@ import { getRoster } from '../services/roster';
 export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, range) => {
   const { db, season, config, i18n } = ctx;
 
-  if (!ctx.isAdmin || !season || !config) {
+  if (!season || !config) {
+    return;
+  }
+
+  if (!ctx.isCaptain) {
+    range.text(i18n.lineup.notCaptain, (ctx) => ctx.answerCallbackQuery());
     return;
   }
 

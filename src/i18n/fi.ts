@@ -4,6 +4,7 @@ export interface Translations {
   };
   errors: {
     notAdmin: string;
+    notCaptain: string;
     noActiveSeason: string;
     noUserMentioned: string;
     playerNotFound: string;
@@ -20,12 +21,21 @@ export interface Translations {
     empty: string;
     title: string;
     playerLine: (name: string, username: string | null) => string;
+    captainLine: (name: string, username: string | null) => string;
     invitationPrompt: string;
     invitationSent: (name: string) => string;
     invitationAccepted: (name: string) => string;
     invitationDeclined: (name: string) => string;
     invitationExpired: string;
     addplayerUsage: string;
+  };
+  captain: {
+    promoted: (name: string) => string;
+    demoted: (name: string) => string;
+    alreadyCaptain: (name: string) => string;
+    notACaptain: (name: string) => string;
+    usage: string;
+    removeUsage: string;
   };
   season: {
     started: (name: string) => string;
@@ -67,6 +77,7 @@ export interface Translations {
     title: (week: number, dateRange: string) => string;
     matchWeekTitle: (week: number, dateRange: string) => string;
     legend: string;
+    notInRoster: string;
     days: {
       mon: string;
       tue: string;
@@ -77,13 +88,13 @@ export interface Translations {
       sun: string;
     };
   };
-  practice: {
+  avail: {
     title: (week: number, dateRange: string) => string;
+    practiceTitle: (week: number, dateRange: string) => string;
+    matchTitle: (week: number, dateRange: string) => string;
     dayTitle: (day: string, date: string) => string;
     noResponses: string;
     noResponsesForDay: (day: string) => string;
-    playerLine: (name: string, times: string[], status: string) => string;
-    invalidDay: string;
     usage: string;
   };
   match: {
@@ -91,13 +102,6 @@ export interface Translations {
     usage: string;
     invalidDay: string;
     invalidTime: string;
-    info: (week: number, dateRange: string) => string;
-    time: (day: string, time: string) => string;
-    timeDefault: (day: string, time: string) => string;
-    notScheduled: string;
-    lineupTitle: string;
-    lineupEmpty: string;
-    lineupPlayer: (name: string) => string;
   };
   lineup: {
     set: (count: number, players: string) => string;
@@ -110,6 +114,7 @@ export interface Translations {
     done: string;
     needExact: (count: number) => string;
     saved: (count: number) => string;
+    notCaptain: string;
   };
   reminder: {
     title: (week: number, dateRange: string) => string;
@@ -137,25 +142,27 @@ export interface Translations {
   help: {
     publicCommands: string;
     playerCommands: string;
+    captainCommands: string;
     adminCommands: string;
     commands: {
       help: string;
       roster: string;
       nextmatch: string;
-      match: string;
-      practice: string;
+      avail: string;
+      poll: string;
+      status: string;
+      setweek: string;
+      setmatch: string;
+      setlineup: string;
+      remind: string;
       startseason: string;
       endseason: string;
       season: string;
       config: string;
       addplayer: string;
       removeplayer: string;
-      setweek: string;
-      setmatch: string;
-      setlineup: string;
-      poll: string;
-      remind: string;
-      status: string;
+      setcaptain: string;
+      removecaptain: string;
     };
   };
   announcements: {
@@ -178,6 +185,7 @@ export const fi: Translations = {
   },
   errors: {
     notAdmin: 'Sinulla ei ole oikeuksia tähän komentoon.',
+    notCaptain: 'Sinulla ei ole kapteenin oikeuksia tähän komentoon.',
     noActiveSeason: 'Ei aktiivista kautta. Aloita kausi komennolla /startseason <nimi>',
     noUserMentioned: 'Mainitse käyttäjä komennossa (esim. /addplayer @käyttäjä)',
     playerNotFound: 'Pelaajaa ei löytynyt.',
@@ -194,6 +202,7 @@ export const fi: Translations = {
     empty: 'Rosteri on tyhjä.',
     title: 'Rosteri:',
     playerLine: (name, username) => (username ? `• ${name} (@${username})` : `• ${name}`),
+    captainLine: (name, username) => (username ? `⭐ ${name} (@${username})` : `⭐ ${name}`),
     invitationPrompt: 'Haluatko liittyä rosteriin? Reagoi 👍 hyväksyäksesi tai 👎 hylätäksesi.',
     invitationSent: (name) => `Kutsu lähetetty: ${name}`,
     invitationAccepted: (name) => `${name} lisätty rosteriin!`,
@@ -201,6 +210,14 @@ export const fi: Translations = {
     invitationExpired: 'Kutsu vanhentunut.',
     addplayerUsage:
       'Käyttö: /addplayer <käyttäjänimi>\nTai napauta käyttäjän nimeä viestissä ja kirjoita /addplayer',
+  },
+  captain: {
+    promoted: (name) => `${name} ylennetty kapteniksi.`,
+    demoted: (name) => `${name} alennettu pelaajaksi.`,
+    alreadyCaptain: (name) => `${name} on jo kapteeni.`,
+    notACaptain: (name) => `${name} ei ole kapteeni.`,
+    usage: 'Käyttö: /setcaptain @pelaaja',
+    removeUsage: 'Käyttö: /removecaptain @pelaaja',
   },
   season: {
     started: (name) => `Kausi "${name}" aloitettu!`,
@@ -244,6 +261,7 @@ export const fi: Translations = {
     matchWeekTitle: (week, dateRange) =>
       `Vko ${week} (${dateRange}) - MATSI!\nOletusaika su 20:00. Merkkaa milloin pääset.`,
     legend: '✅ Vapaa | 🏋️ Vain treeni | 🏆 Vain matsi | ⚠️ Jos tarve | ❌ Ei pääse',
+    notInRoster: 'Valikko on vain rosterissa oleville pelaajille.',
     days: {
       mon: 'Ma',
       tue: 'Ti',
@@ -254,15 +272,14 @@ export const fi: Translations = {
       sun: 'Su',
     },
   },
-  practice: {
-    title: (week: number, dateRange: string) => `Vko ${week} (${dateRange}) aikataulut:`,
-    dayTitle: (day: string, date: string) => `${day} ${date} aikataulut:`,
+  avail: {
+    title: (week, dateRange) => `Vko ${week} (${dateRange}) aikataulut:`,
+    practiceTitle: (week, dateRange) => `Vko ${week} (${dateRange}) treenivalmius:`,
+    matchTitle: (week, dateRange) => `Vko ${week} (${dateRange}) matsivalmius:`,
+    dayTitle: (day, date) => `${day} ${date} aikataulut:`,
     noResponses: 'Ei vastauksia.',
-    noResponsesForDay: (day: string) => `Ei vastauksia päivälle ${day}.`,
-    playerLine: (name: string, times: string[], status: string) =>
-      `• ${name}: ${times.join(', ')} ${status}`,
-    invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
-    usage: 'Käyttö: /practice [today|<päivä>]',
+    noResponsesForDay: (day) => `Ei vastauksia päivälle ${day}.`,
+    usage: 'Käyttö: /avail [practice|match] [today|<päivä>]',
   },
   match: {
     scheduled: (day, time, week, dateRange) =>
@@ -270,13 +287,6 @@ export const fi: Translations = {
     usage: 'Käyttö: /setmatch <päivä> <aika>\nEsim: /setmatch sun 20:00',
     invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Virheellinen aika. Käytä muotoa HH:MM (esim. 20:00)',
-    info: (week, dateRange) => `📅 Vko ${week} (${dateRange}) matsi`,
-    time: (day, time) => `Aika: ${day} klo ${time}`,
-    timeDefault: (day, time) => `Oletusaika: ${day} klo ${time}`,
-    notScheduled: 'Aikaa ei vielä sovittu',
-    lineupTitle: 'Linari:',
-    lineupEmpty: 'Linaria ei ole vielä asetettu',
-    lineupPlayer: (name) => `• ${name}`,
   },
   lineup: {
     set: (count, players) => `Linari asetettu (${count} pelaajaa):\n${players}`,
@@ -289,6 +299,7 @@ export const fi: Translations = {
     done: 'Valmis',
     needExact: (count) => `Valitse ${count} pelaajaa.`,
     saved: (count) => `Linari tallennettu (${count} pelaajaa).`,
+    notCaptain: 'Valikko on vain kapteeneille.',
   },
   reminder: {
     title: (week, dateRange) => `📋 Muistutus: Vko ${week} (${dateRange}) aikataulukysely`,
@@ -316,25 +327,27 @@ export const fi: Translations = {
   help: {
     publicCommands: 'Julkiset komennot',
     playerCommands: 'Pelaajan komennot',
+    captainCommands: 'Kapteenin komennot',
     adminCommands: 'Admin-komennot',
     commands: {
       help: 'Näytä komennot',
       roster: 'Näytä joukkueen rosteri',
       nextmatch: 'Näytä seuraavan matsin tiedot',
-      match: 'Näytä matsin tiedot ja linari',
-      practice: 'Näytä treenien mahdolliset aikataulut',
+      avail: 'Näytä pelaajien saatavuus',
+      poll: 'Näytä aikataulukysely',
+      status: 'Näytä tilannekatsaus',
+      setweek: 'Aseta viikon tyyppi',
+      setmatch: 'Ajoita matsi',
+      setlineup: 'Aseta linari',
+      remind: 'Lähetä muistutus vastaamattomille',
       startseason: 'Aloita uusi kausi',
       endseason: 'Päätä nykyinen kausi',
       season: 'Näytä kauden tiedot',
       config: 'Näytä/muokkaa asetuksia',
       addplayer: 'Lisää pelaaja rosteriin',
       removeplayer: 'Poista pelaaja rosterista',
-      setweek: 'Aseta viikon tyyppi',
-      setmatch: 'Ajoita matsi',
-      setlineup: 'Aseta linari',
-      poll: 'Lähetä aikataulukysely',
-      remind: 'Lähetä muistutus vastaamattomille',
-      status: 'Näytä tilannekatsaus',
+      setcaptain: 'Ylennä pelaaja kapteniksi',
+      removecaptain: 'Alenna kapteeni pelaajaksi',
     },
   },
   announcements: {

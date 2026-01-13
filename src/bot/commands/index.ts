@@ -1,5 +1,6 @@
 import type { Bot } from 'grammy';
 import type { BotContext } from '../context';
+import { registerCaptainCommands } from './admin/captain';
 import { registerConfigCommand } from './admin/config';
 import { registerMatchCommands } from './admin/match';
 import { registerPlayerCommands } from './admin/players';
@@ -8,10 +9,9 @@ import { registerRemindCommand } from './admin/remind';
 import { registerSeasonCommands } from './admin/season';
 import { registerStatusCommand } from './admin/status';
 import { registerWeekCommand } from './admin/week';
+import { registerAvailCommand } from './player/avail';
 import { registerHelpCommand } from './player/help';
-import { registerMatchInfoCommand } from './player/match';
 import { registerNextMatchCommand } from './player/nextmatch';
-import { registerPracticeCommand } from './player/practice';
 import { registerRosterCommand } from './player/roster';
 
 export const registerCommands = (bot: Bot<BotContext>) => {
@@ -20,12 +20,12 @@ export const registerCommands = (bot: Bot<BotContext>) => {
   registerStatusCommand(bot);
   registerHelpCommand(bot);
   registerPlayerCommands(bot);
+  registerCaptainCommands(bot);
   registerSeasonCommands(bot);
   registerConfigCommand(bot);
   registerWeekCommand(bot);
   registerMatchCommands(bot);
-  registerMatchInfoCommand(bot);
+  registerAvailCommand(bot);
   registerRosterCommand(bot);
-  registerPracticeCommand(bot);
   registerNextMatchCommand(bot);
 };

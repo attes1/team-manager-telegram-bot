@@ -1,4 +1,5 @@
 import type { Kysely } from 'kysely';
+import type { RosterRole } from '../lib/schemas';
 import type { DB, Player } from '../types/db';
 
 export type { Player };
@@ -84,4 +85,57 @@ export const getPlayerByTelegramId = async (
     .executeTakeFirst();
 
   return row;
+};
+
+export const getPlayerRole = async (
+  db: Kysely<DB>,
+  seasonId: number,
+  telegramId: number,
+): Promise<RosterRole | null> => {
+  const row = await db
+    .selectFrom('seasonRoster')
+    .select('role')
+    .where('seasonId', '=', seasonId)
+    .where('playerId', '=', telegramId)
+    .executeTakeFirst();
+
+  return row?.role ?? null;
+};
+
+export const isCaptain = async (
+  db: Kysely<DB>,
+  seasonId: number,
+  telegramId: number,
+): Promise<boolean> => {
+  const role = await getPlayerRole(db, seasonId, telegramId);
+  return role === 'captain';
+};
+
+export const setPlayerRole = async (
+  db: Kysely<DB>,
+  seasonId: number,
+  telegramId: number,
+  role: RosterRole,
+): Promise<boolean> => {
+  const result = await db
+    .updateTable('seasonRoster')
+    .set({ role })
+    .where('seasonId', '=', seasonId)
+    .where('playerId', '=', telegramId)
+    .executeTakeFirst();
+
+  return result.numUpdatedRows > 0n;
+};
+
+export const getCaptains = async (db: Kysely<DB>, seasonId: number): Promise<Player[]> => {
+  const rows = await db
+    .selectFrom('seasonRoster')
+    .innerJoin('players', 'players.telegramId', 'seasonRoster.playerId')
+    .selectAll('players')
+    .where('seasonRoster.seasonId', '=', seasonId)
+    .where('seasonRoster.role', '=', 'captain')
+    .orderBy('players.displayName', 'asc')
+    .execute();
+
+  return rows;
 };

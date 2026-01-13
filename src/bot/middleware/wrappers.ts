@@ -3,10 +3,19 @@ import type {
   AdminContext,
   AdminSeasonContext,
   BotContext,
+  CaptainContext,
+  CaptainSeasonContext,
   RosterContext,
   SeasonContext,
 } from '../context';
-import { isAdminContext, isAdminSeasonContext, isRosterContext, isSeasonContext } from './guards';
+import {
+  isAdminContext,
+  isAdminSeasonContext,
+  isCaptainContext,
+  isCaptainSeasonContext,
+  isRosterContext,
+  isSeasonContext,
+} from './guards';
 
 type CommandHandler<T extends BotContext> = (ctx: T) => Promise<unknown> | unknown;
 
@@ -59,6 +68,34 @@ export const adminSeasonCommand = (
       return;
     }
     if (!isAdminSeasonContext(ctx)) {
+      await ctx.reply(ctx.i18n.errors.noActiveSeason);
+      return;
+    }
+    return handler(ctx);
+  };
+};
+
+export const captainCommand = (
+  handler: CommandHandler<CaptainContext>,
+): CommandMiddleware<BotContext> => {
+  return async (ctx) => {
+    if (!isCaptainContext(ctx)) {
+      await ctx.reply(ctx.i18n.errors.notCaptain);
+      return;
+    }
+    return handler(ctx);
+  };
+};
+
+export const captainSeasonCommand = (
+  handler: CommandHandler<CaptainSeasonContext>,
+): CommandMiddleware<BotContext> => {
+  return async (ctx) => {
+    if (!isCaptainContext(ctx)) {
+      await ctx.reply(ctx.i18n.errors.notCaptain);
+      return;
+    }
+    if (!isCaptainSeasonContext(ctx)) {
       await ctx.reply(ctx.i18n.errors.noActiveSeason);
       return;
     }

@@ -8,6 +8,7 @@ export interface BotContext extends Context {
   db: Kysely<DB>;
   userId: number;
   isAdmin: boolean;
+  isCaptain: boolean;
   isInRoster: boolean;
   season?: Season;
   config?: ParsedConfig;
@@ -29,4 +30,12 @@ export type AdminContext = BotContext & {
 
 export type AdminSeasonContext = SeasonContext & {
   isAdmin: true;
+};
+
+export type CaptainContext = BotContext & {
+  isCaptain: true;
+};
+
+export type CaptainSeasonContext = SeasonContext & {
+  isCaptain: true;
 };

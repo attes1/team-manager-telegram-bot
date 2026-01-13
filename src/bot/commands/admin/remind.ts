@@ -3,13 +3,13 @@ import { formatDateRange, formatPlayerName } from '../../../lib/format';
 import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
 import { hasRespondedForWeek } from '../../../services/availability';
 import { getRoster } from '../../../services/roster';
-import type { AdminSeasonContext, BotContext } from '../../context';
-import { adminSeasonCommand } from '../../middleware';
+import type { BotContext, CaptainSeasonContext } from '../../context';
+import { captainSeasonCommand } from '../../middleware';
 
 export const registerRemindCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'remind',
-    adminSeasonCommand(async (ctx: AdminSeasonContext) => {
+    captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, config, i18n } = ctx;
       const { week, year } = getCurrentWeek();
       const { start, end } = getWeekDateRange(year, week);

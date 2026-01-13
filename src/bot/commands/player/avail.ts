@@ -16,6 +16,24 @@ const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   unavailable: '❌',
 };
 
+type AvailFilter = 'all' | 'practice' | 'match';
+
+const PRACTICE_STATUSES: AvailabilityStatus[] = ['available', 'practice_only', 'if_needed'];
+const MATCH_STATUSES: AvailabilityStatus[] = ['available', 'match_only', 'if_needed'];
+
+const matchesFilter = (status: AvailabilityStatus, filter: AvailFilter): boolean => {
+  if (filter === 'all') {
+    return status !== 'unavailable';
+  }
+  if (filter === 'practice') {
+    return PRACTICE_STATUSES.includes(status);
+  }
+  if (filter === 'match') {
+    return MATCH_STATUSES.includes(status);
+  }
+  return true;
+};
+
 const getTodayDay = (): Day => {
   const days: Day[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   return days[new Date().getDay()];
@@ -27,6 +45,7 @@ const showDayAvailability = async (
   i18n: Translations,
   week: number,
   year: number,
+  filter: AvailFilter,
 ): Promise<void> => {
   const { db, season } = ctx;
   const availability = await getWeekAvailability(db, {
@@ -35,10 +54,13 @@ const showDayAvailability = async (
     year,
   });
 
-  const playersForDay = availability.filter((p) => p.responses[day]);
+  const playersForDay = availability.filter((p) => {
+    const response = p.responses[day];
+    return response && matchesFilter(response.status, filter);
+  });
 
   if (playersForDay.length === 0) {
-    await ctx.reply(i18n.practice.noResponsesForDay(i18n.poll.days[day]));
+    await ctx.reply(i18n.avail.noResponsesForDay(i18n.poll.days[day]));
     return;
   }
 
@@ -48,7 +70,7 @@ const showDayAvailability = async (
   dayDate.setDate(dayDate.getDate() + dayIndex);
   const dateStr = `${dayDate.getDate()}.${dayDate.getMonth() + 1}.`;
 
-  const lines: string[] = [i18n.practice.dayTitle(i18n.poll.days[day], dateStr), ''];
+  const lines: string[] = [i18n.avail.dayTitle(i18n.poll.days[day], dateStr), ''];
 
   for (const player of playersForDay) {
     const response = player.responses[day];
@@ -62,26 +84,49 @@ const showDayAvailability = async (
   await ctx.reply(lines.join('\n'));
 };
 
-export const registerPracticeCommand = (bot: Bot<BotContext>) => {
+const parseArgs = (args: string): { filter: AvailFilter; day: Day | 'today' | null } => {
+  const parts = args.split(/\s+/).filter(Boolean);
+
+  let filter: AvailFilter = 'all';
+  let day: Day | 'today' | null = null;
+
+  for (const part of parts) {
+    const lower = part.toLowerCase();
+    if (lower === 'practice' || lower === 'treeni') {
+      filter = 'practice';
+    } else if (lower === 'match' || lower === 'matsi') {
+      filter = 'match';
+    } else if (lower === 'today' || lower === 'tänään') {
+      day = 'today';
+    } else {
+      const parseResult = daySchema.safeParse(lower);
+      if (parseResult.success) {
+        day = parseResult.data;
+      }
+    }
+  }
+
+  return { filter, day };
+};
+
+export const registerAvailCommand = (bot: Bot<BotContext>) => {
   bot.command(
-    'practice',
+    'avail',
     rosterCommand(async (ctx: RosterContext) => {
       const { db, season, config, i18n } = ctx;
-      const args = ctx.match?.toString().trim().toLowerCase() ?? '';
+      const args = ctx.match?.toString().trim() ?? '';
       const { week, year } = getCurrentWeek();
       const { start, end } = getWeekDateRange(year, week);
       const dateRange = formatDateRange(start, end);
 
-      if (args === 'today') {
-        return showDayAvailability(ctx, getTodayDay(), i18n, week, year);
+      const { filter, day } = parseArgs(args);
+
+      if (day === 'today') {
+        return showDayAvailability(ctx, getTodayDay(), i18n, week, year, filter);
       }
 
-      if (args && args !== '') {
-        const parseResult = daySchema.safeParse(args);
-        if (!parseResult.success) {
-          return ctx.reply(i18n.practice.invalidDay);
-        }
-        return showDayAvailability(ctx, parseResult.data, i18n, week, year);
+      if (day) {
+        return showDayAvailability(ctx, day, i18n, week, year, filter);
       }
 
       const availability = await getWeekAvailability(db, {
@@ -91,14 +136,24 @@ export const registerPracticeCommand = (bot: Bot<BotContext>) => {
       });
 
       if (availability.length === 0) {
-        return ctx.reply(i18n.practice.noResponses);
+        return ctx.reply(i18n.avail.noResponses);
       }
 
-      const lines: string[] = [i18n.practice.title(week, dateRange), ''];
+      const title =
+        filter === 'practice'
+          ? i18n.avail.practiceTitle(week, dateRange)
+          : filter === 'match'
+            ? i18n.avail.matchTitle(week, dateRange)
+            : i18n.avail.title(week, dateRange);
 
-      for (const day of config.pollDays) {
-        const dayHeader = i18n.poll.days[day];
-        const playersForDay = availability.filter((p) => p.responses[day]);
+      const lines: string[] = [title, ''];
+
+      for (const dayKey of config.pollDays) {
+        const dayHeader = i18n.poll.days[dayKey];
+        const playersForDay = availability.filter((p) => {
+          const response = p.responses[dayKey];
+          return response && matchesFilter(response.status, filter);
+        });
 
         if (playersForDay.length === 0) {
           continue;
@@ -106,7 +161,7 @@ export const registerPracticeCommand = (bot: Bot<BotContext>) => {
 
         lines.push(`${dayHeader}:`);
         for (const player of playersForDay) {
-          const response = player.responses[day];
+          const response = player.responses[dayKey];
           if (response) {
             const timesStr = response.timeSlots.length > 0 ? response.timeSlots.join(', ') : '-';
             const statusIcon = STATUS_ICONS[response.status];

@@ -3,8 +3,9 @@ import { getISOWeek } from 'date-fns';
 import type { Kysely } from 'kysely';
 import { CamelCasePlugin, Kysely as KyselyClass, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerPracticeCommand } from '@/bot/commands/player/practice';
-import { up } from '@/db/migrations/001_initial';
+import { registerAvailCommand } from '@/bot/commands/player/avail';
+import { up as up001 } from '@/db/migrations/001_initial';
+import { up as up002 } from '@/db/migrations/002_roster_roles';
 import type { DB } from '@/types/db';
 import { createCommandUpdate, createTestBot } from './helpers';
 
@@ -32,7 +33,7 @@ const CHAT_ID = -100123456789;
 vi.mock('@/db', () => mockDb);
 vi.mock('@/env', () => mockEnv);
 
-describe('/practice command', () => {
+describe('/avail command', () => {
   beforeEach(async () => {
     const db = new KyselyClass<DB>({
       dialect: new SqliteDialect({
@@ -40,7 +41,8 @@ describe('/practice command', () => {
       }),
       plugins: [new CamelCasePlugin()],
     });
-    await up(db);
+    await up001(db);
+    await up002(db);
     mockDb.db = db;
   });
 
@@ -50,9 +52,9 @@ describe('/practice command', () => {
 
   test('returns error when no active season', async () => {
     const { bot, calls } = createTestBot();
-    registerPracticeCommand(bot);
+    registerAvailCommand(bot);
 
-    const update = createCommandUpdate('/practice', ADMIN_ID, CHAT_ID);
+    const update = createCommandUpdate('/avail', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
@@ -62,7 +64,7 @@ describe('/practice command', () => {
 
   test('shows no responses message when no availability data', async () => {
     const { bot, calls } = createTestBot();
-    registerPracticeCommand(bot);
+    registerAvailCommand(bot);
 
     const season = await mockDb.db
       .insertInto('seasons')
@@ -82,7 +84,7 @@ describe('/practice command', () => {
       .values({ seasonId: season.id, playerId: ADMIN_ID })
       .execute();
 
-    const update = createCommandUpdate('/practice', ADMIN_ID, CHAT_ID);
+    const update = createCommandUpdate('/avail', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
@@ -92,7 +94,7 @@ describe('/practice command', () => {
 
   test('shows availability grid with players', async () => {
     const { bot, calls } = createTestBot();
-    registerPracticeCommand(bot);
+    registerAvailCommand(bot);
 
     const season = await mockDb.db
       .insertInto('seasons')
@@ -139,18 +141,17 @@ describe('/practice command', () => {
       ])
       .execute();
 
-    const update = createCommandUpdate('/practice', ADMIN_ID, CHAT_ID);
+    const update = createCommandUpdate('/avail', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
-    // Player has username (no @ to avoid ping)
     expect(calls[0].payload.text).toContain('playerone');
   });
 
   test('shows availability for specific day', async () => {
     const { bot, calls } = createTestBot();
-    registerPracticeCommand(bot);
+    registerAvailCommand(bot);
 
     const season = await mockDb.db
       .insertInto('seasons')
@@ -170,16 +171,144 @@ describe('/practice command', () => {
       .values({ seasonId: season.id, playerId: ADMIN_ID })
       .execute();
 
-    const update = createCommandUpdate('/practice mon', ADMIN_ID, CHAT_ID);
+    const update = createCommandUpdate('/avail mon', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
   });
 
-  test('returns error for invalid day', async () => {
+  test('filters practice-only availability', async () => {
     const { bot, calls } = createTestBot();
-    registerPracticeCommand(bot);
+    registerAvailCommand(bot);
+
+    const season = await mockDb.db
+      .insertInto('seasons')
+      .values({ name: 'Test Season' })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+
+    await mockDb.db.insertInto('config').values({ seasonId: season.id }).execute();
+
+    await mockDb.db
+      .insertInto('players')
+      .values([
+        { telegramId: ADMIN_ID, displayName: 'Admin', username: 'admin' },
+        { telegramId: 111, displayName: 'Player One', username: 'playerone' },
+        { telegramId: 222, displayName: 'Player Two', username: 'playertwo' },
+      ])
+      .execute();
+
+    await mockDb.db
+      .insertInto('seasonRoster')
+      .values([
+        { seasonId: season.id, playerId: ADMIN_ID },
+        { seasonId: season.id, playerId: 111 },
+        { seasonId: season.id, playerId: 222 },
+      ])
+      .execute();
+
+    const week = getISOWeek(new Date());
+    const year = new Date().getFullYear();
+
+    await mockDb.db
+      .insertInto('dayResponses')
+      .values([
+        {
+          seasonId: season.id,
+          playerId: 111,
+          weekNumber: week,
+          year,
+          day: 'mon',
+          status: 'practice_only',
+        },
+        {
+          seasonId: season.id,
+          playerId: 222,
+          weekNumber: week,
+          year,
+          day: 'mon',
+          status: 'match_only',
+        },
+      ])
+      .execute();
+
+    const update = createCommandUpdate('/avail practice', ADMIN_ID, CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.text).toContain('playerone');
+    expect(calls[0].payload.text).not.toContain('playertwo');
+  });
+
+  test('filters match-only availability', async () => {
+    const { bot, calls } = createTestBot();
+    registerAvailCommand(bot);
+
+    const season = await mockDb.db
+      .insertInto('seasons')
+      .values({ name: 'Test Season' })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+
+    await mockDb.db.insertInto('config').values({ seasonId: season.id }).execute();
+
+    await mockDb.db
+      .insertInto('players')
+      .values([
+        { telegramId: ADMIN_ID, displayName: 'Admin', username: 'admin' },
+        { telegramId: 111, displayName: 'Player One', username: 'playerone' },
+        { telegramId: 222, displayName: 'Player Two', username: 'playertwo' },
+      ])
+      .execute();
+
+    await mockDb.db
+      .insertInto('seasonRoster')
+      .values([
+        { seasonId: season.id, playerId: ADMIN_ID },
+        { seasonId: season.id, playerId: 111 },
+        { seasonId: season.id, playerId: 222 },
+      ])
+      .execute();
+
+    const week = getISOWeek(new Date());
+    const year = new Date().getFullYear();
+
+    await mockDb.db
+      .insertInto('dayResponses')
+      .values([
+        {
+          seasonId: season.id,
+          playerId: 111,
+          weekNumber: week,
+          year,
+          day: 'mon',
+          status: 'practice_only',
+        },
+        {
+          seasonId: season.id,
+          playerId: 222,
+          weekNumber: week,
+          year,
+          day: 'mon',
+          status: 'match_only',
+        },
+      ])
+      .execute();
+
+    const update = createCommandUpdate('/avail match', ADMIN_ID, CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.text).toContain('playertwo');
+    expect(calls[0].payload.text).not.toContain('playerone');
+  });
+
+  test('accepts Finnish aliases for filters', async () => {
+    const { bot, calls } = createTestBot();
+    registerAvailCommand(bot);
 
     const season = await mockDb.db
       .insertInto('seasons')
@@ -199,11 +328,26 @@ describe('/practice command', () => {
       .values({ seasonId: season.id, playerId: ADMIN_ID })
       .execute();
 
-    const update = createCommandUpdate('/practice invalid', ADMIN_ID, CHAT_ID);
+    const week = getISOWeek(new Date());
+    const year = new Date().getFullYear();
+
+    await mockDb.db
+      .insertInto('dayResponses')
+      .values({
+        seasonId: season.id,
+        playerId: ADMIN_ID,
+        weekNumber: week,
+        year,
+        day: 'mon',
+        status: 'available',
+      })
+      .execute();
+
+    const update = createCommandUpdate('/avail treeni', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
-    expect(calls[0].payload.text).toContain('Invalid day');
+    expect(calls[0].payload.text).toContain('practice');
   });
 });

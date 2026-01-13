@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
-import { up } from '@/db/migrations/001_initial';
+import { up as up001 } from '@/db/migrations/001_initial';
+import { up as up002 } from '@/db/migrations/002_roster_roles';
 import type { DB } from '@/types/db';
 
 export const testEnv = {
@@ -24,6 +25,7 @@ export const createTestDb = async (): Promise<Kysely<DB>> => {
     }),
     plugins: [new CamelCasePlugin()],
   });
-  await up(db);
+  await up001(db);
+  await up002(db);
   return db;
 };

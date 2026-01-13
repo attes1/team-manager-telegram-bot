@@ -5,13 +5,13 @@ import { getWeekAvailability } from '../../../services/availability';
 import { getLineup, getMatchInfo } from '../../../services/match';
 import { getRoster } from '../../../services/roster';
 import { getWeek } from '../../../services/week';
-import type { AdminSeasonContext, BotContext } from '../../context';
-import { adminSeasonCommand } from '../../middleware';
+import type { BotContext, RosterContext } from '../../context';
+import { rosterCommand } from '../../middleware';
 
 export const registerStatusCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'status',
-    adminSeasonCommand(async (ctx: AdminSeasonContext) => {
+    rosterCommand(async (ctx: RosterContext) => {
       const { db, season, config, i18n } = ctx;
       const { week, year } = getCurrentWeek();
       const { start, end } = getWeekDateRange(year, week);

@@ -10,8 +10,8 @@ import {
 } from '../../../services/announcements';
 import { clearLineup, getLineup, setLineup, setMatchTime } from '../../../services/match';
 import { isPlayerInRoster } from '../../../services/roster';
-import type { AdminSeasonContext, BotContext } from '../../context';
-import { adminSeasonCommand } from '../../middleware';
+import type { BotContext, CaptainSeasonContext } from '../../context';
+import { captainSeasonCommand } from '../../middleware';
 
 interface MentionedUser {
   id: number;
@@ -19,7 +19,7 @@ interface MentionedUser {
   username?: string;
 }
 
-const getAllMentionedUsers = (ctx: AdminSeasonContext): MentionedUser[] => {
+const getAllMentionedUsers = (ctx: CaptainSeasonContext): MentionedUser[] => {
   const users: MentionedUser[] = [];
 
   const textMentions = ctx.entities('text_mention');
@@ -39,7 +39,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
 
   bot.command(
     'setmatch',
-    adminSeasonCommand(async (ctx: AdminSeasonContext) => {
+    captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
       const [dayStr, timeStr] = args.split(/\s+/);
@@ -86,7 +86,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
 
   bot.command(
     'setlineup',
-    adminSeasonCommand(async (ctx: AdminSeasonContext) => {
+    captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
 

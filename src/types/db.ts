@@ -3,6 +3,7 @@ import type {
   AvailabilityStatus,
   Day,
   RemindersMode,
+  RosterRole,
   SeasonStatus,
   WeekType,
 } from '../lib/schemas';
@@ -42,6 +43,7 @@ export interface PlayersTable {
 export interface SeasonRosterTable {
   seasonId: number;
   playerId: number;
+  role: Generated<RosterRole>;
   addedAt: Generated<string>;
 }
 

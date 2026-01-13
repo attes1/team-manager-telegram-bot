@@ -2,10 +2,8 @@ import Database from 'better-sqlite3';
 import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { registerMatchCommands } from '@/bot/commands/admin/match';
-import { registerMatchInfoCommand } from '@/bot/commands/player/match';
-import { up } from '@/db/migrations/001_initial';
-import { getCurrentWeek } from '@/lib/week';
-import { setLineup, setMatchTime } from '@/services/match';
+import { up as up001 } from '@/db/migrations/001_initial';
+import { up as up002 } from '@/db/migrations/002_roster_roles';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
@@ -44,7 +42,8 @@ describe('/setmatch command', () => {
       }),
       plugins: [new CamelCasePlugin()],
     });
-    await up(db);
+    await up001(db);
+    await up002(db);
     mockDb.db = db;
   });
 
@@ -182,7 +181,8 @@ describe('/setlineup command', () => {
       }),
       plugins: [new CamelCasePlugin()],
     });
-    await up(db);
+    await up001(db);
+    await up002(db);
     mockDb.db = db;
 
     const season = await startSeason(mockDb.db, 'Test Season');
@@ -283,99 +283,5 @@ describe('/setlineup command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].payload.text).toContain('not in the roster');
-  });
-});
-
-describe('/match command', () => {
-  let seasonId: number;
-
-  beforeEach(async () => {
-    const db = new Kysely<DB>({
-      dialect: new SqliteDialect({
-        database: new Database(':memory:'),
-      }),
-      plugins: [new CamelCasePlugin()],
-    });
-    await up(db);
-    mockDb.db = db;
-
-    const season = await startSeason(mockDb.db, 'Test Season');
-    seasonId = season.id;
-  });
-
-  afterEach(async () => {
-    await mockDb.db.destroy();
-  });
-
-  test('shows match info when scheduled', async () => {
-    const { week, year } = getCurrentWeek();
-
-    await addPlayerToRoster(mockDb.db, {
-      seasonId,
-      telegramId: TEST_USER_ID,
-      displayName: 'Test User',
-    });
-
-    await setMatchTime(mockDb.db, {
-      seasonId,
-      weekNumber: week,
-      year,
-      matchDay: 'sun',
-      matchTime: '20:00',
-    });
-
-    const { bot, calls } = createTestBot();
-    registerMatchInfoCommand(bot);
-
-    const update = createCommandUpdate('/match', TEST_USER_ID, TEST_CHAT_ID);
-    await bot.handleUpdate(update);
-
-    expect(calls).toHaveLength(1);
-    expect(calls[0].method).toBe('sendMessage');
-  });
-
-  test('shows lineup when set', async () => {
-    const { week, year } = getCurrentWeek();
-
-    await addPlayerToRoster(mockDb.db, {
-      seasonId,
-      telegramId: TEST_USER_ID,
-      displayName: 'Test User',
-    });
-
-    await addPlayerToRoster(mockDb.db, {
-      seasonId,
-      telegramId: 111,
-      displayName: 'Player One',
-    });
-
-    await setLineup(mockDb.db, {
-      seasonId,
-      weekNumber: week,
-      year,
-      playerIds: [111],
-    });
-
-    const { bot, calls } = createTestBot();
-    registerMatchInfoCommand(bot);
-
-    const update = createCommandUpdate('/match', TEST_USER_ID, TEST_CHAT_ID);
-    await bot.handleUpdate(update);
-
-    expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('Player One');
-  });
-
-  test('requires active season', async () => {
-    await mockDb.db.updateTable('seasons').set({ status: 'ended' }).execute();
-
-    const { bot, calls } = createTestBot();
-    registerMatchInfoCommand(bot);
-
-    const update = createCommandUpdate('/match', TEST_USER_ID, TEST_CHAT_ID);
-    await bot.handleUpdate(update);
-
-    expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('No active season');
   });
 });
