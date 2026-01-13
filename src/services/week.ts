@@ -33,33 +33,3 @@ export const getWeek = async (
     .where('year', '=', year)
     .executeTakeFirst();
 };
-
-export interface GetUpcomingMatchWeeksParams {
-  seasonId: number;
-  fromWeek: number;
-  fromYear: number;
-  limit?: number;
-}
-
-export const getUpcomingMatchWeeks = async (
-  db: Kysely<DB>,
-  params: GetUpcomingMatchWeeksParams,
-): Promise<Week[]> => {
-  const { seasonId, fromWeek, fromYear, limit = 10 } = params;
-
-  return db
-    .selectFrom('weeks')
-    .selectAll()
-    .where('seasonId', '=', seasonId)
-    .where((eb) =>
-      eb.or([
-        eb('year', '>', fromYear),
-        eb.and([eb('year', '=', fromYear), eb('weekNumber', '>=', fromWeek)]),
-      ]),
-    )
-    .where('type', '!=', 'practice')
-    .orderBy('year', 'asc')
-    .orderBy('weekNumber', 'asc')
-    .limit(limit)
-    .execute();
-};

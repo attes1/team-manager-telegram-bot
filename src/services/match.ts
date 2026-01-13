@@ -1,19 +1,9 @@
-import { addWeeks } from 'date-fns';
 import type { Kysely } from 'kysely';
 import { formatDateRange, formatDay, formatPlayerName } from '@/lib/format';
 import type { Day, ParsedConfig } from '@/lib/schemas';
-import {
-  getCurrentWeek,
-  getWeekDateRange,
-  getWeekNumber,
-  getWeekYear,
-  isMatchInFuture,
-} from '@/lib/week';
+import { getCurrentWeek, getWeekDateRange, isMatchInFuture } from '@/lib/week';
 import type { DB, Player, Week } from '@/types/db';
 import type { Translations } from '../i18n';
-import { getWeek } from './week';
-
-const MAX_LOOKAHEAD_WEEKS = 4;
 
 export interface SetMatchTimeParams {
   seasonId: number;
@@ -224,29 +214,6 @@ export const clearOpponent = async (db: Kysely<DB>, params: WeekParams): Promise
   return result.numUpdatedRows > 0n;
 };
 
-const findNextMatchWeek = async (
-  db: Kysely<DB>,
-  seasonId: number,
-  startWeek: { week: number; year: number },
-): Promise<{ week: number; year: number } | null> => {
-  const { start } = getWeekDateRange(startWeek.year, startWeek.week);
-
-  for (let i = 1; i <= MAX_LOOKAHEAD_WEEKS; i++) {
-    const futureDate = addWeeks(start, i);
-    const checkWeek = getWeekNumber(futureDate);
-    const checkYear = getWeekYear(futureDate);
-
-    const weekInfo = await getWeek(db, seasonId, checkWeek, checkYear);
-
-    // Default to match week if no weekInfo, or if explicitly set to match
-    if (!weekInfo || weekInfo.type === 'match') {
-      return { week: checkWeek, year: checkYear };
-    }
-  }
-
-  return null;
-};
-
 const buildMatchDisplayData = async (
   ctx: MatchInfoContext,
   week: number,
@@ -292,38 +259,58 @@ const buildMatchDisplayData = async (
 export const getNextMatchResult = async (ctx: MatchInfoContext): Promise<NextMatchResult> => {
   const { db, config } = ctx;
   const seasonId = ctx.season.id;
+  const { week: currentWeek, year: currentYear } = getCurrentWeek();
 
-  // Use current week (not scheduling week) - we want to show what's coming up
-  const { week, year } = getCurrentWeek();
+  // Get all weeks >= current week in one query
+  const weeks = await db
+    .selectFrom('weeks')
+    .selectAll()
+    .where('seasonId', '=', seasonId)
+    .where((eb) =>
+      eb.or([
+        eb('year', '>', currentYear),
+        eb.and([eb('year', '=', currentYear), eb('weekNumber', '>=', currentWeek)]),
+      ]),
+    )
+    .orderBy('year', 'asc')
+    .orderBy('weekNumber', 'asc')
+    .execute();
 
-  const weekInfo = await getWeek(db, seasonId, week, year);
+  // Find current week info
+  const currentWeekInfo = weeks.find((w) => w.weekNumber === currentWeek && w.year === currentYear);
+
+  // Helper to find next match after current week
+  const findNextMatch = () =>
+    weeks.find(
+      (w) =>
+        w.type !== 'practice' &&
+        (w.year > currentYear || (w.year === currentYear && w.weekNumber > currentWeek)),
+    );
 
   // Case 1: Current week is explicitly marked as practice
-  if (weekInfo?.type === 'practice') {
-    const nextMatchWeek = await findNextMatchWeek(db, seasonId, { week, year });
-    const nextMatch = nextMatchWeek
-      ? await buildMatchDisplayData(ctx, nextMatchWeek.week, nextMatchWeek.year)
+  if (currentWeekInfo?.type === 'practice') {
+    const nextWeek = findNextMatch();
+    const nextMatch = nextWeek
+      ? await buildMatchDisplayData(ctx, nextWeek.weekNumber, nextWeek.year)
       : null;
     return { type: 'no_match_this_week', nextMatch };
   }
 
-  // Case 2 & 3: Current week is a match week (default or explicit)
-  // Determine match day/time to check if it's in the future
-  const matchDay: Day = weekInfo?.matchDay ?? config.matchDay;
-  const matchTime: string = weekInfo?.matchTime ?? config.matchTime;
+  // Case 2 & 3: Current week is a match week (explicit or default - no row means match)
+  const matchDay: Day = currentWeekInfo?.matchDay ?? config.matchDay;
+  const matchTime: string = currentWeekInfo?.matchTime ?? config.matchTime;
 
-  if (isMatchInFuture(year, week, matchDay, matchTime)) {
-    // Match is still upcoming
-    const data = await buildMatchDisplayData(ctx, week, year);
+  if (isMatchInFuture(currentYear, currentWeek, matchDay, matchTime)) {
+    const data = await buildMatchDisplayData(ctx, currentWeek, currentYear);
     return { type: 'upcoming', data };
-  } else {
-    // Match was already played
-    const nextMatchWeek = await findNextMatchWeek(db, seasonId, { week, year });
-    const nextMatch = nextMatchWeek
-      ? await buildMatchDisplayData(ctx, nextMatchWeek.week, nextMatchWeek.year)
-      : null;
-    return { type: 'already_played', nextMatch };
   }
+
+  // Match already played
+  const nextWeek = findNextMatch();
+  const nextMatch = nextWeek
+    ? await buildMatchDisplayData(ctx, nextWeek.weekNumber, nextWeek.year)
+    : null;
+  return { type: 'already_played', nextMatch };
 };
 
 const buildMatchDetails = (i18n: Translations, data: MatchDisplayData): string[] => {
