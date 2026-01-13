@@ -21,6 +21,7 @@ export interface MatchAnnouncementData {
   matchTime: string | null;
   isDefault: boolean;
   lineup: Player[];
+  lineupSize: number;
 }
 
 export const buildMatchAnnouncement = (i18n: Translations, data: MatchAnnouncementData): string => {
@@ -36,7 +37,8 @@ export const buildMatchAnnouncement = (i18n: Translations, data: MatchAnnounceme
   }
 
   lines.push('');
-  lines.push(i18n.announcements.lineupTitle);
+  const lineupWarning = data.lineup.length > 0 && data.lineup.length < data.lineupSize ? ' ⚠️' : '';
+  lines.push(`${i18n.announcements.lineupTitle}${lineupWarning}`);
 
   if (data.lineup.length > 0) {
     for (const player of data.lineup) {
@@ -117,5 +119,6 @@ export const getMatchAnnouncementData = async (
     matchTime,
     isDefault,
     lineup,
+    lineupSize: config.lineupSize,
   };
 };

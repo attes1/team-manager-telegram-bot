@@ -21,6 +21,7 @@ describe('announcements service', () => {
           { telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' },
           { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
         ],
+        lineupSize: 2,
       };
 
       const message = buildMatchAnnouncement(en, data);
@@ -42,6 +43,7 @@ describe('announcements service', () => {
         matchTime: '20:00',
         isDefault: true,
         lineup: [],
+        lineupSize: 5,
       };
 
       const message = buildMatchAnnouncement(en, data);
@@ -58,11 +60,49 @@ describe('announcements service', () => {
         matchTime: null,
         isDefault: false,
         lineup: [],
+        lineupSize: 5,
       };
 
       const message = buildMatchAnnouncement(en, data);
 
       expect(message).toContain('Time not yet scheduled');
+    });
+
+    test('shows warning emoji when lineup is partial', () => {
+      const data: MatchAnnouncementData = {
+        week: 5,
+        dateRange: '27.1. - 2.2.',
+        matchDay: 'Sunday',
+        matchTime: '20:00',
+        isDefault: false,
+        lineup: [{ telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' }],
+        lineupSize: 5,
+      };
+
+      const message = buildMatchAnnouncement(en, data);
+
+      expect(message).toContain('Lineup');
+      expect(message).toContain('⚠️');
+    });
+
+    test('no warning emoji when lineup is full', () => {
+      const data: MatchAnnouncementData = {
+        week: 5,
+        dateRange: '27.1. - 2.2.',
+        matchDay: 'Sunday',
+        matchTime: '20:00',
+        isDefault: false,
+        lineup: [
+          { telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' },
+          { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
+        ],
+        lineupSize: 2,
+      };
+
+      const message = buildMatchAnnouncement(en, data);
+
+      expect(message).toContain('Lineup');
+      expect(message).not.toContain('⚠️');
     });
   });
 

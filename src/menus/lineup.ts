@@ -30,7 +30,7 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
     const player = roster[i];
     const isSelected = selectedIds.has(player.telegramId);
     const name = formatPlayerName(player);
-    const label = isSelected ? `✅ ${name}` : name;
+    const label = isSelected ? `🔫 ${name}` : name;
 
     range.text(label, async (ctx) => {
       const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
@@ -64,14 +64,13 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
     .text(i18n.lineup.done, async (ctx) => {
       const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
 
-      if (lineup.length !== lineupSize) {
-        await ctx.answerCallbackQuery(ctx.i18n.lineup.needExact(lineupSize));
-        return;
-      }
-
       await ctx.answerCallbackQuery(ctx.i18n.lineup.saved(lineup.length));
 
-      if (env.PUBLIC_GROUP_ID && config.publicAnnouncements === 'on') {
+      if (
+        env.PUBLIC_GROUP_ID &&
+        config.publicAnnouncements === 'on' &&
+        lineup.length === lineupSize
+      ) {
         const { start, end } = getWeekDateRange(year, week);
         const dateRange = formatDateRange(start, end);
         const announcement = buildLineupAnnouncement(ctx.i18n, week, dateRange, lineup);
