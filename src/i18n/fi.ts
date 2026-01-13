@@ -424,7 +424,7 @@ export const fi: Translations = {
     roster: 'Rosteri',
     players: 'pelaajaa',
     responses: 'Vastauksia',
-    matchTime: 'Seuraava matsi:',
+    matchTime: 'Seuraava matsi',
     lineup: 'Linari',
     schedulingFor: 'Suunnitellaan viikolle',
     weekLabel: (week) => `Vko ${week}`,
