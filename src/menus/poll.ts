@@ -81,7 +81,10 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
 
   const inRoster = await isPlayerInRoster(db, season.id, userId);
   if (!inRoster) {
-    range.text(i18n.poll.notInRoster, (ctx) => ctx.answerCallbackQuery());
+    // If this is a button click (callback query), show error alert without modifying menu
+    if (ctx.callbackQuery) {
+      await ctx.answerCallbackQuery({ text: i18n.poll.notInRoster, show_alert: true });
+    }
     return;
   }
 
