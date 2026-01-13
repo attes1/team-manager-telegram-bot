@@ -27,8 +27,26 @@ export const createTestBot = () => {
     } satisfies UserFromGetMe,
   });
 
+  let messageIdCounter = 1000;
+
   bot.api.config.use((_prev, method, payload, _signal) => {
     calls.push({ method, payload: payload as Record<string, unknown> });
+
+    // Return proper message object for sendMessage calls
+    if (method === 'sendMessage') {
+      const chatId = (payload as { chat_id?: number }).chat_id;
+      return {
+        ok: true,
+        result: {
+          message_id: messageIdCounter++,
+          date: Math.floor(Date.now() / 1000),
+          chat: { id: chatId, type: 'group', title: 'Test Group' },
+          from: { id: 1, is_bot: true, first_name: 'TestBot' },
+          text: (payload as { text?: string }).text ?? '',
+        },
+      } as ReturnType<typeof _prev>;
+    }
+
     return { ok: true, result: true } as ReturnType<typeof _prev>;
   });
 
