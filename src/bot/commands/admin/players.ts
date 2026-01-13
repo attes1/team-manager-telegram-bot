@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
 import type { AdminSeasonContext, BotContext } from '@/bot/context';
 import { adminSeasonCommand } from '@/bot/middleware';
-import { escapeHtml } from '@/lib/format';
+import { formatUserMention } from '@/lib/format';
 import { addInvitation } from '@/services/pending-invitations';
 import { removePlayerFromRoster } from '@/services/roster';
 
@@ -45,7 +45,7 @@ export const registerPlayerCommands = (bot: Bot<BotContext>) => {
       const textMention = getTextMention(ctx);
       if (textMention) {
         // Create mention link for user without username
-        const userLink = `<a href="tg://user?id=${textMention.userId}">${escapeHtml(textMention.displayName)}</a>`;
+        const userLink = formatUserMention(textMention.userId, textMention.displayName);
         const message = `${userLink}, ${i18n.roster.invitationPrompt}`;
 
         const sentMessage = await ctx.reply(message, { parse_mode: 'HTML' });

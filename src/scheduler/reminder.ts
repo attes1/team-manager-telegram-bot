@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
 import { getTranslations } from '@/i18n';
-import { formatDateRange, formatPlayerName } from '@/lib/format';
+import { formatDateRange, formatPlayerName, formatUserMention } from '@/lib/format';
 import { getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
 import { hasRespondedForWeek } from '@/services/availability';
 import { getConfig } from '@/services/config';
@@ -63,9 +63,7 @@ export const sendReminder = async (bot: Bot<BotContext>, chatId: number): Promis
 
   const isPingMode = config.remindersMode === 'ping';
   const names = playersWithoutResponse
-    .map((p) =>
-      isPingMode ? `• <a href="tg://user?id=${p.telegramId}">${p.name}</a>` : `• ${p.name}`,
-    )
+    .map((p) => (isPingMode ? `• ${formatUserMention(p.telegramId, p.name)}` : `• ${p.name}`))
     .join('\n');
 
   const message = `${i18n.reminder.title(week, dateRange)}\n\n${i18n.reminder.missingResponses(names)}`;

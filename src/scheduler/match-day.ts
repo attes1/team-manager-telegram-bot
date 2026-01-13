@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
 import { getTranslations } from '@/i18n';
-import { formatPlayerName } from '@/lib/format';
+import { formatPlayerName, formatUserMention } from '@/lib/format';
 import { getCurrentWeek } from '@/lib/temporal';
 import { getConfig } from '@/services/config';
 import { getLineup, getMatchInfo } from '@/services/match';
@@ -47,7 +47,7 @@ export const sendMatchDayReminder = async (bot: Bot<BotContext>, chatId: number)
     const players = lineup
       .map((p) =>
         isPingMode
-          ? `• <a href="tg://user?id=${p.telegramId}">${formatPlayerName(p)}</a>`
+          ? `• ${formatUserMention(p.telegramId, formatPlayerName(p))}`
           : `• ${formatPlayerName(p)}`,
       )
       .join('\n');

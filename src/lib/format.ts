@@ -88,3 +88,8 @@ export const escapeHtml = (text: string): string => {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 };
+
+// Create a Telegram user mention link (for use with parse_mode: 'HTML')
+export const formatUserMention = (telegramId: number, displayName: string): string => {
+  return `<a href="tg://user?id=${telegramId}">${escapeHtml(displayName)}</a>`;
+};
