@@ -98,15 +98,15 @@ const parseArgs = (args: string): ParsedArgs => {
     const lower = part.toLowerCase();
 
     // Check for filter keywords
-    if (lower === 'practice' || lower === 'treeni') {
+    if (lower === 'practice') {
       filter = 'practice';
       continue;
     }
-    if (lower === 'match' || lower === 'matsi') {
+    if (lower === 'match') {
       filter = 'match';
       continue;
     }
-    if (lower === 'today' || lower === 'tänään') {
+    if (lower === 'today') {
       day = 'today';
       continue;
     }

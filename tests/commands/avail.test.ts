@@ -272,49 +272,4 @@ describe('/avail command', () => {
     expect(calls[0].payload.text).toContain('playertwo');
     expect(calls[0].payload.text).not.toContain('playerone');
   });
-
-  test('accepts Finnish aliases for filters', async () => {
-    const { bot, calls } = createTestBot();
-    registerAvailCommand(bot);
-
-    const season = await mockDb.db
-      .insertInto('seasons')
-      .values({ name: 'Test Season' })
-      .returningAll()
-      .executeTakeFirstOrThrow();
-
-    await mockDb.db.insertInto('config').values({ seasonId: season.id, language: 'en' }).execute();
-
-    await mockDb.db
-      .insertInto('players')
-      .values({ telegramId: ADMIN_ID, displayName: 'Admin', username: 'admin' })
-      .execute();
-
-    await mockDb.db
-      .insertInto('seasonRoster')
-      .values({ seasonId: season.id, playerId: ADMIN_ID })
-      .execute();
-
-    const week = getISOWeek(new Date());
-    const year = new Date().getFullYear();
-
-    await mockDb.db
-      .insertInto('dayResponses')
-      .values({
-        seasonId: season.id,
-        playerId: ADMIN_ID,
-        weekNumber: week,
-        year,
-        day: 'mon',
-        status: 'available',
-      })
-      .execute();
-
-    const update = createCommandUpdate('/avail treeni', ADMIN_ID, CHAT_ID);
-    await bot.handleUpdate(update);
-
-    expect(calls).toHaveLength(1);
-    expect(calls[0].method).toBe('sendMessage');
-    expect(calls[0].payload.text).toContain('practice');
-  });
 });
