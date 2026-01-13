@@ -22,6 +22,8 @@ describe('announcements service', () => {
           { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
         ],
         lineupSize: 2,
+        opponentName: null,
+        opponentUrl: null,
       };
 
       const message = buildMatchAnnouncement(en, data);
@@ -44,6 +46,8 @@ describe('announcements service', () => {
         isDefault: true,
         lineup: [],
         lineupSize: 5,
+        opponentName: null,
+        opponentUrl: null,
       };
 
       const message = buildMatchAnnouncement(en, data);
@@ -61,6 +65,8 @@ describe('announcements service', () => {
         isDefault: false,
         lineup: [],
         lineupSize: 5,
+        opponentName: null,
+        opponentUrl: null,
       };
 
       const message = buildMatchAnnouncement(en, data);
@@ -77,6 +83,8 @@ describe('announcements service', () => {
         isDefault: false,
         lineup: [{ telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' }],
         lineupSize: 5,
+        opponentName: null,
+        opponentUrl: null,
       };
 
       const message = buildMatchAnnouncement(en, data);
@@ -97,12 +105,51 @@ describe('announcements service', () => {
           { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
         ],
         lineupSize: 2,
+        opponentName: null,
+        opponentUrl: null,
       };
 
       const message = buildMatchAnnouncement(en, data);
 
       expect(message).toContain('Lineup');
       expect(message).not.toContain('⚠️');
+    });
+
+    test('builds announcement with opponent name only', () => {
+      const data: MatchAnnouncementData = {
+        week: 5,
+        dateRange: '27.1. - 2.2.',
+        matchDay: 'Sunday',
+        matchTime: '20:00',
+        isDefault: false,
+        lineup: [],
+        lineupSize: 5,
+        opponentName: 'EC Myyrylit',
+        opponentUrl: null,
+      };
+
+      const message = buildMatchAnnouncement(en, data);
+
+      expect(message).toContain('Opponent: EC Myyrylit');
+      expect(message).not.toContain('[EC Myyrylit]');
+    });
+
+    test('builds announcement with opponent name and url', () => {
+      const data: MatchAnnouncementData = {
+        week: 5,
+        dateRange: '27.1. - 2.2.',
+        matchDay: 'Sunday',
+        matchTime: '20:00',
+        isDefault: false,
+        lineup: [],
+        lineupSize: 5,
+        opponentName: 'EC Myyrylit',
+        opponentUrl: 'https://example.com/ec-myyrylit',
+      };
+
+      const message = buildMatchAnnouncement(en, data);
+
+      expect(message).toContain('[EC Myyrylit](https://example.com/ec-myyrylit)');
     });
   });
 

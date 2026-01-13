@@ -34,6 +34,7 @@ export const registerHelpCommand = (bot: Bot<BotContext>) => {
       lines.push(...formatCommand('/setweek', cmds.setweek));
       lines.push(...formatCommand('/setmatch', cmds.setmatch));
       lines.push(...formatCommand('/setlineup', cmds.setlineup));
+      lines.push(...formatCommand('/setopponent', cmds.setopponent));
       lines.push(...formatCommand('/remind', cmds.remind));
     }
 

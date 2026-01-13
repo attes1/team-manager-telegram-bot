@@ -181,6 +181,7 @@ export interface Translations {
       setweek: string;
       setmatch: string;
       setlineup: string[];
+      setopponent: string;
       remind: string;
       startseason: string;
       endseason: string;
@@ -203,6 +204,15 @@ export interface Translations {
     lineupSet: (count: number) => string;
     matchScheduled: (day: string, time: string) => string;
     noMatchWeek: string;
+    opponent: (name: string) => string;
+    opponentWithUrl: (name: string, url: string) => string;
+  };
+  opponent: {
+    set: (name: string) => string;
+    setWithUrl: (name: string, url: string) => string;
+    cleared: string;
+    usage: string;
+    noOpponentSet: string;
   };
 }
 
@@ -392,6 +402,7 @@ export const fi: Translations = {
       setweek: 'Aseta viikon tyyppi &lt;week&gt; &lt;practice|match&gt;',
       setmatch: 'Ajoita matsi &lt;day&gt; &lt;time&gt;',
       setlineup: ['Avaa linarivalikko', 'Aseta linari @players... | clear'],
+      setopponent: 'Aseta vihu &lt;name&gt; [url] | clear',
       remind: 'Lähetä muistutus vastaamattomille',
       startseason: 'Aloita uusi kausi &lt;name&gt;',
       endseason: 'Päätä nykyinen kausi',
@@ -418,5 +429,15 @@ export const fi: Translations = {
     lineupSet: (count) => `🎮 Linari asetettu (${count} pelaajaa)!`,
     matchScheduled: (day, time) => `📅 Matsi sovittu: ${day} klo ${time}`,
     noMatchWeek: 'Tällä viikolla ei ole matsia.',
+    opponent: (name) => `🆚 Vihu: ${name}`,
+    opponentWithUrl: (name, url) => `🆚 Vihu: [${name}](${url})`,
+  },
+  opponent: {
+    set: (name) => `Vihu asetettu: ${name}`,
+    setWithUrl: (name, url) => `Vihu asetettu: ${name} (${url})`,
+    cleared: 'Vihu poistettu.',
+    usage:
+      'Käyttö: /setopponent <nimi> [url]\nEsim: /setopponent EC Myyrylit https://example.com/team',
+    noOpponentSet: 'Vihua ei ole asetettu.',
   },
 };

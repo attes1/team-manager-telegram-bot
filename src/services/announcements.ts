@@ -22,10 +22,21 @@ export interface MatchAnnouncementData {
   isDefault: boolean;
   lineup: Player[];
   lineupSize: number;
+  opponentName: string | null;
+  opponentUrl: string | null;
 }
 
 export const buildMatchAnnouncement = (i18n: Translations, data: MatchAnnouncementData): string => {
   const lines: string[] = [i18n.announcements.nextMatch(data.week, data.dateRange), ''];
+
+  if (data.opponentName) {
+    if (data.opponentUrl) {
+      lines.push(i18n.announcements.opponentWithUrl(data.opponentName, data.opponentUrl));
+    } else {
+      lines.push(i18n.announcements.opponent(data.opponentName));
+    }
+    lines.push('');
+  }
 
   if (data.matchDay && data.matchTime) {
     const timeText = data.isDefault
@@ -121,5 +132,7 @@ export const getMatchAnnouncementData = async (
     isDefault,
     lineup,
     lineupSize: config.lineupSize,
+    opponentName: matchInfo?.opponentName ?? null,
+    opponentUrl: matchInfo?.opponentUrl ?? null,
   };
 };

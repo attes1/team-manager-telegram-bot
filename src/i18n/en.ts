@@ -186,6 +186,7 @@ export const en: Translations = {
       setweek: 'Set week type &lt;week&gt; &lt;practice|match&gt;',
       setmatch: 'Schedule a match &lt;day&gt; &lt;time&gt;',
       setlineup: ['Open lineup menu', 'Set lineup @players... | clear'],
+      setopponent: 'Set opponent &lt;name&gt; [url] | clear',
       remind: 'Send reminder to non-responders',
       startseason: 'Start a new season &lt;name&gt;',
       endseason: 'End current season',
@@ -212,5 +213,15 @@ export const en: Translations = {
     lineupSet: (count) => `🎮 Lineup set (${count} players)!`,
     matchScheduled: (day, time) => `📅 Match scheduled: ${day} at ${time}`,
     noMatchWeek: 'No match this week.',
+    opponent: (name) => `🆚 Opponent: ${name}`,
+    opponentWithUrl: (name, url) => `🆚 Opponent: [${name}](${url})`,
+  },
+  opponent: {
+    set: (name) => `Opponent set: ${name}`,
+    setWithUrl: (name, url) => `Opponent set: ${name} (${url})`,
+    cleared: 'Opponent cleared.',
+    usage:
+      'Usage: /setopponent <name> [url]\nExample: /setopponent EC Myyrylit https://example.com/team',
+    noOpponentSet: 'Opponent not set.',
   },
 };

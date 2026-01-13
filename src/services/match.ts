@@ -10,6 +10,14 @@ export interface SetMatchTimeParams {
   matchTime: string;
 }
 
+export interface SetOpponentParams {
+  seasonId: number;
+  weekNumber: number;
+  year: number;
+  opponentName: string;
+  opponentUrl?: string;
+}
+
 export interface WeekParams {
   seasonId: number;
   weekNumber: number;
@@ -141,4 +149,39 @@ export const clearLineup = async (db: Kysely<DB>, params: WeekParams): Promise<b
     .executeTakeFirst();
 
   return result.numDeletedRows > 0n;
+};
+
+export const setOpponent = async (db: Kysely<DB>, params: SetOpponentParams): Promise<Week> => {
+  const { seasonId, weekNumber, year, opponentName, opponentUrl } = params;
+
+  return db
+    .insertInto('weeks')
+    .values({
+      seasonId,
+      weekNumber,
+      year,
+      opponentName,
+      opponentUrl: opponentUrl ?? null,
+    })
+    .onConflict((oc) =>
+      oc
+        .columns(['seasonId', 'weekNumber', 'year'])
+        .doUpdateSet({ opponentName, opponentUrl: opponentUrl ?? null }),
+    )
+    .returningAll()
+    .executeTakeFirstOrThrow();
+};
+
+export const clearOpponent = async (db: Kysely<DB>, params: WeekParams): Promise<boolean> => {
+  const { seasonId, weekNumber, year } = params;
+
+  const result = await db
+    .updateTable('weeks')
+    .set({ opponentName: null, opponentUrl: null })
+    .where('seasonId', '=', seasonId)
+    .where('weekNumber', '=', weekNumber)
+    .where('year', '=', year)
+    .executeTakeFirst();
+
+  return result.numUpdatedRows > 0n;
 };

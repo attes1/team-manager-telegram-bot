@@ -8,7 +8,14 @@ import {
   buildLineupAnnouncement,
   buildMatchScheduledAnnouncement,
 } from '../../../services/announcements';
-import { clearLineup, getLineup, setLineup, setMatchTime } from '../../../services/match';
+import {
+  clearLineup,
+  clearOpponent,
+  getLineup,
+  setLineup,
+  setMatchTime,
+  setOpponent,
+} from '../../../services/match';
 import { isPlayerInRoster } from '../../../services/roster';
 import type { BotContext, CaptainSeasonContext } from '../../context';
 import { captainSeasonCommand } from '../../middleware';
@@ -129,6 +136,58 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
 
       const playerList = mentionedUsers.map((u) => `• ${u.name}`).join('\n');
       return ctx.reply(i18n.lineup.set(mentionedUsers.length, playerList));
+    }),
+  );
+
+  bot.command(
+    'setopponent',
+    captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
+      const { db, season, i18n } = ctx;
+      const args = ctx.match?.toString().trim() ?? '';
+
+      if (args.toLowerCase() === 'clear') {
+        const now = new Date();
+        const weekNumber = getWeekNumber(now);
+        const year = getWeekYear(now);
+        await clearOpponent(db, { seasonId: season.id, weekNumber, year });
+        return ctx.reply(i18n.opponent.cleared);
+      }
+
+      if (!args) {
+        return ctx.reply(i18n.opponent.usage);
+      }
+
+      const urlMatch = args.match(/\s+(https?:\/\/\S+)$/i);
+      let opponentName: string;
+      let opponentUrl: string | undefined;
+
+      if (urlMatch) {
+        opponentUrl = urlMatch[1];
+        opponentName = args.slice(0, urlMatch.index).trim();
+      } else {
+        opponentName = args;
+      }
+
+      if (!opponentName) {
+        return ctx.reply(i18n.opponent.usage);
+      }
+
+      const now = new Date();
+      const weekNumber = getWeekNumber(now);
+      const year = getWeekYear(now);
+
+      await setOpponent(db, {
+        seasonId: season.id,
+        weekNumber,
+        year,
+        opponentName,
+        opponentUrl,
+      });
+
+      if (opponentUrl) {
+        return ctx.reply(i18n.opponent.setWithUrl(opponentName, opponentUrl));
+      }
+      return ctx.reply(i18n.opponent.set(opponentName));
     }),
   );
 };

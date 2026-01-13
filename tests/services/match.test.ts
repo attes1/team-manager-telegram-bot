@@ -4,11 +4,13 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import {
   addPlayerToLineup,
   clearLineup,
+  clearOpponent,
   getLineup,
   getMatchInfo,
   removePlayerFromLineup,
   setLineup,
   setMatchTime,
+  setOpponent,
 } from '@/services/match';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
@@ -322,6 +324,163 @@ describe('match service', () => {
         const cleared = await clearLineup(db, { seasonId, weekNumber, year });
         expect(cleared).toBe(false);
       });
+    });
+  });
+
+  describe('setOpponent', () => {
+    test('sets opponent name only', async () => {
+      const result = await setOpponent(db, {
+        seasonId,
+        weekNumber,
+        year,
+        opponentName: 'EC Myyrylit',
+      });
+
+      expect(result.opponentName).toBe('EC Myyrylit');
+      expect(result.opponentUrl).toBeNull();
+    });
+
+    test('sets opponent name and url', async () => {
+      const result = await setOpponent(db, {
+        seasonId,
+        weekNumber,
+        year,
+        opponentName: 'EC Myyrylit',
+        opponentUrl: 'https://example.com/ec-myyrylit',
+      });
+
+      expect(result.opponentName).toBe('EC Myyrylit');
+      expect(result.opponentUrl).toBe('https://example.com/ec-myyrylit');
+    });
+
+    test('updates existing opponent info', async () => {
+      await setOpponent(db, {
+        seasonId,
+        weekNumber,
+        year,
+        opponentName: 'EC Myyrylit',
+        opponentUrl: 'https://example.com/ec-myyrylit',
+      });
+
+      const result = await setOpponent(db, {
+        seasonId,
+        weekNumber,
+        year,
+        opponentName: 'Vihun joukkue',
+        opponentUrl: 'https://example.com/vihun-joukkue',
+      });
+
+      expect(result.opponentName).toBe('Vihun joukkue');
+      expect(result.opponentUrl).toBe('https://example.com/vihun-joukkue');
+
+      const weeks = await db
+        .selectFrom('weeks')
+        .selectAll()
+        .where('seasonId', '=', seasonId)
+        .where('weekNumber', '=', weekNumber)
+        .execute();
+      expect(weeks).toHaveLength(1);
+    });
+
+    test('preserves week type and match time when setting opponent', async () => {
+      await setMatchTime(db, {
+        seasonId,
+        weekNumber,
+        year,
+        matchDay: 'sun',
+        matchTime: '20:00',
+      });
+
+      const result = await setOpponent(db, {
+        seasonId,
+        weekNumber,
+        year,
+        opponentName: 'EC Myyrylit',
+      });
+
+      expect(result.opponentName).toBe('EC Myyrylit');
+      expect(result.matchDay).toBe('sun');
+      expect(result.matchTime).toBe('20:00');
+    });
+  });
+
+  describe('clearOpponent', () => {
+    test('clears opponent info from week', async () => {
+      await setOpponent(db, {
+        seasonId,
+        weekNumber,
+        year,
+        opponentName: 'EC Myyrylit',
+        opponentUrl: 'https://example.com/ec-myyrylit',
+      });
+
+      const cleared = await clearOpponent(db, { seasonId, weekNumber, year });
+
+      expect(cleared).toBe(true);
+
+      const matchInfo = await getMatchInfo(db, { seasonId, weekNumber, year });
+      expect(matchInfo?.opponentName).toBeNull();
+      expect(matchInfo?.opponentUrl).toBeNull();
+    });
+
+    test('returns false when week does not exist', async () => {
+      const cleared = await clearOpponent(db, { seasonId, weekNumber, year });
+      expect(cleared).toBe(false);
+    });
+
+    test('preserves match time when clearing opponent', async () => {
+      await setMatchTime(db, {
+        seasonId,
+        weekNumber,
+        year,
+        matchDay: 'sun',
+        matchTime: '20:00',
+      });
+      await setOpponent(db, {
+        seasonId,
+        weekNumber,
+        year,
+        opponentName: 'EC Myyrylit',
+      });
+
+      await clearOpponent(db, { seasonId, weekNumber, year });
+
+      const matchInfo = await getMatchInfo(db, { seasonId, weekNumber, year });
+      expect(matchInfo?.matchDay).toBe('sun');
+      expect(matchInfo?.matchTime).toBe('20:00');
+      expect(matchInfo?.opponentName).toBeNull();
+    });
+  });
+
+  describe('getMatchInfo with opponent', () => {
+    test('returns opponent info when set', async () => {
+      await setOpponent(db, {
+        seasonId,
+        weekNumber,
+        year,
+        opponentName: 'EC Myyrylit',
+        opponentUrl: 'https://example.com/ec-myyrylit',
+      });
+
+      const result = await getMatchInfo(db, { seasonId, weekNumber, year });
+
+      expect(result?.opponentName).toBe('EC Myyrylit');
+      expect(result?.opponentUrl).toBe('https://example.com/ec-myyrylit');
+    });
+
+    test('returns null opponent info when not set', async () => {
+      await setMatchTime(db, {
+        seasonId,
+        weekNumber,
+        year,
+        matchDay: 'sun',
+        matchTime: '20:00',
+      });
+
+      const result = await getMatchInfo(db, { seasonId, weekNumber, year });
+
+      expect(result?.opponentName).toBeNull();
+      expect(result?.opponentUrl).toBeNull();
     });
   });
 });

@@ -108,7 +108,7 @@ This allows friends/spectators to view match info without accessing team managem
 Available to everyone:
 - `/help` - Show command list
 - `/roster` - View team roster
-- `/nextmatch` - View upcoming match info
+- `/nextmatch` - View upcoming match info (opponent, time, lineup)
 
 ### Player Commands
 Available to roster members, captains, and admins:
@@ -127,6 +127,7 @@ Available to captains and admins:
 - `/setweek <week> practice|match` - Set week type
 - `/setmatch <day> <time>` - Schedule a match
 - `/setlineup @users...` - Set match lineup
+- `/setopponent <name> [url]` - Set opponent name and optional team profile link
 - `/remind` - Send reminder to non-responders
 
 ### Admin Commands

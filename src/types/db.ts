@@ -74,6 +74,8 @@ export interface WeeksTable {
   type: Generated<WeekType>;
   matchDay: Day | null;
   matchTime: string | null;
+  opponentName: string | null;
+  opponentUrl: string | null;
 }
 
 export interface LineupsTable {
