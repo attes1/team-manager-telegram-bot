@@ -71,7 +71,7 @@ export const en: Translations = {
       `Week ${week} (${dateRange}) availability poll.\nMark when you can play:`,
     matchWeekTitle: (week, dateRange) =>
       `Week ${week} (${dateRange}) - MATCH WEEK!\nDefault: Sun 20:00. Mark your availability:`,
-    legend: '✅ Available | 🏋️ Practice | 🏆 Match | ⚠️ If needed | ❌ Unavailable',
+    legend: '✅ Available | 🏋️ Practice only | 🏆 Match only | ⚠️ If needed | ❌ Unavailable',
     days: {
       mon: 'Mon',
       tue: 'Tue',

@@ -244,7 +244,7 @@ export const fi: Translations = {
       `Vko ${week} (${dateRange}) aikataulukysely.\nMerkkaa milloin pääset pelaamaan:`,
     matchWeekTitle: (week, dateRange) =>
       `Vko ${week} (${dateRange}) - MATSI!\nOletusaika su 20:00. Merkkaa milloin pääset:`,
-    legend: '✅ Vapaa | 🏋️ Treeni | 🏆 Matsi | ⚠️ Jos tarve | ❌ Ei pääse',
+    legend: '✅ Vapaa | 🏋️ Vain treeni | 🏆 Vain matsi | ⚠️ Jos tarve | ❌ Ei pääse',
     days: {
       mon: 'Ma',
       tue: 'Ti',
