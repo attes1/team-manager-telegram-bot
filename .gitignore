@@ -3,6 +3,7 @@ data/
 .env
 *.log
 dist/
+coverage/
 
 # Claude Code docs
 AGENTS.md
