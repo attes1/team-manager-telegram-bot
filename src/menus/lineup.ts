@@ -4,8 +4,7 @@ import { env } from '../env';
 import { formatDateRange, formatPlayerName } from '../lib/format';
 import type { ParsedConfig } from '../lib/schemas';
 import { getSchedulingWeek, getWeekDateRange } from '../lib/week';
-import { buildLineupAnnouncement } from '../services/announcements';
-import { getLineup, setLineup } from '../services/match';
+import { buildLineupMessage, getLineup, setLineup } from '../services/match';
 import { getRoster } from '../services/roster';
 
 export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, range) => {
@@ -74,7 +73,7 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
       ) {
         const { start, end } = getWeekDateRange(year, week);
         const dateRange = formatDateRange(start, end);
-        const announcement = buildLineupAnnouncement(ctx.i18n, week, dateRange, lineup);
+        const announcement = buildLineupMessage(ctx.i18n, week, dateRange, lineup);
         await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
       }
 

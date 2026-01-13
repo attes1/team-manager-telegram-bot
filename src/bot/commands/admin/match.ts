@@ -5,10 +5,8 @@ import { daySchema, timeSchema } from '../../../lib/schemas';
 import { getSchedulingWeek, getWeekDateRange } from '../../../lib/week';
 import { getLineupMenuMessage, lineupMenu } from '../../../menus/lineup';
 import {
-  buildLineupAnnouncement,
-  buildMatchScheduledAnnouncement,
-} from '../../../services/announcements';
-import {
+  buildLineupMessage,
+  buildMatchScheduledMessage,
   clearLineup,
   clearOpponent,
   getLineup,
@@ -82,7 +80,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const dayFormatted = formatDay(dayResult.data, config.language);
 
       if (env.PUBLIC_GROUP_ID && config.publicAnnouncements === 'on') {
-        const announcement = buildMatchScheduledAnnouncement(i18n, dayFormatted, timeResult.data);
+        const announcement = buildMatchScheduledMessage(i18n, dayFormatted, timeResult.data);
         await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
       }
 
@@ -132,7 +130,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         const { start, end } = getWeekDateRange(year, week);
         const dateRange = formatDateRange(start, end);
         const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
-        const announcement = buildLineupAnnouncement(i18n, week, dateRange, lineup);
+        const announcement = buildLineupMessage(i18n, week, dateRange, lineup);
         await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
       }
 

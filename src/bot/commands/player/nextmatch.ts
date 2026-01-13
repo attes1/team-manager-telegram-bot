@@ -1,5 +1,5 @@
 import type { Bot } from 'grammy';
-import { buildNextMatchMessage, getNextMatchResult } from '@/services/announcements';
+import { buildNextMatchMessage, getNextMatchResult } from '@/services/match';
 import type { BotContext, SeasonContext } from '../../context';
 import { seasonCommand } from '../../middleware';
 

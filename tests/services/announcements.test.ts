@@ -1,19 +1,17 @@
 import { describe, expect, test } from 'vitest';
 import { en } from '@/i18n/en';
 import {
-  buildLineupAnnouncement,
-  buildMatchScheduledAnnouncement,
+  buildLineupMessage,
+  buildMatchScheduledMessage,
   buildNextMatchMessage,
-  type MatchAnnouncementData,
+  type MatchDisplayData,
   type NextMatchResult,
-} from '@/services/announcements';
+} from '@/services/match';
 import type { Player } from '@/types/db';
 
-describe('announcements service', () => {
+describe('match message formatting', () => {
   describe('buildNextMatchMessage', () => {
-    const createMatchData = (
-      overrides: Partial<MatchAnnouncementData> = {},
-    ): MatchAnnouncementData => ({
+    const createMatchData = (overrides: Partial<MatchDisplayData> = {}): MatchDisplayData => ({
       week: 5,
       year: 2025,
       dateRange: '27.1. - 2.2.',
@@ -180,14 +178,14 @@ describe('announcements service', () => {
     });
   });
 
-  describe('buildLineupAnnouncement', () => {
-    test('builds lineup announcement', () => {
+  describe('buildLineupMessage', () => {
+    test('builds lineup message', () => {
       const lineup: Player[] = [
         { telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' },
         { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
       ];
 
-      const message = buildLineupAnnouncement(en, 5, '27.1. - 2.2.', lineup);
+      const message = buildLineupMessage(en, 5, '27.1. - 2.2.', lineup);
 
       expect(message).toContain('Lineup set (2 players)');
       expect(message).toContain('Week 5');
@@ -195,12 +193,12 @@ describe('announcements service', () => {
       expect(message).toContain('Player 2');
     });
 
-    test('builds lineup announcement with single player', () => {
+    test('builds lineup message with single player', () => {
       const lineup: Player[] = [
         { telegramId: 1, displayName: 'Player 1', username: null, createdAt: '' },
       ];
 
-      const message = buildLineupAnnouncement(en, 5, '27.1. - 2.2.', lineup);
+      const message = buildLineupMessage(en, 5, '27.1. - 2.2.', lineup);
 
       expect(message).toContain('Lineup set (1 players)');
       expect(message).toContain('Week 5');
@@ -208,9 +206,9 @@ describe('announcements service', () => {
     });
   });
 
-  describe('buildMatchScheduledAnnouncement', () => {
-    test('builds match scheduled announcement', () => {
-      const message = buildMatchScheduledAnnouncement(en, 'Sunday', '20:00');
+  describe('buildMatchScheduledMessage', () => {
+    test('builds match scheduled message', () => {
+      const message = buildMatchScheduledMessage(en, 'Sunday', '20:00');
 
       expect(message).toContain('Match scheduled');
       expect(message).toContain('Sunday at 20:00');
