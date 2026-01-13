@@ -72,6 +72,8 @@ export const en: Translations = {
       match_day_reminder_mode: 'Match day reminder mode',
       match_day_reminder_time: 'Match day reminder time',
       public_announcements: 'Public announcements',
+      menu_expiration_hours: 'Menu expiration (hours)',
+      menu_cleanup_time: 'Menu cleanup time',
     },
     options: {
       language: 'fi, en',
@@ -90,6 +92,8 @@ export const en: Translations = {
       match_day_reminder_mode: 'ping, quiet, off',
       match_day_reminder_time: 'HH:MM (e.g. 18:00)',
       public_announcements: 'on, off',
+      menu_expiration_hours: '1-168',
+      menu_cleanup_time: 'HH:MM (e.g. 04:00)',
     },
   },
   week: {

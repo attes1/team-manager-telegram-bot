@@ -70,6 +70,8 @@ export interface Translations {
       match_day_reminder_mode: string;
       match_day_reminder_time: string;
       public_announcements: string;
+      menu_expiration_hours: string;
+      menu_cleanup_time: string;
     };
     options: {
       language: string;
@@ -88,6 +90,8 @@ export interface Translations {
       match_day_reminder_mode: string;
       match_day_reminder_time: string;
       public_announcements: string;
+      menu_expiration_hours: string;
+      menu_cleanup_time: string;
     };
   };
   week: {
@@ -296,6 +300,8 @@ export const fi: Translations = {
       match_day_reminder_mode: 'Matsipäivän muistutustila',
       match_day_reminder_time: 'Matsipäivän muistutusaika',
       public_announcements: 'Julkiset ilmoitukset',
+      menu_expiration_hours: 'Valikon vanheneminen (tuntia)',
+      menu_cleanup_time: 'Valikon siivousaika',
     },
     options: {
       language: 'fi, en',
@@ -314,6 +320,8 @@ export const fi: Translations = {
       match_day_reminder_mode: 'ping, quiet, off',
       match_day_reminder_time: 'HH:MM (esim. 18:00)',
       public_announcements: 'on, off',
+      menu_expiration_hours: '1-168',
+      menu_cleanup_time: 'HH:MM (esim. 04:00)',
     },
   },
   week: {
