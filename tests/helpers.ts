@@ -1,9 +1,12 @@
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Database from 'better-sqlite3';
-import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
-import { up as up001 } from '@/db/migrations/001_initial';
-import { up as up002 } from '@/db/migrations/002_roster_roles';
-import { up as up003 } from '@/db/migrations/003_match_day_reminder_mode';
+import { CamelCasePlugin, FileMigrationProvider, Kysely, Migrator, SqliteDialect } from 'kysely';
 import type { DB } from '@/types/db';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const testEnv = {
   DEFAULT_LANGUAGE: 'en' as const,
@@ -28,8 +31,21 @@ export const createTestDb = async (): Promise<Kysely<DB>> => {
     }),
     plugins: [new CamelCasePlugin()],
   });
-  await up001(db);
-  await up002(db);
-  await up003(db);
+
+  const migrator = new Migrator({
+    db,
+    provider: new FileMigrationProvider({
+      fs,
+      path,
+      migrationFolder: path.join(__dirname, '../src/db/migrations'),
+    }),
+  });
+
+  const { error } = await migrator.migrateToLatest();
+
+  if (error) {
+    throw error;
+  }
+
   return db;
 };

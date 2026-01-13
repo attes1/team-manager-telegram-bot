@@ -1,32 +1,31 @@
-import Database from 'better-sqlite3';
-import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
+import { createTestDb } from '@tests/helpers';
+import type { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { registerMatchCommands } from '@/bot/commands/admin/match';
-import { up as up001 } from '@/db/migrations/001_initial';
-import { up as up002 } from '@/db/migrations/002_roster_roles';
-import { up as up003 } from '@/db/migrations/003_match_day_reminder_mode';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
 import { createCommandUpdate, createMultiMentionUpdate, createTestBot } from './helpers';
 
-const mockDb = vi.hoisted(() => ({ db: null as unknown as Kysely<DB> }));
-const mockEnv = vi.hoisted(() => ({
-  env: {
-    ADMIN_IDS: [123456],
-    DEFAULT_LANGUAGE: 'en' as const,
-    DEFAULT_POLL_DAY: 'sun',
-    DEFAULT_POLL_TIME: '10:00',
-    DEFAULT_POLL_DAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-    DEFAULT_POLL_TIMES: [19, 20, 21],
-    DEFAULT_POLL_REMINDER_DAY: 'wed',
-    DEFAULT_POLL_REMINDER_TIME: '18:00',
-    DEFAULT_POLL_REMINDER_MODE: 'quiet' as const,
-    DEFAULT_MATCH_DAY: 'sun',
-    DEFAULT_MATCH_TIME: '20:00',
-    DEFAULT_LINEUP_SIZE: 5,
-    DEFAULT_MATCH_DAY_REMINDER_MODE: 'quiet' as const,
-    DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
+const { mockDb, mockEnv } = vi.hoisted(() => ({
+  mockDb: { db: null as unknown as Kysely<DB> },
+  mockEnv: {
+    env: {
+      ADMIN_IDS: [123456],
+      DEFAULT_LANGUAGE: 'en' as const,
+      DEFAULT_POLL_DAY: 'sun',
+      DEFAULT_POLL_TIME: '10:00',
+      DEFAULT_POLL_DAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+      DEFAULT_POLL_TIMES: [19, 20, 21],
+      DEFAULT_POLL_REMINDER_DAY: 'wed',
+      DEFAULT_POLL_REMINDER_TIME: '18:00',
+      DEFAULT_POLL_REMINDER_MODE: 'quiet' as const,
+      DEFAULT_MATCH_DAY: 'sun',
+      DEFAULT_MATCH_TIME: '20:00',
+      DEFAULT_LINEUP_SIZE: 5,
+      DEFAULT_MATCH_DAY_REMINDER_MODE: 'quiet' as const,
+      DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
+    },
   },
 }));
 
@@ -39,16 +38,7 @@ vi.mock('@/env', () => mockEnv);
 
 describe('/setmatch command', () => {
   beforeEach(async () => {
-    const db = new Kysely<DB>({
-      dialect: new SqliteDialect({
-        database: new Database(':memory:'),
-      }),
-      plugins: [new CamelCasePlugin()],
-    });
-    await up001(db);
-    await up002(db);
-    await up003(db);
-    mockDb.db = db;
+    mockDb.db = await createTestDb();
   });
 
   afterEach(async () => {
@@ -179,16 +169,7 @@ describe('/setlineup command', () => {
   let seasonId: number;
 
   beforeEach(async () => {
-    const db = new Kysely<DB>({
-      dialect: new SqliteDialect({
-        database: new Database(':memory:'),
-      }),
-      plugins: [new CamelCasePlugin()],
-    });
-    await up001(db);
-    await up002(db);
-    await up003(db);
-    mockDb.db = db;
+    mockDb.db = await createTestDb();
 
     const season = await startSeason(mockDb.db, 'Test Season');
     seasonId = season.id;
