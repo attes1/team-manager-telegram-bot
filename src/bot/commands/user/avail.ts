@@ -4,13 +4,7 @@ import { rosterCommand } from '@/bot/middleware';
 import type { Translations } from '@/i18n';
 import { formatDateRange, formatPlayerName } from '@/lib/format';
 import type { AvailabilityStatus, Day } from '@/lib/schemas';
-import {
-  getSchedulingWeek,
-  getTodayDay,
-  getWeekDateRange,
-  parseDayWeekInput,
-  parseWeekInput,
-} from '@/lib/week';
+import { getSchedulingWeek, getTodayDay, getWeekDateRange, parseDayOrWeekInput } from '@/lib/week';
 import type { PlayerWeekAvailability } from '@/services/availability';
 import { getWeekAvailability } from '@/services/availability';
 
@@ -200,22 +194,22 @@ const parseAvailArgs = (
       continue;
     }
 
-    const dayWeekResult = parseDayWeekInput(part.toLowerCase(), schedulingWeek);
-    if (dayWeekResult.success) {
-      day = dayWeekResult.day;
-      week = dayWeekResult.week;
-      year = dayWeekResult.year;
+    const parsed = parseDayOrWeekInput(part, {
+      defaultWeek: schedulingWeek,
+      allowPast: false,
+      schedulingWeek,
+    });
+
+    if (parsed.success) {
+      week = parsed.week;
+      year = parsed.year;
+      if (parsed.type === 'day') {
+        day = parsed.day;
+      }
       continue;
     }
 
-    const weekResult = parseWeekInput(part, { allowPast: false, schedulingWeek });
-    if (weekResult.success) {
-      week = weekResult.week;
-      year = weekResult.year;
-      continue;
-    }
-
-    if (weekResult.error === 'past') {
+    if (parsed.error === 'past') {
       return { type: 'error', error: 'past' };
     }
   }

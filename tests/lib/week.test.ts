@@ -7,6 +7,7 @@ import {
   getWeekDateRange,
   getWeekNumber,
   getWeekYear,
+  parseDayOrWeekInput,
   parseDayWeekInput,
   parseWeekInput,
 } from '@/lib/week';
@@ -467,6 +468,97 @@ describe('parseDayWeekInput', () => {
 
     test('rejects too many parts', () => {
       const result = parseDayWeekInput('tue/5/2026/extra', defaultWeek);
+      expect(result).toEqual({ success: false, error: 'invalid' });
+    });
+  });
+});
+
+describe('parseDayOrWeekInput', () => {
+  const currentYear = new Date().getFullYear();
+  const defaultWeek = { week: 10, year: currentYear };
+  const schedulingWeek = { week: 10, year: currentYear };
+
+  describe('day formats', () => {
+    test('parses day only', () => {
+      const result = parseDayOrWeekInput('tue', { defaultWeek });
+      expect(result).toEqual({
+        success: true,
+        type: 'day',
+        day: 'tue',
+        week: 10,
+        year: currentYear,
+      });
+    });
+
+    test('parses day/week format', () => {
+      const result = parseDayOrWeekInput('wed/15', { defaultWeek });
+      expect(result).toEqual({
+        success: true,
+        type: 'day',
+        day: 'wed',
+        week: 15,
+        year: currentYear,
+      });
+    });
+
+    test('parses day/week/year format', () => {
+      const result = parseDayOrWeekInput(`thu/20/${currentYear}`, { defaultWeek });
+      expect(result).toEqual({
+        success: true,
+        type: 'day',
+        day: 'thu',
+        week: 20,
+        year: currentYear,
+      });
+    });
+  });
+
+  describe('week formats', () => {
+    test('parses week only', () => {
+      const result = parseDayOrWeekInput('15', { defaultWeek });
+      expect(result).toEqual({ success: true, type: 'week', week: 15, year: currentYear });
+    });
+
+    test('parses week/year format', () => {
+      const result = parseDayOrWeekInput(`20/${currentYear}`, { defaultWeek });
+      expect(result).toEqual({ success: true, type: 'week', week: 20, year: currentYear });
+    });
+  });
+
+  describe('allowPast option', () => {
+    test('allows past week when allowPast is true', () => {
+      const result = parseDayOrWeekInput('5', { defaultWeek, schedulingWeek, allowPast: true });
+      expect(result).toEqual({ success: true, type: 'week', week: 5, year: currentYear });
+    });
+
+    test('rejects past week when allowPast is false', () => {
+      const result = parseDayOrWeekInput('5', { defaultWeek, schedulingWeek, allowPast: false });
+      expect(result).toEqual({ success: false, error: 'past' });
+    });
+
+    test('rejects past day/week when allowPast is false', () => {
+      const result = parseDayOrWeekInput('mon/5', {
+        defaultWeek,
+        schedulingWeek,
+        allowPast: false,
+      });
+      expect(result).toEqual({ success: false, error: 'past' });
+    });
+
+    test('accepts current scheduling week', () => {
+      const result = parseDayOrWeekInput('10', { defaultWeek, schedulingWeek, allowPast: false });
+      expect(result).toEqual({ success: true, type: 'week', week: 10, year: currentYear });
+    });
+
+    test('accepts future week', () => {
+      const result = parseDayOrWeekInput('15', { defaultWeek, schedulingWeek, allowPast: false });
+      expect(result).toEqual({ success: true, type: 'week', week: 15, year: currentYear });
+    });
+  });
+
+  describe('invalid input', () => {
+    test('rejects invalid input', () => {
+      const result = parseDayOrWeekInput('invalid', { defaultWeek });
       expect(result).toEqual({ success: false, error: 'invalid' });
     });
   });

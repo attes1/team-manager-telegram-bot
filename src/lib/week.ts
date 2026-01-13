@@ -151,6 +151,54 @@ export const parseDayWeekInput = (
   };
 };
 
+export type ParseDayOrWeekResult =
+  | { success: true; type: 'day'; day: Day; week: number; year: number }
+  | { success: true; type: 'week'; week: number; year: number }
+  | { success: false; error: 'invalid' | 'past' };
+
+/**
+ * Parse input that can be either day-based or week-based.
+ * Handles: "tue", "tue/5", "tue/5/2026", "5", "5/2026"
+ */
+export const parseDayOrWeekInput = (
+  input: string,
+  options: {
+    defaultWeek: { week: number; year: number };
+    allowPast?: boolean;
+    schedulingWeek?: { week: number; year: number };
+  },
+): ParseDayOrWeekResult => {
+  const { defaultWeek, allowPast = true, schedulingWeek } = options;
+
+  // Try day+week format first (tue, tue/5, tue/5/2026)
+  const dayWeekResult = parseDayWeekInput(input.toLowerCase(), defaultWeek);
+  if (dayWeekResult.success) {
+    if (!allowPast && schedulingWeek) {
+      const isInPast =
+        dayWeekResult.year < schedulingWeek.year ||
+        (dayWeekResult.year === schedulingWeek.year && dayWeekResult.week < schedulingWeek.week);
+      if (isInPast) {
+        return { success: false, error: 'past' };
+      }
+    }
+    return {
+      success: true,
+      type: 'day',
+      day: dayWeekResult.day,
+      week: dayWeekResult.week,
+      year: dayWeekResult.year,
+    };
+  }
+
+  // Try week-only format (5, 5/2026)
+  const weekResult = parseWeekInput(input, { allowPast, schedulingWeek });
+  if (weekResult.success) {
+    return { success: true, type: 'week', week: weekResult.week, year: weekResult.year };
+  }
+
+  return { success: false, error: weekResult.error };
+};
+
 /**
  * Get the datetime for a match on a specific week/year/day/time.
  */
