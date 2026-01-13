@@ -142,10 +142,13 @@ export const en: Translations = {
   },
   help: {
     title: 'Pappaliiga Bot - Commands',
+    publicCommands: 'Public Commands',
     playerCommands: 'Player Commands',
     adminCommands: 'Admin Commands',
     commands: {
+      help: 'Show command list',
       roster: 'View team roster',
+      nextmatch: 'Show upcoming match info',
       match: 'View match info and lineup',
       practice: 'View practice availability',
       startseason: 'Start a new season',
@@ -160,7 +163,6 @@ export const en: Translations = {
       poll: 'Send availability poll',
       remind: 'Send reminder to non-responders',
       status: 'View status overview',
-      nextmatch: 'Show upcoming match info',
     },
   },
   announcements: {

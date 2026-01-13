@@ -136,10 +136,13 @@ export interface Translations {
   };
   help: {
     title: string;
+    publicCommands: string;
     playerCommands: string;
     adminCommands: string;
     commands: {
+      help: string;
       roster: string;
+      nextmatch: string;
       match: string;
       practice: string;
       startseason: string;
@@ -154,7 +157,6 @@ export interface Translations {
       poll: string;
       remind: string;
       status: string;
-      nextmatch: string;
     };
   };
   announcements: {
@@ -314,10 +316,13 @@ export const fi: Translations = {
   },
   help: {
     title: 'Pappaliiga Bot - Komennot',
+    publicCommands: 'Julkiset komennot',
     playerCommands: 'Pelaajan komennot',
     adminCommands: 'Admin-komennot',
     commands: {
+      help: 'Näytä komennot',
       roster: 'Näytä joukkueen rosteri',
+      nextmatch: 'Näytä seuraavan matsin tiedot',
       match: 'Näytä matsin tiedot ja linari',
       practice: 'Näytä treenien saatavuudet',
       startseason: 'Aloita uusi kausi',
@@ -328,11 +333,10 @@ export const fi: Translations = {
       removeplayer: 'Poista pelaaja rosterista',
       setweek: 'Aseta viikon tyyppi',
       setmatch: 'Ajoita matsi',
-      setlineup: 'Aseta linri',
+      setlineup: 'Aseta linari',
       poll: 'Lähetä aikataulukysely',
       remind: 'Lähetä muistutus vastaamattomille',
       status: 'Näytä tilannekatsaus',
-      nextmatch: 'Näytä seuraavan matsin tiedot',
     },
   },
   announcements: {

@@ -3,17 +3,23 @@ import type { BotContext } from '../../context';
 
 export const registerHelpCommand = (bot: Bot<BotContext>) => {
   bot.command('help', async (ctx) => {
-    const { i18n, isAdmin } = ctx;
+    const { i18n, isAdmin, isInRoster } = ctx;
 
     const lines: string[] = [
       `<b>${i18n.help.title}</b>`,
       '',
-      `<b>${i18n.help.playerCommands}</b>`,
+      `<b>${i18n.help.publicCommands}</b>`,
+      `• /help - ${i18n.help.commands.help}`,
       `• /roster - ${i18n.help.commands.roster}`,
-      `• /match - ${i18n.help.commands.match}`,
-      `• /practice - ${i18n.help.commands.practice}`,
       `• /nextmatch - ${i18n.help.commands.nextmatch}`,
     ];
+
+    if (isInRoster || isAdmin) {
+      lines.push('');
+      lines.push(`<b>${i18n.help.playerCommands}</b>`);
+      lines.push(`• /match - ${i18n.help.commands.match}`);
+      lines.push(`• /practice - ${i18n.help.commands.practice}`);
+    }
 
     if (isAdmin) {
       lines.push('');
