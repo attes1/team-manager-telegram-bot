@@ -111,6 +111,21 @@ export interface Translations {
     matchDayLineup: (players: string) => string;
     matchDayNoLineup: string;
   };
+  status: {
+    title: string;
+    season: string;
+    week: string;
+    weekType: string;
+    weekTypes: {
+      match: string;
+      practice: string;
+    };
+    roster: string;
+    players: string;
+    responses: string;
+    matchTime: string;
+    lineup: string;
+  };
 }
 
 export const fi: Translations = {
@@ -229,5 +244,20 @@ export const fi: Translations = {
     matchDayTitle: (day, time) => `🎮 Matsi tänään! ${day} klo ${time}`,
     matchDayLineup: (players) => `Kokoonpano:\n${players}`,
     matchDayNoLineup: 'Kokoonpanoa ei ole asetettu!',
+  },
+  status: {
+    title: 'Tilannekatsaus',
+    season: 'Kausi',
+    week: 'Viikko',
+    weekType: 'Viikon tyyppi',
+    weekTypes: {
+      match: 'Matsiviikko',
+      practice: 'Treeniviikko',
+    },
+    roster: 'Rosteri',
+    players: 'pelaajaa',
+    responses: 'Vastauksia',
+    matchTime: 'Matsin aika',
+    lineup: 'Kokoonpano',
   },
 };

@@ -116,4 +116,19 @@ export const en: Translations = {
     matchDayLineup: (players) => `Lineup:\n${players}`,
     matchDayNoLineup: 'Lineup has not been set!',
   },
+  status: {
+    title: 'Status Overview',
+    season: 'Season',
+    week: 'Week',
+    weekType: 'Week type',
+    weekTypes: {
+      match: 'Match week',
+      practice: 'Practice week',
+    },
+    roster: 'Roster',
+    players: 'players',
+    responses: 'Responses',
+    matchTime: 'Match time',
+    lineup: 'Lineup',
+  },
 };
