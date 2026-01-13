@@ -8,6 +8,7 @@ import {
   startOfISOWeek,
 } from 'date-fns';
 import type { Day } from './schemas';
+import { weekNumberSchema } from './schemas';
 
 const DAY_TO_ISO_WEEKDAY: Record<Day, number> = {
   mon: 1,
@@ -79,4 +80,36 @@ export const inferWeekYear = (
     return { week: requestedWeek, year: targetWeek.year + 1 };
   }
   return { week: requestedWeek, year: targetWeek.year };
+};
+
+export type ParseWeekResult =
+  | { success: true; week: number; year: number }
+  | { success: false; error: 'invalid' | 'past' };
+
+export const parseWeekInput = (
+  input: string,
+  targetWeek: { week: number; year: number },
+  options: { allowPast?: boolean } = {},
+): ParseWeekResult => {
+  const { allowPast = true } = options;
+
+  const parsed = weekNumberSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: 'invalid' };
+  }
+
+  const weekNum = parsed.data;
+  const result = inferWeekYear(weekNum, targetWeek);
+
+  if (!allowPast) {
+    const isInPast =
+      result.year < targetWeek.year ||
+      (result.year === targetWeek.year && result.week < targetWeek.week);
+
+    if (isInPast) {
+      return { success: false, error: 'past' };
+    }
+  }
+
+  return { success: true, week: result.week, year: result.year };
 };

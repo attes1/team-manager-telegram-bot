@@ -38,7 +38,9 @@ const STATUS_ICONS: Record<AvailabilityStatus, string> = {
 
 const NO_RESPONSE_ICON = '·';
 
-const STATUS_ORDER: AvailabilityStatus[] = [
+const PRACTICE_STATUS_ORDER: AvailabilityStatus[] = ['practice_only', 'unavailable'];
+
+const MATCH_STATUS_ORDER: AvailabilityStatus[] = [
   'available',
   'practice_only',
   'match_only',
@@ -46,9 +48,31 @@ const STATUS_ORDER: AvailabilityStatus[] = [
   'unavailable',
 ];
 
-const getNextStatus = (current: AvailabilityStatus): AvailabilityStatus => {
-  const currentIndex = STATUS_ORDER.indexOf(current);
-  return STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
+export const getNextStatus = (
+  current: AvailabilityStatus,
+  isPracticeWeek: boolean,
+): AvailabilityStatus => {
+  const order = isPracticeWeek ? PRACTICE_STATUS_ORDER : MATCH_STATUS_ORDER;
+  const idx = order.indexOf(current);
+  // If status not in order (e.g., 'available' in practice week), start from first
+  if (idx === -1) {
+    return order[0];
+  }
+  return order[(idx + 1) % order.length];
+};
+
+export const getDisplayStatus = (
+  status: AvailabilityStatus,
+  isPracticeWeek: boolean,
+): AvailabilityStatus => {
+  if (!isPracticeWeek) {
+    return status;
+  }
+  // In practice weeks, map match-related statuses to practice_only for UI display
+  if (status === 'available' || status === 'match_only' || status === 'if_needed') {
+    return 'practice_only';
+  }
+  return status;
 };
 
 export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) => {
@@ -71,6 +95,10 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
   const { week, year } = parsedWeek ?? getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
   const days = config.pollDays;
   const times = config.pollTimes.split(',');
+
+  // Fetch week type for practice week handling
+  const weekData = await getWeek(db, season.id, week, year);
+  const isPracticeWeek = weekData?.type === 'practice';
 
   // Header row with time slots
   range.text(' ', (ctx) => ctx.answerCallbackQuery());
@@ -102,11 +130,12 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
 
       range.text(icon, async (ctx) => {
         const newSlots = hasSlot ? currentSlots.filter((s) => s !== time) : [...currentSlots, time];
-        // When adding a timeslot: default to 'available' if no response or if currently 'unavailable'
+        // When adding a timeslot: default to appropriate status if no response or if currently 'unavailable'
         const isAdding = !hasSlot;
+        const defaultStatus = isPracticeWeek ? 'practice_only' : 'available';
         const status =
           isAdding && (!hasResponse || currentStatus === 'unavailable')
-            ? 'available'
+            ? defaultStatus
             : currentStatus;
 
         await setDayAvailability(db, {
@@ -124,7 +153,9 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
     }
 
     // Show neutral icon if no response yet, otherwise show status icon
-    const statusIcon = hasResponse ? STATUS_ICONS[currentStatus] : NO_RESPONSE_ICON;
+    // In practice weeks, map match-related statuses to practice_only for display
+    const displayStatus = getDisplayStatus(currentStatus, isPracticeWeek);
+    const statusIcon = hasResponse ? STATUS_ICONS[displayStatus] : NO_RESPONSE_ICON;
 
     range.text(statusIcon, async (ctx) => {
       let nextStatus: AvailabilityStatus;
@@ -133,11 +164,12 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
         // No response and no timeslots: go directly to unavailable
         nextStatus = 'unavailable';
       } else if (!hasResponse && hasTimeslots) {
-        // Has timeslots but no explicit response yet: start cycling from available
-        nextStatus = getNextStatus('available');
+        // Has timeslots but no explicit response yet: start cycling
+        const defaultStatus = isPracticeWeek ? 'practice_only' : 'available';
+        nextStatus = getNextStatus(defaultStatus, isPracticeWeek);
       } else {
-        // Has response: normal cycling
-        nextStatus = getNextStatus(currentStatus);
+        // Has response: normal cycling (using display status for practice weeks)
+        nextStatus = getNextStatus(displayStatus, isPracticeWeek);
       }
 
       const newSlots = nextStatus === 'unavailable' ? [] : currentSlots;
@@ -176,8 +208,11 @@ export const getPollMessage = async (
     ? i18n.poll.matchWeekTitle(week, dateRange)
     : i18n.poll.title(week, dateRange);
 
+  // Use appropriate legend based on week type
+  const legend = isMatchWeek ? i18n.poll.legend : i18n.poll.practiceLegend;
+
   // Append week marker for menu to parse
   const weekMarker = createWeekMarker(week, year);
 
-  return `${title}\n\n${i18n.poll.legend}\n${weekMarker}`;
+  return `${title}\n\n${legend}\n${weekMarker}`;
 };

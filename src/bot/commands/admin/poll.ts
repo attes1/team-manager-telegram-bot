@@ -1,5 +1,5 @@
 import type { Bot } from 'grammy';
-import { getTargetWeek, inferWeekYear } from '../../../lib/week';
+import { getTargetWeek, parseWeekInput } from '../../../lib/week';
 import { getPollMessage, pollMenu } from '../../../menus/poll';
 import type { BotContext, RosterContext } from '../../context';
 import { rosterCommand } from '../../middleware';
@@ -20,22 +20,16 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
       let pollWeek = targetWeek;
 
       if (args.length > 0) {
-        const weekNum = Number.parseInt(args[0], 10);
-        if (Number.isNaN(weekNum) || weekNum < 1 || weekNum > 53) {
+        const weekResult = parseWeekInput(args[0], targetWeek, { allowPast: false });
+
+        if (!weekResult.success) {
+          if (weekResult.error === 'past') {
+            return ctx.reply(i18n.poll.weekInPast(targetWeek.week));
+          }
           return ctx.reply(i18n.poll.invalidWeek);
         }
 
-        // Use smart year inference
-        pollWeek = inferWeekYear(weekNum, targetWeek);
-
-        // Validate: must be >= target week (future only)
-        const isInPast =
-          pollWeek.year < targetWeek.year ||
-          (pollWeek.year === targetWeek.year && pollWeek.week < targetWeek.week);
-
-        if (isInPast) {
-          return ctx.reply(i18n.poll.weekInPast(targetWeek.week));
-        }
+        pollWeek = { week: weekResult.week, year: weekResult.year };
       }
 
       const message = await getPollMessage(season.id, pollWeek);

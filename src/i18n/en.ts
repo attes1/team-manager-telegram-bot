@@ -95,7 +95,7 @@ export const en: Translations = {
   week: {
     setPractice: (week, dateRange) => `Week ${week} (${dateRange}) set as practice week.`,
     setMatch: (week, dateRange) => `Week ${week} (${dateRange}) set as match week.`,
-    usage: 'Usage: /setweek <week> practice|match',
+    usage: 'Usage: /setweek [week] <practice|match>',
     invalidWeek: 'Invalid week number.',
     invalidType: 'Invalid type. Use "practice" or "match".',
   },
@@ -105,6 +105,7 @@ export const en: Translations = {
     matchWeekTitle: (week, dateRange) =>
       `Week ${week} (${dateRange}) - MATCH WEEK!\nDefault: Sun 20:00. Mark your availability.`,
     legend: '✅ Available | 🏋️ Practice only | 🏆 Match only | ⚠️ If needed | ❌ Unavailable',
+    practiceLegend: '🏋️ Available for practice | ❌ Unavailable',
     notInRoster: 'Menu is only available for roster players.',
     invalidWeek: 'Invalid week number (1-53).',
     weekInPast: (targetWeek) => `Week must be ${targetWeek} or later.`,

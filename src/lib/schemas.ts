@@ -9,6 +9,8 @@ export const timeSchema = z
 
 export const hourSchema = z.coerce.number().int().min(0).max(23);
 
+export const weekNumberSchema = z.coerce.number().int().min(1).max(53);
+
 export const daySchema = z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
 
 export const availabilityStatusSchema = z.enum([

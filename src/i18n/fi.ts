@@ -101,6 +101,7 @@ export interface Translations {
     title: (week: number, dateRange: string) => string;
     matchWeekTitle: (week: number, dateRange: string) => string;
     legend: string;
+    practiceLegend: string;
     notInRoster: string;
     invalidWeek: string;
     weekInPast: (targetWeek: number) => string;
@@ -311,7 +312,7 @@ export const fi: Translations = {
   week: {
     setPractice: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty treeniviikoksi.`,
     setMatch: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty matsiviikoksi.`,
-    usage: 'Käyttö: /setweek <viikko> practice|match',
+    usage: 'Käyttö: /setweek [viikko] <practice|match>',
     invalidWeek: 'Virheellinen viikkonumero.',
     invalidType: 'Virheellinen tyyppi. Käytä "practice" tai "match".',
   },
@@ -321,6 +322,7 @@ export const fi: Translations = {
     matchWeekTitle: (week, dateRange) =>
       `Vko ${week} (${dateRange}) - matsiviikko!\nOletusaika su 20:00. Merkkaa milloin pääset peleille.`,
     legend: '✅ Vapaa | 🏋️ Vain treeni | 🏆 Vain matsi | ⚠️ Jos tarve | ❌ Ei pääse',
+    practiceLegend: '🏋️ Pääsee treeneihin | ❌ Ei pääse',
     notInRoster: 'Valikko on vain rosterissa oleville pelaajille.',
     invalidWeek: 'Virheellinen viikkonumero (1-53).',
     weekInPast: (targetWeek) => `Viikon pitää olla ${targetWeek} tai myöhempi.`,
