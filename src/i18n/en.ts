@@ -153,7 +153,7 @@ export const en: Translations = {
       poll: 'Send availability poll',
       remind: 'Send reminder to non-responders',
       status: 'View status overview',
-      nextmatch: 'Send match info to channel',
+      nextmatch: 'Show upcoming match info',
     },
   },
   announcements: {

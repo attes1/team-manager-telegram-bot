@@ -78,7 +78,7 @@ describe('announcements service', () => {
 
       expect(message).toContain('Vko 5');
       expect(message).toContain('sunnuntai klo 20:00');
-      expect(message).toContain('Kokoonpano');
+      expect(message).toContain('Linari');
       expect(message).toContain('Pelaaja');
     });
   });
@@ -105,7 +105,7 @@ describe('announcements service', () => {
 
       const message = buildLineupAnnouncement(fi, 5, '27.1. - 2.2.', lineup);
 
-      expect(message).toContain('Kokoonpano asetettu (1 pelaajaa)');
+      expect(message).toContain('Linari asetettu (1 pelaajaa)');
       expect(message).toContain('Vko 5');
       expect(message).toContain('Pelaaja 1');
     });

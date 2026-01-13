@@ -37,6 +37,11 @@ const envSchema = z.object({
 
   DEFAULT_MATCH_DAY: z.string().default('sun'),
   DEFAULT_MATCH_TIME: z.string().default('20:00'),
+  DEFAULT_MATCH_DAY_REMINDER_ENABLED: z
+    .enum(['true', 'false', '1', '0', 'on', 'off'])
+    .default('on')
+    .transform((v) => v === 'true' || v === '1' || v === 'on'),
+  DEFAULT_MATCH_DAY_REMINDER_TIME: z.string().default('18:00'),
 
   DEFAULT_LINEUP_SIZE: z.coerce.number().default(5),
 });
