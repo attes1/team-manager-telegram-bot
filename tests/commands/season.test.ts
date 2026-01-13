@@ -10,7 +10,17 @@ const mockDb = vi.hoisted(() => ({ db: null as unknown as Kysely<DB> }));
 const mockEnv = vi.hoisted(() => ({
   env: {
     ADMIN_IDS: [123456],
-    DEFAULT_LANGUAGE: 'en',
+    DEFAULT_LANGUAGE: 'en' as const,
+    DEFAULT_POLL_DAY: 'sun',
+    DEFAULT_POLL_TIME: '10:00',
+    DEFAULT_POLL_DAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+    DEFAULT_POLL_TIMES: [19, 20, 21],
+    DEFAULT_REMINDER_DAY: 'wed',
+    DEFAULT_REMINDER_TIME: '18:00',
+    DEFAULT_REMINDERS_MODE: 'quiet' as const,
+    DEFAULT_MATCH_DAY: 'sun',
+    DEFAULT_MATCH_TIME: '20:00',
+    DEFAULT_LINEUP_SIZE: 5,
   },
 }));
 

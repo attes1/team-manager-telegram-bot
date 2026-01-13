@@ -1,15 +1,11 @@
-import { createTestDb } from '@tests/helpers';
+import { createTestDb, testEnv } from '@tests/helpers';
 import type { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { getConfig, updateConfig } from '@/services/config';
 import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
 
-vi.mock('@/env', () => ({
-  env: {
-    DEFAULT_LANGUAGE: 'en',
-  },
-}));
+vi.mock('@/env', () => ({ env: testEnv }));
 
 describe('config service', () => {
   let db: Kysely<DB>;

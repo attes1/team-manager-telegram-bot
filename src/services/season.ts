@@ -23,6 +23,16 @@ export const startSeason = async (db: Kysely<DB>, name: string): Promise<Season>
     .values({
       seasonId: season.id,
       language: env.DEFAULT_LANGUAGE,
+      pollDay: env.DEFAULT_POLL_DAY,
+      pollTime: env.DEFAULT_POLL_TIME,
+      pollDays: env.DEFAULT_POLL_DAYS.join(','),
+      pollTimes: env.DEFAULT_POLL_TIMES.join(','),
+      reminderDay: env.DEFAULT_REMINDER_DAY,
+      reminderTime: env.DEFAULT_REMINDER_TIME,
+      remindersMode: env.DEFAULT_REMINDERS_MODE,
+      matchDay: env.DEFAULT_MATCH_DAY,
+      matchTime: env.DEFAULT_MATCH_TIME,
+      lineupSize: env.DEFAULT_LINEUP_SIZE,
     })
     .execute();
 
