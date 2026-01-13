@@ -12,6 +12,7 @@ Cursor AI auto-completion and Claude Code AI agent have been used to develop thi
 - **Match Scheduling**: Set match times, manage lineups
 - **Automated Reminders**: Scheduled weekly polls and mid-week reminders
 - **Public Group Support**: Optional public group with restricted commands and auto-announcements
+- **Menu Lifecycle Management**: Auto-delete old menus when new ones are created, daily cleanup of expired menus
 - **Multi-language**: Finnish and English support
 
 ## Prerequisites
@@ -62,6 +63,10 @@ DEFAULT_MATCH_TIME=20:00
 DEFAULT_MATCH_DAY_REMINDER_MODE=quiet
 DEFAULT_MATCH_DAY_REMINDER_TIME=18:00
 DEFAULT_LINEUP_SIZE=5
+
+# Menu lifecycle
+DEFAULT_MENU_EXPIRATION_HOURS=24
+DEFAULT_MENU_CLEANUP_TIME=04:00
 ```
 
 4. Run database migrations:
@@ -181,6 +186,8 @@ Use `/config` to view all settings. Available options:
 | `match_day_reminder_mode` | Match day reminder (ping/quiet/off) | `quiet` |
 | `match_day_reminder_time` | Time for match day reminder | `18:00` |
 | `public_announcements` | Auto-announce to public group (on/off) | `on` |
+| `menu_expiration_hours` | Hours before menus are cleaned up (1-168) | `24` |
+| `menu_cleanup_time` | Time to run daily menu cleanup | `04:00` |
 
 **Week Change Logic**: After the week change (default: Sunday 10:00), polls and scheduling automatically target the next week. This ensures that when you send the Sunday poll, it asks about next week's availability (for the upcoming match), not the current week.
 
