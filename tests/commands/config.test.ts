@@ -96,45 +96,45 @@ describe('/config command', () => {
       expect(calls[0].payload.text).toContain('en');
     });
 
-    test('admin can update pollDay', async () => {
+    test('admin can update poll_day', async () => {
       await startSeason(mockDb.db, 'Test Season');
 
       const { bot, calls } = createTestBot();
       registerConfigCommand(bot);
 
-      const update = createCommandUpdate('/config pollDay mon', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/config poll_day mon', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('pollDay');
+      expect(calls[0].payload.text).toContain('poll_day');
       expect(calls[0].payload.text).toContain('mon');
     });
 
-    test('admin can update pollTime', async () => {
+    test('admin can update poll_time', async () => {
       await startSeason(mockDb.db, 'Test Season');
 
       const { bot, calls } = createTestBot();
       registerConfigCommand(bot);
 
-      const update = createCommandUpdate('/config pollTime 09:00', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/config poll_time 09:00', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('pollTime');
+      expect(calls[0].payload.text).toContain('poll_time');
       expect(calls[0].payload.text).toContain('09:00');
     });
 
-    test('admin can update lineupSize', async () => {
+    test('admin can update lineup_size', async () => {
       await startSeason(mockDb.db, 'Test Season');
 
       const { bot, calls } = createTestBot();
       registerConfigCommand(bot);
 
-      const update = createCommandUpdate('/config lineupSize 7', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/config lineup_size 7', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('lineupSize');
+      expect(calls[0].payload.text).toContain('lineup_size');
       expect(calls[0].payload.text).toContain('7');
     });
 
@@ -157,7 +157,7 @@ describe('/config command', () => {
       const { bot, calls } = createTestBot();
       registerConfigCommand(bot);
 
-      const update = createCommandUpdate('/config pollTime invalid', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/config poll_time invalid', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);

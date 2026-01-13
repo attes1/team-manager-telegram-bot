@@ -5,23 +5,24 @@ import { isAdmin } from '../../lib/admin';
 import { getConfig, updateConfig } from '../../services/config';
 import { getActiveSeason } from '../../services/season';
 
-const CONFIG_KEYS = [
-  'language',
-  'pollDay',
-  'pollTime',
-  'pollDays',
-  'pollTimes',
-  'reminderDay',
-  'reminderTime',
-  'remindersMode',
-  'matchDay',
-  'matchTime',
-  'lineupSize',
-] as const;
+const USER_TO_DB_KEY: Record<string, string> = {
+  language: 'language',
+  poll_day: 'pollDay',
+  poll_time: 'pollTime',
+  poll_days: 'pollDays',
+  poll_times: 'pollTimes',
+  reminder_day: 'reminderDay',
+  reminder_time: 'reminderTime',
+  reminders_mode: 'remindersMode',
+  match_day: 'matchDay',
+  match_time: 'matchTime',
+  lineup_size: 'lineupSize',
+};
 
-type ConfigKey = (typeof CONFIG_KEYS)[number];
+const USER_KEYS = Object.keys(USER_TO_DB_KEY);
 
-const isValidKey = (key: string): key is ConfigKey => CONFIG_KEYS.includes(key as ConfigKey);
+const isValidUserKey = (key: string): boolean => USER_KEYS.includes(key);
+const toDbKey = (userKey: string): string => USER_TO_DB_KEY[userKey];
 
 const formatConfigDisplay = (config: {
   language: string;
@@ -77,7 +78,7 @@ export const registerConfigCommand = (bot: Bot) => {
       return ctx.reply(formatConfigDisplay(config));
     }
 
-    if (!isValidKey(key)) {
+    if (!isValidUserKey(key)) {
       return ctx.reply(t().errors.invalidConfigKey);
     }
 
@@ -90,7 +91,8 @@ export const registerConfigCommand = (bot: Bot) => {
     }
 
     try {
-      await updateConfig(db, season.id, key, value);
+      const dbKey = toDbKey(key);
+      await updateConfig(db, season.id, dbKey, value);
       return ctx.reply(t().config.updated(key, value));
     } catch {
       return ctx.reply(t().errors.invalidConfigValue(key));
