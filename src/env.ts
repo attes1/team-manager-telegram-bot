@@ -15,6 +15,8 @@ const commaSeparatedStrings = (defaultVal?: string) =>
 const envSchema = z.object({
   BOT_TOKEN: z.string().min(1),
 
+  DEV_MODE: z.coerce.boolean().default(false),
+
   ADMIN_IDS: commaSeparatedNumbers(),
 
   DEFAULT_LANGUAGE: z.enum(['fi', 'en']).default('fi'),

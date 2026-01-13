@@ -46,6 +46,7 @@ BOT_TOKEN=your_telegram_bot_token
 ADMIN_IDS=123456789,987654321
 
 # Optional
+DEV_MODE=false
 DEFAULT_LANGUAGE=fi
 TZ=Europe/Helsinki
 DB_PATH=./data/bot.db
@@ -205,15 +206,33 @@ Use `/config` to view all settings. Available options:
 
 **Week Change Logic**: After the week change (default: Sunday 10:00), polls and scheduling automatically target the next week. This ensures that when you send the Sunday poll, it asks about next week's availability (for the upcoming match), not the current week.
 
+## Development Mode
+
+Set `DEV_MODE=true` in your `.env` file to enable development features:
+
+**Status Command Enhancements:**
+- Shows `[DEVELOPMENT]` badge in status output
+- Displays scheduler information (poll, reminder, match day reminder schedules)
+
+**Developer Commands (admin-only):**
+- `/devpoll [minutes]` - Reschedule poll to run in X minutes (default: 1)
+- `/devreminder [minutes]` - Reschedule reminder to run in X minutes
+- `/devmatchreminder [minutes]` - Reschedule match day reminder to run in X minutes
+- `/devtrigger <poll|reminder|matchreminder>` - Immediately trigger a scheduler task
+- `/devschedule` - Show all scheduled tasks
+
+These commands are hidden from `/help` when not in development mode.
+
 ## Project Structure
 
 ```
 src/
 ├── bot/                    # Bot setup and commands
 │   ├── commands/          # Command handlers
+│   │   ├── admin/        # Admin commands (season, config, players)
+│   │   ├── dev/          # Development commands (scheduler testing)
 │   │   ├── public/       # Public commands (help, roster, nextmatch)
-│   │   ├── user/         # User commands (avail, poll, status, etc.)
-│   │   └── admin/        # Admin commands (season, config, players)
+│   │   └── user/         # User commands (avail, poll, status, etc.)
 │   ├── context.ts        # BotContext type
 │   └── middleware/       # Auth and context middleware
 ├── db/                    # Database setup

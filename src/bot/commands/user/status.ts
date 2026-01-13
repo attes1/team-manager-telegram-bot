@@ -1,6 +1,7 @@
 import type { Bot } from 'grammy';
 import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
+import { env } from '@/env';
 import { formatDateRange } from '@/lib/format';
 import { getCurrentWeek, getWeekDateRange } from '@/lib/temporal';
 import { getWeekAvailability } from '@/services/availability';
@@ -40,8 +41,10 @@ export const registerStatusCommand = (bot: Bot<BotContext>) => {
       const matchTime = matchInfo?.matchTime ?? config.matchTime;
       const dayName = i18n.poll.days[matchDay as keyof typeof i18n.poll.days] ?? matchDay;
 
+      const devBadge = env.DEV_MODE ? ` ${i18n.status.devBadge}` : '';
+
       const lines: string[] = [
-        `📊 <b>${i18n.status.title}</b>`,
+        `📊 <b>${i18n.status.title}</b>${devBadge}`,
         '',
         `<b>${i18n.status.season}:</b> ${season.name}`,
       ];
@@ -66,6 +69,36 @@ export const registerStatusCommand = (bot: Bot<BotContext>) => {
         lines.push(
           `${lineupIcon} <b>${i18n.status.lineup}:</b> ${lineup.length}/${config.lineupSize} ${i18n.status.players}`,
         );
+      }
+
+      // Add schedule information
+      const getDayLabel = (day: string) =>
+        i18n.poll.days[day as keyof typeof i18n.poll.days] ?? day;
+
+      lines.push('');
+      lines.push(`<b>${i18n.status.schedulesTitle}:</b>`);
+      lines.push(
+        `• ${i18n.status.pollSchedule}: ${getDayLabel(config.pollDay)} ${config.pollTime}`,
+      );
+
+      if (config.remindersMode !== 'off') {
+        lines.push(
+          `• ${i18n.status.reminderSchedule}: ${getDayLabel(config.reminderDay)} ${config.reminderTime}`,
+        );
+      } else {
+        lines.push(`• ${i18n.status.reminderSchedule}: ${i18n.status.scheduleOff}`);
+      }
+
+      if (config.matchDayReminderMode !== 'off') {
+        lines.push(
+          `• ${i18n.status.matchDayReminderSchedule}: ${getDayLabel(config.matchDay)} ${config.matchDayReminderTime}`,
+        );
+      } else {
+        lines.push(`• ${i18n.status.matchDayReminderSchedule}: ${i18n.status.scheduleOff}`);
+      }
+
+      if (env.DEV_MODE) {
+        lines.push(`• ${i18n.status.menuCleanupSchedule}: ${config.menuCleanupTime}`);
       }
 
       return ctx.reply(lines.join('\n'), { parse_mode: 'HTML' });

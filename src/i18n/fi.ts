@@ -178,12 +178,20 @@ export interface Translations {
     lineup: string;
     schedulingFor: string;
     weekLabel: (week: number) => string;
+    devBadge: string;
+    schedulesTitle: string;
+    pollSchedule: string;
+    reminderSchedule: string;
+    matchDayReminderSchedule: string;
+    menuCleanupSchedule: string;
+    scheduleOff: string;
   };
   help: {
     publicCommands: string;
     playerCommands: string;
     captainCommands: string;
     adminCommands: string;
+    devCommands: string;
     legend: string;
     commands: {
       help: string;
@@ -206,6 +214,11 @@ export interface Translations {
       promote: string;
       demote: string;
       setgrouptype: string;
+      devpoll: string;
+      devreminder: string;
+      devmatchreminder: string;
+      devtrigger: string;
+      devschedule: string;
     };
   };
   announcements: {
@@ -238,6 +251,19 @@ export interface Translations {
     usage: string;
     setTeam: string;
     setPublic: string;
+    noTeamGroup: string;
+  };
+  dev: {
+    notDevMode: string;
+    pollScheduled: (minutes: number) => string;
+    reminderScheduled: (minutes: number) => string;
+    matchReminderScheduled: (minutes: number) => string;
+    triggerUsage: string;
+    triggerInvalidTask: string;
+    triggerStarted: (task: string) => string;
+    scheduleTitle: string;
+    scheduleLine: (name: string, nextRun: string) => string;
+    noTasks: string;
     noTeamGroup: string;
   };
 }
@@ -428,12 +454,20 @@ export const fi: Translations = {
     lineup: 'Linari',
     schedulingFor: 'Suunnitellaan viikolle',
     weekLabel: (week) => `Vko ${week}`,
+    devBadge: '[DEVELOPMENT]',
+    schedulesTitle: 'Ajastukset',
+    pollSchedule: 'Kysely',
+    reminderSchedule: 'Muistutus',
+    matchDayReminderSchedule: 'Matsipäivämuistutus',
+    menuCleanupSchedule: 'Valikon siivous',
+    scheduleOff: 'pois',
   },
   help: {
     publicCommands: 'Julkiset komennot',
     playerCommands: 'Pelaajan komennot',
     captainCommands: 'Kapteenin komennot',
     adminCommands: 'Admin-komennot',
+    devCommands: 'Kehittäjän komennot',
     legend: '&lt;required&gt; [optional] a|b = valinta',
     commands: {
       help: 'Näytä komennot',
@@ -463,6 +497,11 @@ export const fi: Translations = {
       promote: 'Ylennä pelaaja kapteeniksi @player',
       demote: 'Alenna kapteeni pelaajaksi @player',
       setgrouptype: 'Aseta ryhmätyyppi &lt;public|team&gt;',
+      devpoll: 'Ajasta kysely [minuuttia]',
+      devreminder: 'Ajasta muistutus [minuuttia]',
+      devmatchreminder: 'Ajasta matsipäivämuistutus [minuuttia]',
+      devtrigger: 'Suorita ajastettu tehtävä &lt;poll|reminder|matchreminder&gt;',
+      devschedule: 'Näytä ajastusten tila',
     },
   },
   announcements: {
@@ -496,6 +535,20 @@ export const fi: Translations = {
     usage: 'Käyttö: /setgrouptype <public|team>',
     setTeam: 'Tämä ryhmä on nyt tiimin ryhmä. Kyselyt ja muistutukset lähetetään tänne.',
     setPublic: 'Ryhmän tyyppi muutettu julkiseksi.',
+    noTeamGroup: 'Tiimin ryhmää ei ole asetettu.',
+  },
+  dev: {
+    notDevMode: 'Komento käytettävissä vain development-tilassa.',
+    pollScheduled: (minutes) => `Kysely ajastettu ${minutes} minuutin päähän.`,
+    reminderScheduled: (minutes) => `Muistutus ajastettu ${minutes} minuutin päähän.`,
+    matchReminderScheduled: (minutes) =>
+      `Matsipäivämuistutus ajastettu ${minutes} minuutin päähän.`,
+    triggerUsage: 'Käyttö: /devtrigger <poll|reminder|matchreminder>',
+    triggerInvalidTask: 'Tuntematon tehtävä. Käytä: poll, reminder, matchreminder',
+    triggerStarted: (task) => `Tehtävä "${task}" käynnistetty.`,
+    scheduleTitle: 'Ajastetut tehtävät:',
+    scheduleLine: (name, nextRun) => `• ${name}: ${nextRun}`,
+    noTasks: 'Ei ajastettuja tehtäviä.',
     noTeamGroup: 'Tiimin ryhmää ei ole asetettu.',
   },
 };

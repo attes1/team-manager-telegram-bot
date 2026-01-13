@@ -1,5 +1,6 @@
 import type { Bot } from 'grammy';
 import type { BotContext } from '@/bot/context';
+import { env } from '@/env';
 
 const formatCommand = (cmd: string, desc: string | string[]): string[] => {
   if (Array.isArray(desc)) {
@@ -50,6 +51,16 @@ export const registerHelpCommand = (bot: Bot<BotContext>) => {
       lines.push(...formatCommand('/promote', cmds.promote));
       lines.push(...formatCommand('/demote', cmds.demote));
       lines.push(...formatCommand('/setgrouptype', cmds.setgrouptype));
+
+      if (env.DEV_MODE) {
+        lines.push('');
+        lines.push(`<b>${i18n.help.devCommands}</b>`);
+        lines.push(...formatCommand('/devpoll', cmds.devpoll));
+        lines.push(...formatCommand('/devreminder', cmds.devreminder));
+        lines.push(...formatCommand('/devmatchreminder', cmds.devmatchreminder));
+        lines.push(...formatCommand('/devtrigger', cmds.devtrigger));
+        lines.push(...formatCommand('/devschedule', cmds.devschedule));
+      }
     }
 
     lines.push('');

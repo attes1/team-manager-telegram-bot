@@ -116,11 +116,67 @@ export const refreshScheduler = async (): Promise<void> => {
 
 export const getScheduledTasks = (): ScheduledTask[] => [...tasks];
 
+export const getStoredBot = (): Bot<BotContext> | null => storedBot;
+
+export type TaskType = 'weekly-poll' | 'reminder' | 'match-day';
+
+export const rescheduleTaskInMinutes = (taskType: TaskType, minutes: number): boolean => {
+  const taskIndex = tasks.findIndex((t) => t.name === taskType);
+  if (taskIndex === -1) {
+    return false;
+  }
+
+  // Stop the existing task
+  tasks[taskIndex].task.stop();
+
+  // Calculate new cron expression for X minutes from now
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + minutes);
+  const cronExpression = `${now.getMinutes()} ${now.getHours()} ${now.getDate()} ${now.getMonth() + 1} *`;
+
+  // Schedule replacement task based on type
+  const bot = storedBot;
+  if (!bot) {
+    return false;
+  }
+
+  // We need to get the chatId from the database
+  const createHandler = async () => {
+    const season = await getActiveSeason(db);
+    if (!season) {
+      return;
+    }
+    const teamGroupId = await getTeamGroupId(db);
+    if (!teamGroupId) {
+      return;
+    }
+
+    switch (taskType) {
+      case 'weekly-poll':
+        await sendWeeklyPoll(bot, teamGroupId);
+        break;
+      case 'reminder':
+        await sendReminder(bot, teamGroupId);
+        break;
+      case 'match-day':
+        await sendMatchDayReminder(bot, teamGroupId);
+        break;
+    }
+  };
+
+  const newTask = scheduleTask(taskType, cronExpression, createHandler);
+  tasks[taskIndex] = newTask;
+
+  console.log(`Scheduler: ${taskType} rescheduled to run at ${now.toLocaleTimeString()}`);
+  return true;
+};
+
 export const startScheduler = async (bot: Bot<BotContext>): Promise<void> => {
   storedBot = bot;
   await initScheduler(bot);
 };
 
 export { sendMatchDayReminder } from './match-day';
+export { cleanupExpiredMenus } from './menu-cleanup';
 export { sendReminder } from './reminder';
 export { sendWeeklyPoll } from './weekly-poll';

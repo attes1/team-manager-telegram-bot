@@ -5,6 +5,7 @@ import { registerConfigCommand } from './admin/config';
 import { registerGroupCommands } from './admin/group';
 import { registerPlayerCommands } from './admin/players';
 import { registerSeasonCommands } from './admin/season';
+import { registerDevCommands } from './dev';
 import { registerHelpCommand } from './public/help';
 import { registerNextMatchCommand } from './public/nextmatch';
 import { registerRosterCommand } from './public/roster';
@@ -35,4 +36,7 @@ export const registerCommands = (bot: Bot<BotContext>) => {
   registerPlayerCommands(bot);
   registerCaptainCommands(bot);
   registerGroupCommands(bot);
+
+  // Dev commands (only registered in DEV_MODE)
+  registerDevCommands(bot);
 };
