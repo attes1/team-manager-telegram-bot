@@ -1,10 +1,8 @@
-import type { Bot } from 'grammy';
 import type { Kysely } from 'kysely';
 import { formatDateRange, formatDay } from '@/lib/format';
 import type { Day } from '@/lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '@/lib/week';
 import type { Config, DB, Player } from '@/types/db';
-import type { BotContext } from '../bot/context';
 import type { Translations } from '../i18n';
 import { getLineup, getMatchInfo } from './match';
 import { getWeek } from './week';
@@ -121,60 +119,4 @@ export const getMatchAnnouncementData = async (
     isDefault,
     lineup,
   };
-};
-
-export const sendMatchAnnouncement = async (
-  bot: Bot<BotContext>,
-  ctx: AnnouncementContext,
-): Promise<boolean> => {
-  const chatId = ctx.config.announcementsChatId;
-  if (!chatId) {
-    return false;
-  }
-
-  const data = await getMatchAnnouncementData(ctx);
-  if (!data) {
-    return false;
-  }
-
-  const message = buildMatchAnnouncement(ctx.i18n, data);
-  await bot.api.sendMessage(chatId, message);
-  return true;
-};
-
-export const sendLineupAnnouncement = async (
-  bot: Bot<BotContext>,
-  ctx: AnnouncementContext,
-  lineup: Player[],
-): Promise<boolean> => {
-  const chatId = ctx.config.announcementsChatId;
-  if (!chatId) {
-    return false;
-  }
-
-  const { week, year } = getCurrentWeek();
-  const { start, end } = getWeekDateRange(year, week);
-  const dateRange = formatDateRange(start, end);
-
-  const message = buildLineupAnnouncement(ctx.i18n, week, dateRange, lineup);
-  await bot.api.sendMessage(chatId, message);
-  return true;
-};
-
-export const sendMatchScheduledAnnouncement = async (
-  bot: Bot<BotContext>,
-  ctx: AnnouncementContext,
-  matchDay: Day,
-  matchTime: string,
-): Promise<boolean> => {
-  const chatId = ctx.config.announcementsChatId;
-  if (!chatId) {
-    return false;
-  }
-
-  const lang = ctx.config.language as 'fi' | 'en';
-  const dayFormatted = formatDay(matchDay, lang);
-  const message = buildMatchScheduledAnnouncement(ctx.i18n, dayFormatted, matchTime);
-  await bot.api.sendMessage(chatId, message);
-  return true;
 };

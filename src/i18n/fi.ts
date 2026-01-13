@@ -46,7 +46,8 @@ export interface Translations {
       match_day: string;
       match_time: string;
       lineup_size: string;
-      announcements_chat_id: string;
+      match_day_reminder_enabled: string;
+      match_day_reminder_time: string;
     };
   };
   week: {
@@ -151,7 +152,6 @@ export interface Translations {
     };
   };
   announcements: {
-    noChannel: string;
     nextMatch: (week: number, dateRange: string) => string;
     matchTime: (day: string, time: string) => string;
     matchTimeDefault: (day: string, time: string) => string;
@@ -162,7 +162,6 @@ export interface Translations {
     lineupSet: (count: number) => string;
     matchScheduled: (day: string, time: string) => string;
     noMatchWeek: string;
-    sent: string;
   };
 }
 
@@ -214,7 +213,8 @@ export const fi: Translations = {
       match_day: 'Oletusmatsin päivä',
       match_time: 'Oletusmatsin aika',
       lineup_size: 'Kokoonpanon koko',
-      announcements_chat_id: 'Ilmoituskanava',
+      match_day_reminder_enabled: 'Matsipäivän muistutus',
+      match_day_reminder_time: 'Matsipäivän muistutusaika',
     },
   },
   week: {
@@ -323,7 +323,6 @@ export const fi: Translations = {
     },
   },
   announcements: {
-    noChannel: 'Ilmoituskanavaa ei ole asetettu. Käytä /config announcementsChatId <kanava_id>',
     nextMatch: (week, dateRange) => `🎮 Vko ${week} (${dateRange}) matsi`,
     matchTime: (day, time) => `📅 ${day} klo ${time}`,
     matchTimeDefault: (day, time) => `📅 Oletusaika: ${day} klo ${time}`,
@@ -334,6 +333,5 @@ export const fi: Translations = {
     lineupSet: (count) => `🎮 Kokoonpano asetettu (${count} pelaajaa)!`,
     matchScheduled: (day, time) => `📅 Matsi sovittu: ${day} klo ${time}`,
     noMatchWeek: 'Tällä viikolla ei ole matsia.',
-    sent: 'Ilmoitus lähetetty kanavalle.',
   },
 };

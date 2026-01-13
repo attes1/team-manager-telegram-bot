@@ -2,7 +2,6 @@ import type { Bot } from 'grammy';
 import type { BotContext } from '../context';
 import { registerConfigCommand } from './admin/config';
 import { registerMatchCommands } from './admin/match';
-import { registerNextMatchCommand } from './admin/nextmatch';
 import { registerPlayerCommands } from './admin/players';
 import { registerPollCommand } from './admin/poll';
 import { registerRemindCommand } from './admin/remind';
@@ -11,6 +10,7 @@ import { registerStatusCommand } from './admin/status';
 import { registerWeekCommand } from './admin/week';
 import { registerHelpCommand } from './player/help';
 import { registerMatchInfoCommand } from './player/match';
+import { registerNextMatchCommand } from './player/nextmatch';
 import { registerPracticeCommand } from './player/practice';
 import { registerRosterCommand } from './player/roster';
 

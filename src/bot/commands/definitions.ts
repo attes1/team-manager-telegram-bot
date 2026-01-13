@@ -7,6 +7,7 @@ const commandsEn: BotCommand[] = [
   { command: 'roster', description: 'View team roster' },
   { command: 'match', description: 'View match info and lineup' },
   { command: 'practice', description: 'View practice availability' },
+  { command: 'nextmatch', description: 'View next match info' },
   { command: 'startseason', description: 'Start a new season (admin)' },
   { command: 'endseason', description: 'End current season (admin)' },
   { command: 'season', description: 'View season info (admin)' },
@@ -19,7 +20,6 @@ const commandsEn: BotCommand[] = [
   { command: 'poll', description: 'Send availability poll (admin)' },
   { command: 'remind', description: 'Send reminder to non-responders (admin)' },
   { command: 'status', description: 'View status overview (admin)' },
-  { command: 'nextmatch', description: 'Send match info to channel (admin)' },
 ];
 
 const commandsFi: BotCommand[] = [
@@ -28,6 +28,7 @@ const commandsFi: BotCommand[] = [
   { command: 'roster', description: 'Näytä joukkueen rosteri' },
   { command: 'match', description: 'Näytä matsitiedot ja kokoonpano' },
   { command: 'practice', description: 'Näytä treenien saatavuudet' },
+  { command: 'nextmatch', description: 'Näytä seuraavan matsin tiedot' },
   { command: 'startseason', description: 'Aloita uusi kausi (admin)' },
   { command: 'endseason', description: 'Päätä nykyinen kausi (admin)' },
   { command: 'season', description: 'Näytä kauden tiedot (admin)' },
@@ -40,7 +41,6 @@ const commandsFi: BotCommand[] = [
   { command: 'poll', description: 'Lähetä saatavuuskysely (admin)' },
   { command: 'remind', description: 'Lähetä muistutus vastaamattomille (admin)' },
   { command: 'status', description: 'Näytä tilannekatsaus (admin)' },
-  { command: 'nextmatch', description: 'Lähetä matsitiedot kanavalle (admin)' },
 ];
 
 export const commandDefinitions: Record<Language, BotCommand[]> = {

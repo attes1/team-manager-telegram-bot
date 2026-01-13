@@ -48,7 +48,8 @@ export const en: Translations = {
       match_day: 'Default match day',
       match_time: 'Default match time',
       lineup_size: 'Lineup size',
-      announcements_chat_id: 'Announcements channel',
+      match_day_reminder_enabled: 'Match day reminder',
+      match_day_reminder_time: 'Match day reminder time',
     },
   },
   week: {
@@ -156,7 +157,6 @@ export const en: Translations = {
     },
   },
   announcements: {
-    noChannel: 'Announcements channel not set. Use /config announcementsChatId <channel_id>',
     nextMatch: (week, dateRange) => `🎮 Week ${week} (${dateRange}) match`,
     matchTime: (day, time) => `📅 ${day} at ${time}`,
     matchTimeDefault: (day, time) => `📅 Default time: ${day} at ${time}`,
@@ -167,6 +167,5 @@ export const en: Translations = {
     lineupSet: (count) => `🎮 Lineup set (${count} players)!`,
     matchScheduled: (day, time) => `📅 Match scheduled: ${day} at ${time}`,
     noMatchWeek: 'No match this week.',
-    sent: 'Announcement sent to channel.',
   },
 };

@@ -15,7 +15,8 @@ const VALID_CONFIG_KEYS = [
   'matchDay',
   'matchTime',
   'lineupSize',
-  'announcementsChatId',
+  'matchDayReminderEnabled',
+  'matchDayReminderTime',
 ] as const;
 
 type ConfigKey = (typeof VALID_CONFIG_KEYS)[number];
@@ -37,7 +38,12 @@ export const updateConfig = async (
     throw new Error(`Invalid config key: ${key}`);
   }
 
-  const updateValue = key === 'lineupSize' ? Number(value) : value;
+  let updateValue: string | number | boolean = value;
+  if (key === 'lineupSize') {
+    updateValue = Number(value);
+  } else if (key === 'matchDayReminderEnabled') {
+    updateValue = value === 'true' || value === '1' || value === 'on';
+  }
 
   const result = await db
     .updateTable('config')

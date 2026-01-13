@@ -83,11 +83,13 @@ export const initScheduler = async (
   }
 
   // Match day reminder
-  const matchDayCron = buildCronExpression(config.matchDay, config.matchTime, -2);
-  tasks.push(scheduleTask('match-day', matchDayCron, () => handlers.onMatchDay(bot, chatId)));
-  console.log(
-    `Scheduler: Match day reminder scheduled for ${config.matchDay}, 2 hours before ${config.matchTime}`,
-  );
+  if (config.matchDayReminderEnabled) {
+    const matchDayCron = buildCronExpression(config.matchDay, config.matchDayReminderTime);
+    tasks.push(scheduleTask('match-day', matchDayCron, () => handlers.onMatchDay(bot, chatId)));
+    console.log(
+      `Scheduler: Match day reminder scheduled for ${config.matchDay} at ${config.matchDayReminderTime}`,
+    );
+  }
 
   console.log(`Scheduler: ${tasks.length} task(s) scheduled`);
 };

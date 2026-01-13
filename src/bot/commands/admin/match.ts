@@ -1,4 +1,5 @@
 import type { Bot } from 'grammy';
+import { env } from '../../../env';
 import { formatDateRange, formatDay } from '../../../lib/format';
 import { daySchema, timeSchema } from '../../../lib/schemas';
 import { getCurrentWeek, getWeekDateRange, getWeekNumber, getWeekYear } from '../../../lib/week';
@@ -75,9 +76,9 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const dayName = i18n.poll.days[dayResult.data];
       const dayFormatted = formatDay(dayResult.data, lang);
 
-      if (config.announcementsChatId) {
+      if (env.PUBLIC_CHANNEL_ID) {
         const announcement = buildMatchScheduledAnnouncement(i18n, dayFormatted, timeResult.data);
-        await ctx.api.sendMessage(config.announcementsChatId, announcement);
+        await ctx.api.sendMessage(env.PUBLIC_CHANNEL_ID, announcement);
       }
 
       return ctx.reply(i18n.match.scheduled(dayName, timeResult.data, weekNumber, dateRange));
@@ -87,7 +88,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
   bot.command(
     'setlineup',
     adminSeasonCommand(async (ctx: AdminSeasonContext) => {
-      const { db, season, config, i18n } = ctx;
+      const { db, season, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
 
       if (args.toLowerCase() === 'clear') {
@@ -121,12 +122,12 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         playerIds: mentionedUsers.map((u) => u.id),
       });
 
-      if (config.announcementsChatId) {
+      if (env.PUBLIC_CHANNEL_ID) {
         const { start, end } = getWeekDateRange(year, week);
         const dateRange = formatDateRange(start, end);
         const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
         const announcement = buildLineupAnnouncement(i18n, week, dateRange, lineup);
-        await ctx.api.sendMessage(config.announcementsChatId, announcement);
+        await ctx.api.sendMessage(env.PUBLIC_CHANNEL_ID, announcement);
       }
 
       const playerList = mentionedUsers.map((u) => `• ${u.name}`).join('\n');

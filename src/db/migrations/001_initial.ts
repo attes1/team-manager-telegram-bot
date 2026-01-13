@@ -36,6 +36,13 @@ export async function up<T>(db: Kysely<T>): Promise<void> {
       col.notNull().defaultTo('20:00').check(sql`match_time GLOB '[0-2][0-9]:[0-5][0-9]'`),
     )
     .addColumn('lineup_size', 'integer', (col) => col.notNull().defaultTo(5))
+    .addColumn('match_day_reminder_enabled', 'integer', (col) => col.notNull().defaultTo(1))
+    .addColumn('match_day_reminder_time', 'text', (col) =>
+      col
+        .notNull()
+        .defaultTo('18:00')
+        .check(sql`match_day_reminder_time GLOB '[0-2][0-9]:[0-5][0-9]'`),
+    )
     .execute();
 
   await db.schema

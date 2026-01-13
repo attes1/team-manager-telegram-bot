@@ -28,7 +28,8 @@ export interface ConfigTable {
   matchDay: Generated<string>;
   matchTime: Generated<string>;
   lineupSize: Generated<number>;
-  announcementsChatId: string | null;
+  matchDayReminderEnabled: Generated<boolean>;
+  matchDayReminderTime: Generated<string>;
 }
 
 export interface PlayersTable {
