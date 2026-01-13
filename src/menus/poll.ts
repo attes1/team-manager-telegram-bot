@@ -17,6 +17,8 @@ const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   unavailable: '❌',
 };
 
+const NO_RESPONSE_ICON = '·';
+
 const STATUS_ORDER: AvailabilityStatus[] = [
   'available',
   'practice_only',
@@ -64,8 +66,10 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
 
   for (const day of days) {
     const dayData = availability[day];
+    const hasResponse = dayData !== undefined;
     const currentStatus: AvailabilityStatus = dayData?.status ?? 'available';
     const currentSlots = dayData?.timeSlots ?? [];
+    const hasTimeslots = currentSlots.length > 0;
 
     range.text(i18n.poll.days[day], (ctx) => ctx.answerCallbackQuery());
 
@@ -75,6 +79,8 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
 
       range.text(icon, async (ctx) => {
         const newSlots = hasSlot ? currentSlots.filter((s) => s !== time) : [...currentSlots, time];
+        // When adding first timeslot without prior response, default to 'available'
+        const status = hasResponse ? currentStatus : 'available';
 
         await setDayAvailability(db, {
           seasonId: season.id,
@@ -82,7 +88,7 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
           weekNumber: week,
           year,
           day,
-          status: currentStatus,
+          status,
           timeSlots: newSlots,
         });
 
@@ -90,8 +96,23 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
       });
     }
 
-    range.text(STATUS_ICONS[currentStatus], async (ctx) => {
-      const nextStatus = getNextStatus(currentStatus);
+    // Show neutral icon if no response yet, otherwise show status icon
+    const statusIcon = hasResponse ? STATUS_ICONS[currentStatus] : NO_RESPONSE_ICON;
+
+    range.text(statusIcon, async (ctx) => {
+      let nextStatus: AvailabilityStatus;
+
+      if (!hasResponse && !hasTimeslots) {
+        // No response and no timeslots: go directly to unavailable
+        nextStatus = 'unavailable';
+      } else if (!hasResponse && hasTimeslots) {
+        // Has timeslots but no explicit response yet: start cycling from available
+        nextStatus = getNextStatus('available');
+      } else {
+        // Has response: normal cycling
+        nextStatus = getNextStatus(currentStatus);
+      }
+
       const newSlots = nextStatus === 'unavailable' ? [] : currentSlots;
 
       await setDayAvailability(db, {
