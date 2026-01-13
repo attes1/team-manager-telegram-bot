@@ -1,6 +1,6 @@
 import type { Bot } from 'grammy';
 import type { Translations } from '../../../i18n';
-import { formatDateRange } from '../../../lib/format';
+import { formatDateRange, formatPlayerName } from '../../../lib/format';
 import type { AvailabilityStatus, Day } from '../../../lib/schemas';
 import { daySchema } from '../../../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
@@ -55,7 +55,7 @@ const showDayAvailability = async (
     if (response) {
       const timesStr = response.timeSlots.length > 0 ? response.timeSlots.join(', ') : '-';
       const statusIcon = STATUS_ICONS[response.status];
-      lines.push(`• ${player.displayName}: ${timesStr} ${statusIcon}`);
+      lines.push(`• ${formatPlayerName(player)}: ${timesStr} ${statusIcon}`);
     }
   }
 
@@ -110,7 +110,7 @@ export const registerPracticeCommand = (bot: Bot<BotContext>) => {
           if (response) {
             const timesStr = response.timeSlots.length > 0 ? response.timeSlots.join(', ') : '-';
             const statusIcon = STATUS_ICONS[response.status];
-            lines.push(`  • ${player.displayName}: ${timesStr} ${statusIcon}`);
+            lines.push(`  • ${formatPlayerName(player)}: ${timesStr} ${statusIcon}`);
           }
         }
         lines.push('');

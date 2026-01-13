@@ -1,5 +1,5 @@
 import type { Bot } from 'grammy';
-import { formatDateRange } from '../../../lib/format';
+import { formatDateRange, formatPlayerName } from '../../../lib/format';
 import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
 import { getLineup, getMatchInfo } from '../../../services/match';
 import type { BotContext, RosterContext } from '../../context';
@@ -32,7 +32,7 @@ export const registerMatchInfoCommand = (bot: Bot<BotContext>) => {
       if (lineup.length > 0) {
         lines.push(i18n.match.lineupTitle);
         for (const player of lineup) {
-          lines.push(i18n.match.lineupPlayer(player.displayName));
+          lines.push(`• ${formatPlayerName(player)}`);
         }
       } else {
         lines.push(i18n.match.lineupEmpty);

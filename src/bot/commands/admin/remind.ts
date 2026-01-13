@@ -1,5 +1,5 @@
 import type { Bot } from 'grammy';
-import { formatDateRange } from '../../../lib/format';
+import { formatDateRange, formatPlayerName } from '../../../lib/format';
 import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
 import { hasRespondedForWeek } from '../../../services/availability';
 import { getRoster } from '../../../services/roster';
@@ -20,7 +20,10 @@ export const registerRemindCommand = (bot: Bot<BotContext>) => {
         return ctx.reply('Roster is empty.');
       }
 
-      const playersWithoutResponse: Array<{ name: string; telegramId: number }> = [];
+      const playersWithoutResponse: Array<{
+        name: string;
+        telegramId: number;
+      }> = [];
 
       for (const player of roster) {
         const hasResponded = await hasRespondedForWeek(db, {
@@ -32,7 +35,7 @@ export const registerRemindCommand = (bot: Bot<BotContext>) => {
 
         if (!hasResponded) {
           playersWithoutResponse.push({
-            name: player.displayName,
+            name: formatPlayerName(player),
             telegramId: player.telegramId,
           });
         }

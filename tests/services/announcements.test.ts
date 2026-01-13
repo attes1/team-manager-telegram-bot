@@ -28,7 +28,8 @@ describe('announcements service', () => {
       expect(message).toContain('Week 5 (27.1. - 2.2.)');
       expect(message).toContain('Sunday at 20:00');
       expect(message).toContain('Lineup');
-      expect(message).toContain('Player 1');
+      // Player 1 has username 'p1' (no @ to avoid ping), Player 2 has no username
+      expect(message).toContain('p1');
       expect(message).toContain('Player 2');
       expect(message).not.toContain('Default');
     });
@@ -76,7 +77,8 @@ describe('announcements service', () => {
 
       expect(message).toContain('Lineup set (2 players)');
       expect(message).toContain('Week 5');
-      expect(message).toContain('Player 1');
+      // Player 1 has username 'p1' (no @ to avoid ping), Player 2 has no username
+      expect(message).toContain('p1');
       expect(message).toContain('Player 2');
     });
 

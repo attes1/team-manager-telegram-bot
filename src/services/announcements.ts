@@ -1,5 +1,5 @@
 import type { Kysely } from 'kysely';
-import { formatDateRange, formatDay } from '@/lib/format';
+import { formatDateRange, formatDay, formatPlayerName } from '@/lib/format';
 import type { ParsedConfig } from '@/lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '@/lib/week';
 import type { DB, Player } from '@/types/db';
@@ -40,7 +40,7 @@ export const buildMatchAnnouncement = (i18n: Translations, data: MatchAnnounceme
 
   if (data.lineup.length > 0) {
     for (const player of data.lineup) {
-      lines.push(i18n.announcements.lineupPlayer(player.displayName));
+      lines.push(`• ${formatPlayerName(player)}`);
     }
   } else {
     lines.push(i18n.announcements.lineupEmpty);
@@ -64,7 +64,7 @@ export const buildLineupAnnouncement = (
   ];
 
   for (const player of lineup) {
-    lines.push(i18n.announcements.lineupPlayer(player.displayName));
+    lines.push(`• ${formatPlayerName(player)}`);
   }
 
   return lines.join('\n');

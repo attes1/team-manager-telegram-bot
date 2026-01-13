@@ -1,7 +1,7 @@
 import { Menu } from '@grammyjs/menu';
 import type { BotContext } from '../bot/context';
 import { env } from '../env';
-import { formatDateRange } from '../lib/format';
+import { formatDateRange, formatPlayerName } from '../lib/format';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { buildLineupAnnouncement } from '../services/announcements';
 import { getLineup, setLineup } from '../services/match';
@@ -24,7 +24,8 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
   for (let i = 0; i < roster.length; i++) {
     const player = roster[i];
     const isSelected = selectedIds.has(player.telegramId);
-    const label = isSelected ? `✅ ${player.displayName}` : player.displayName;
+    const name = formatPlayerName(player);
+    const label = isSelected ? `✅ ${name}` : name;
 
     range.text(label, async (ctx) => {
       const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
@@ -72,7 +73,7 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
         await ctx.api.sendMessage(env.PUBLIC_CHANNEL_ID, announcement);
       }
 
-      const playerList = lineup.map((p) => `• ${p.displayName}`).join('\n');
+      const playerList = lineup.map((p) => `• ${formatPlayerName(p)}`).join('\n');
       await ctx.editMessageText(ctx.i18n.lineup.set(lineup.length, playerList));
     })
     .row();

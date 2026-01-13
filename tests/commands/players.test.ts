@@ -308,8 +308,8 @@ describe('/roster command', () => {
     await bot.handleUpdate(rosterUpdate);
 
     expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('Alice');
-    expect(calls[0].payload.text).toContain('@alice');
+    // Alice has username (no @ to avoid ping), Bob has no username so shows display name
+    expect(calls[0].payload.text).toContain('alice');
     expect(calls[0].payload.text).toContain('Bob');
   });
 });

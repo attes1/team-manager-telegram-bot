@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext } from '../bot/context';
 import { db } from '../db';
 import { getTranslations } from '../i18n';
-import { formatDateRange } from '../lib/format';
+import { formatDateRange, formatPlayerName } from '../lib/format';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { hasRespondedForWeek } from '../services/availability';
 import { getConfig } from '../services/config';
@@ -45,7 +45,7 @@ export const sendReminder = async (bot: Bot<BotContext>, chatId: number): Promis
 
     if (!hasResponded) {
       playersWithoutResponse.push({
-        name: player.displayName,
+        name: formatPlayerName(player),
         telegramId: player.telegramId,
       });
     }

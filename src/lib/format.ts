@@ -54,3 +54,15 @@ export const formatDay = (day: Day, lang: 'fi' | 'en'): string =>
 
 export const formatDayShort = (day: Day, lang: 'fi' | 'en'): string =>
   lang === 'fi' ? DAY_NAMES_SHORT_FI[day] : DAY_NAMES_SHORT_EN[day];
+
+// Format player name, preferring username over display name
+// Use ping: true only for reminders (ping mode) and invitations
+export const formatPlayerName = (
+  player: { displayName: string; username: string | null },
+  options?: { ping?: boolean },
+): string => {
+  if (!player.username) {
+    return player.displayName;
+  }
+  return options?.ping ? `@${player.username}` : player.username;
+};

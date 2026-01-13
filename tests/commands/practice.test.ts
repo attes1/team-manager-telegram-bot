@@ -144,7 +144,8 @@ describe('/practice command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
-    expect(calls[0].payload.text).toContain('Player One');
+    // Player has username (no @ to avoid ping)
+    expect(calls[0].payload.text).toContain('playerone');
   });
 
   test('shows availability for specific day', async () => {

@@ -42,6 +42,7 @@ export interface GetWeekParams {
 export interface PlayerWeekAvailability {
   playerId: number;
   displayName: string;
+  username: string | null;
   responses: Partial<Record<Day, DayAvailability>>;
 }
 
@@ -184,6 +185,7 @@ export const getWeekAvailability = async (
       'dayResponses.day',
       'dayResponses.status',
       'players.displayName',
+      'players.username',
     ])
     .where('dayResponses.seasonId', '=', seasonId)
     .where('dayResponses.weekNumber', '=', weekNumber)
@@ -215,6 +217,7 @@ export const getWeekAvailability = async (
       player = {
         playerId: response.playerId,
         displayName: response.displayName,
+        username: response.username,
         responses: {},
       };
       playerMap.set(response.playerId, player);
