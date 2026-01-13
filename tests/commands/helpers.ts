@@ -25,9 +25,9 @@ export const createTestBot = () => {
     } satisfies UserFromGetMe,
   });
 
-  bot.api.config.use((_prev, method, payload) => {
+  bot.api.config.use((_prev, method, payload, _signal) => {
     calls.push({ method, payload: payload as Record<string, unknown> });
-    return Promise.resolve({ ok: true as const, result: true as unknown });
+    return { ok: true, result: true } as ReturnType<typeof _prev>;
   });
 
   return { bot, calls };
