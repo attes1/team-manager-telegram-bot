@@ -216,6 +216,8 @@ export const en: Translations = {
     lineupSet: (count) => `🎮 Lineup set (${count} players)!`,
     matchScheduled: (day, time) => `📅 Match scheduled: ${day} at ${time}`,
     noMatchWeek: 'No match this week.',
+    matchAlreadyPlayed: "This week's match was already played.",
+    noUpcomingMatch: 'No info about next match.',
     opponent: (name) => `🆚 Opponent: ${name}`,
     opponentWithUrl: (name, url) => `🆚 Opponent: [${name}](${url})`,
   },

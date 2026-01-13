@@ -1,5 +1,5 @@
 import type { Bot } from 'grammy';
-import { buildMatchAnnouncement, getMatchAnnouncementData } from '@/services/announcements';
+import { buildNextMatchMessage, getNextMatchResult } from '@/services/announcements';
 import type { BotContext, SeasonContext } from '../../context';
 import { seasonCommand } from '../../middleware';
 
@@ -9,12 +9,8 @@ export const registerNextMatchCommand = (bot: Bot<BotContext>) => {
     seasonCommand(async (ctx: SeasonContext) => {
       const { db, config, i18n, season } = ctx;
 
-      const data = await getMatchAnnouncementData({ db, config, i18n, season });
-      if (!data) {
-        return ctx.reply(i18n.announcements.noMatchWeek);
-      }
-
-      const message = buildMatchAnnouncement(i18n, data);
+      const result = await getNextMatchResult({ db, config, i18n, season });
+      const message = buildNextMatchMessage(i18n, result);
       return ctx.reply(message);
     }),
   );

@@ -207,6 +207,8 @@ export interface Translations {
     lineupSet: (count: number) => string;
     matchScheduled: (day: string, time: string) => string;
     noMatchWeek: string;
+    matchAlreadyPlayed: string;
+    noUpcomingMatch: string;
     opponent: (name: string) => string;
     opponentWithUrl: (name: string, url: string) => string;
   };
@@ -435,6 +437,8 @@ export const fi: Translations = {
     lineupSet: (count) => `🎮 Linari asetettu (${count} pelaajaa)!`,
     matchScheduled: (day, time) => `📅 Matsi sovittu: ${day} klo ${time}`,
     noMatchWeek: 'Tällä viikolla ei ole matsia.',
+    matchAlreadyPlayed: 'Tämän viikon matsi on jo pelattu.',
+    noUpcomingMatch: 'Ei tietoa seuraavasta matsista.',
     opponent: (name) => `🆚 Vihu: ${name}`,
     opponentWithUrl: (name, url) => `🆚 Vihu: [${name}](${url})`,
   },

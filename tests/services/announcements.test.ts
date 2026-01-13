@@ -2,154 +2,181 @@ import { describe, expect, test } from 'vitest';
 import { en } from '@/i18n/en';
 import {
   buildLineupAnnouncement,
-  buildMatchAnnouncement,
   buildMatchScheduledAnnouncement,
+  buildNextMatchMessage,
   type MatchAnnouncementData,
+  type NextMatchResult,
 } from '@/services/announcements';
 import type { Player } from '@/types/db';
 
 describe('announcements service', () => {
-  describe('buildMatchAnnouncement', () => {
-    test('builds announcement with scheduled match and lineup', () => {
-      const data: MatchAnnouncementData = {
-        week: 5,
-        dateRange: '27.1. - 2.2.',
-        matchDay: 'Sunday',
-        matchTime: '20:00',
-        isDefault: false,
-        lineup: [
-          { telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' },
-          { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
-        ],
-        lineupSize: 2,
-        opponentName: null,
-        opponentUrl: null,
+  describe('buildNextMatchMessage', () => {
+    const createMatchData = (
+      overrides: Partial<MatchAnnouncementData> = {},
+    ): MatchAnnouncementData => ({
+      week: 5,
+      year: 2025,
+      dateRange: '27.1. - 2.2.',
+      matchDay: 'Sunday',
+      matchTime: '20:00',
+      isDefault: false,
+      lineup: [],
+      lineupSize: 5,
+      opponentName: null,
+      opponentUrl: null,
+      ...overrides,
+    });
+
+    test('builds message for upcoming match with scheduled time and lineup', () => {
+      const result: NextMatchResult = {
+        type: 'upcoming',
+        data: createMatchData({
+          lineup: [
+            { telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' },
+            { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
+          ],
+          lineupSize: 2,
+        }),
       };
 
-      const message = buildMatchAnnouncement(en, data);
+      const message = buildNextMatchMessage(en, result);
 
       expect(message).toContain('Week 5 (27.1. - 2.2.)');
       expect(message).toContain('Sunday at 20:00');
       expect(message).toContain('Lineup');
-      // Player 1 has username 'p1' (no @ to avoid ping), Player 2 has no username
       expect(message).toContain('p1');
       expect(message).toContain('Player 2');
       expect(message).not.toContain('Default');
     });
 
-    test('builds announcement with default time', () => {
-      const data: MatchAnnouncementData = {
-        week: 5,
-        dateRange: '27.1. - 2.2.',
-        matchDay: 'Sunday',
-        matchTime: '20:00',
-        isDefault: true,
-        lineup: [],
-        lineupSize: 5,
-        opponentName: null,
-        opponentUrl: null,
+    test('builds message with default time', () => {
+      const result: NextMatchResult = {
+        type: 'upcoming',
+        data: createMatchData({ isDefault: true }),
       };
 
-      const message = buildMatchAnnouncement(en, data);
+      const message = buildNextMatchMessage(en, result);
 
       expect(message).toContain('Default time');
       expect(message).toContain('Lineup not yet set');
     });
 
-    test('builds announcement without scheduled time', () => {
-      const data: MatchAnnouncementData = {
-        week: 5,
-        dateRange: '27.1. - 2.2.',
-        matchDay: null,
-        matchTime: null,
-        isDefault: false,
-        lineup: [],
-        lineupSize: 5,
-        opponentName: null,
-        opponentUrl: null,
+    test('builds message without scheduled time', () => {
+      const result: NextMatchResult = {
+        type: 'upcoming',
+        data: createMatchData({ matchDay: null, matchTime: null }),
       };
 
-      const message = buildMatchAnnouncement(en, data);
+      const message = buildNextMatchMessage(en, result);
 
       expect(message).toContain('Time not yet scheduled');
     });
 
     test('shows warning emoji when lineup is partial', () => {
-      const data: MatchAnnouncementData = {
-        week: 5,
-        dateRange: '27.1. - 2.2.',
-        matchDay: 'Sunday',
-        matchTime: '20:00',
-        isDefault: false,
-        lineup: [{ telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' }],
-        lineupSize: 5,
-        opponentName: null,
-        opponentUrl: null,
+      const result: NextMatchResult = {
+        type: 'upcoming',
+        data: createMatchData({
+          lineup: [{ telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' }],
+          lineupSize: 5,
+        }),
       };
 
-      const message = buildMatchAnnouncement(en, data);
+      const message = buildNextMatchMessage(en, result);
 
       expect(message).toContain('Lineup');
       expect(message).toContain('⚠️');
     });
 
     test('no warning emoji when lineup is full', () => {
-      const data: MatchAnnouncementData = {
-        week: 5,
-        dateRange: '27.1. - 2.2.',
-        matchDay: 'Sunday',
-        matchTime: '20:00',
-        isDefault: false,
-        lineup: [
-          { telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' },
-          { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
-        ],
-        lineupSize: 2,
-        opponentName: null,
-        opponentUrl: null,
+      const result: NextMatchResult = {
+        type: 'upcoming',
+        data: createMatchData({
+          lineup: [
+            { telegramId: 1, displayName: 'Player 1', username: 'p1', createdAt: '' },
+            { telegramId: 2, displayName: 'Player 2', username: null, createdAt: '' },
+          ],
+          lineupSize: 2,
+        }),
       };
 
-      const message = buildMatchAnnouncement(en, data);
+      const message = buildNextMatchMessage(en, result);
 
       expect(message).toContain('Lineup');
       expect(message).not.toContain('⚠️');
     });
 
-    test('builds announcement with opponent name only', () => {
-      const data: MatchAnnouncementData = {
-        week: 5,
-        dateRange: '27.1. - 2.2.',
-        matchDay: 'Sunday',
-        matchTime: '20:00',
-        isDefault: false,
-        lineup: [],
-        lineupSize: 5,
-        opponentName: 'EC Myyrylit',
-        opponentUrl: null,
+    test('builds message with opponent name only', () => {
+      const result: NextMatchResult = {
+        type: 'upcoming',
+        data: createMatchData({ opponentName: 'EC Myyrylit' }),
       };
 
-      const message = buildMatchAnnouncement(en, data);
+      const message = buildNextMatchMessage(en, result);
 
       expect(message).toContain('Opponent: EC Myyrylit');
       expect(message).not.toContain('[EC Myyrylit]');
     });
 
-    test('builds announcement with opponent name and url', () => {
-      const data: MatchAnnouncementData = {
-        week: 5,
-        dateRange: '27.1. - 2.2.',
-        matchDay: 'Sunday',
-        matchTime: '20:00',
-        isDefault: false,
-        lineup: [],
-        lineupSize: 5,
-        opponentName: 'EC Myyrylit',
-        opponentUrl: 'https://example.com/ec-myyrylit',
+    test('builds message with opponent name and url', () => {
+      const result: NextMatchResult = {
+        type: 'upcoming',
+        data: createMatchData({
+          opponentName: 'EC Myyrylit',
+          opponentUrl: 'https://example.com/ec-myyrylit',
+        }),
       };
 
-      const message = buildMatchAnnouncement(en, data);
+      const message = buildNextMatchMessage(en, result);
 
       expect(message).toContain('[EC Myyrylit](https://example.com/ec-myyrylit)');
+    });
+
+    test('builds message for no match this week with next match', () => {
+      const result: NextMatchResult = {
+        type: 'no_match_this_week',
+        nextMatch: createMatchData({ week: 6, dateRange: '3.2. - 9.2.' }),
+      };
+
+      const message = buildNextMatchMessage(en, result);
+
+      expect(message).toContain('No match this week');
+      expect(message).toContain('Week 6 (3.2. - 9.2.)');
+    });
+
+    test('builds message for no match this week with no upcoming match', () => {
+      const result: NextMatchResult = {
+        type: 'no_match_this_week',
+        nextMatch: null,
+      };
+
+      const message = buildNextMatchMessage(en, result);
+
+      expect(message).toContain('No match this week');
+      expect(message).toContain('No info about next match');
+    });
+
+    test('builds message for already played match with next match', () => {
+      const result: NextMatchResult = {
+        type: 'already_played',
+        nextMatch: createMatchData({ week: 6, dateRange: '3.2. - 9.2.' }),
+      };
+
+      const message = buildNextMatchMessage(en, result);
+
+      expect(message).toContain('already played');
+      expect(message).toContain('Week 6 (3.2. - 9.2.)');
+    });
+
+    test('builds message for already played match with no upcoming match', () => {
+      const result: NextMatchResult = {
+        type: 'already_played',
+        nextMatch: null,
+      };
+
+      const message = buildNextMatchMessage(en, result);
+
+      expect(message).toContain('already played');
+      expect(message).toContain('No info about next match');
     });
   });
 
@@ -164,7 +191,6 @@ describe('announcements service', () => {
 
       expect(message).toContain('Lineup set (2 players)');
       expect(message).toContain('Week 5');
-      // Player 1 has username 'p1' (no @ to avoid ping), Player 2 has no username
       expect(message).toContain('p1');
       expect(message).toContain('Player 2');
     });

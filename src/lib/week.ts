@@ -117,3 +117,26 @@ export const parseWeekInput = (
 
   return { success: true, week: result.week, year: result.year };
 };
+
+/**
+ * Get the datetime for a match on a specific week/year/day/time.
+ */
+export const getMatchDateTime = (year: number, week: number, day: Day, time: string): Date => {
+  const { start } = getWeekDateRange(year, week);
+  const dayOffset = DAY_TO_ISO_WEEKDAY[day] - 1; // Monday is 0 offset
+  const [hour, minute] = time.split(':').map(Number);
+
+  const matchDate = new Date(start);
+  matchDate.setDate(matchDate.getDate() + dayOffset);
+  matchDate.setHours(hour, minute, 0, 0);
+
+  return matchDate;
+};
+
+/**
+ * Check if a match is in the future (hasn't been played yet).
+ */
+export const isMatchInFuture = (year: number, week: number, day: Day, time: string): boolean => {
+  const matchDateTime = getMatchDateTime(year, week, day, time);
+  return isBefore(new Date(), matchDateTime);
+};
