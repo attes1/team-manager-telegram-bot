@@ -187,3 +187,42 @@ export const createCallbackQueryUpdate = (
     },
   },
 });
+
+// Creates an update with @username mentions (type: 'mention')
+// These only contain the username text, NOT the user ID
+export const createUsernameMentionUpdate = (
+  command: string,
+  userId: number,
+  chatId: number,
+  usernames: string[],
+): Update => {
+  const mentionTexts = usernames.map((u) => `@${u}`);
+  const fullText = `${command} ${mentionTexts.join(' ')}`;
+
+  const entities: MessageEntity[] = [
+    { type: 'bot_command', offset: 0, length: command.split(' ')[0].length },
+  ];
+
+  let offset = command.length + 1;
+  for (const username of usernames) {
+    const text = `@${username}`;
+    entities.push({
+      type: 'mention',
+      offset,
+      length: text.length,
+    });
+    offset += text.length + 1;
+  }
+
+  return {
+    update_id: 1,
+    message: {
+      message_id: 1,
+      date: Math.floor(Date.now() / 1000),
+      chat: { id: chatId, type: 'group', title: 'Test Group' },
+      from: { id: userId, is_bot: false, first_name: 'Test' },
+      text: fullText,
+      entities,
+    },
+  };
+};

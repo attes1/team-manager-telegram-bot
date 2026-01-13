@@ -17,7 +17,8 @@ import {
   setOpponent,
 } from '@/services/match';
 import { deleteActiveMenu, getActiveMenu, saveActiveMenu } from '@/services/menu';
-import { isPlayerInRoster } from '@/services/roster';
+import { getPlayerByUsername, isPlayerInRoster } from '@/services/roster';
+import { getWeek } from '@/services/week';
 
 interface MentionedUser {
   id: number;
@@ -25,7 +26,8 @@ interface MentionedUser {
   username?: string;
 }
 
-const getAllMentionedUsers = (ctx: CaptainSeasonContext): MentionedUser[] => {
+// Get text_mention entities (users mentioned by tapping on their name)
+const getTextMentionedUsers = (ctx: CaptainSeasonContext): MentionedUser[] => {
   const users: MentionedUser[] = [];
 
   const textMentions = ctx.entities('text_mention');
@@ -38,6 +40,12 @@ const getAllMentionedUsers = (ctx: CaptainSeasonContext): MentionedUser[] => {
   }
 
   return users;
+};
+
+// Get @username mentions from message text
+const getUsernameMentions = (ctx: CaptainSeasonContext): string[] => {
+  const mentions = ctx.entities('mention');
+  return mentions.map((m) => m.text.replace(/^@/, ''));
 };
 
 export const registerMatchCommands = (bot: Bot<BotContext>) => {
@@ -138,7 +146,28 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.lineup.cleared);
       }
 
-      const mentionedUsers = getAllMentionedUsers(ctx);
+      // Get users from text_mention entities (tapping on names - has user ID)
+      const textMentionedUsers = getTextMentionedUsers(ctx);
+
+      // Get users from @username mentions (typed mentions - need to look up by username)
+      const usernameMentions = getUsernameMentions(ctx);
+      const mentionedUsers: MentionedUser[] = [...textMentionedUsers];
+
+      // Look up @username mentions in the roster
+      for (const username of usernameMentions) {
+        const player = await getPlayerByUsername(db, season.id, username);
+        if (!player) {
+          return ctx.reply(i18n.lineup.playerNotInRoster(`@${username}`));
+        }
+        // Avoid duplicates if same user is mentioned both ways
+        if (!mentionedUsers.some((u) => u.id === player.telegramId)) {
+          mentionedUsers.push({
+            id: player.telegramId,
+            name: player.displayName,
+            username: player.username ?? undefined,
+          });
+        }
+      }
 
       if (mentionedUsers.length === 0) {
         // Check for optional week parameter
@@ -154,6 +183,12 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
             return ctx.reply(i18n.lineup.invalidWeek);
           }
           lineupWeek = { week: result.week, year: result.year };
+        }
+
+        // Check for practice week BEFORE showing the menu
+        const weekInfo = await getWeek(db, season.id, lineupWeek.week, lineupWeek.year);
+        if (weekInfo?.type === 'practice') {
+          return ctx.reply(i18n.lineup.practiceWeek);
         }
 
         const chatId = ctx.chat?.id;
@@ -194,7 +229,8 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         return sent;
       }
 
-      for (const user of mentionedUsers) {
+      // Validate all text_mention users are in roster
+      for (const user of textMentionedUsers) {
         const inRoster = await isPlayerInRoster(db, season.id, user.id);
         if (!inRoster) {
           return ctx.reply(i18n.lineup.playerNotInRoster(user.name));

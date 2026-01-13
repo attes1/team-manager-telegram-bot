@@ -2,9 +2,16 @@ import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerMatchCommands } from '@/bot/commands/user/match';
+import { getSchedulingWeek } from '@/lib/week';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
-import { createCommandUpdate, createMultiMentionUpdate, createTestBot } from './helpers';
+import { setWeekType } from '@/services/week';
+import {
+  createCommandUpdate,
+  createMultiMentionUpdate,
+  createTestBot,
+  createUsernameMentionUpdate,
+} from './helpers';
 
 const TEST_ADMIN_ID = 123456;
 const TEST_USER_ID = 999999;
@@ -243,5 +250,110 @@ describe('/setlineup command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].payload.text).toContain('not in the roster');
+  });
+
+  test('admin can set lineup with @username mentions', async () => {
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: 111,
+      displayName: 'Player One',
+      username: 'player1',
+    });
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: 222,
+      displayName: 'Player Two',
+      username: 'player2',
+    });
+
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createUsernameMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+      'player1',
+      'player2',
+    ]);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.text).toContain('Lineup set');
+    expect(calls[0].payload.text).toContain('2 players');
+  });
+
+  test('@username mention for player not in roster shows error', async () => {
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createUsernameMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+      'unknownplayer',
+    ]);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('not in the roster');
+  });
+
+  test('@username mention for player without username in roster shows error', async () => {
+    // Player exists but without username
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: 333,
+      displayName: 'No Username Player',
+      username: null,
+    });
+
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    // Try to mention by a made-up username
+    const update = createUsernameMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+      'nousernameuser',
+    ]);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('not in the roster');
+  });
+
+  test('rejects lineup on practice week with mentions', async () => {
+    await addPlayerToRoster(mockDb.db, {
+      seasonId,
+      telegramId: 111,
+      displayName: 'Player One',
+      username: 'player1',
+    });
+
+    // Set current scheduling week as practice
+    const { week, year } = getSchedulingWeek('sun', '10:00');
+    await setWeekType(mockDb.db, seasonId, week, year, 'practice');
+
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createMultiMentionUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID, [
+      { id: 111, firstName: 'Player', lastName: 'One', username: 'player1' },
+    ]);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].payload.text).toContain('practice');
+  });
+
+  test('rejects lineup menu on practice week immediately', async () => {
+    // Set current scheduling week as practice
+    const { week, year } = getSchedulingWeek('sun', '10:00');
+    await setWeekType(mockDb.db, seasonId, week, year, 'practice');
+
+    const { bot, calls } = createTestBot();
+    registerMatchCommands(bot);
+
+    const update = createCommandUpdate('/setlineup', TEST_ADMIN_ID, TEST_CHAT_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+    // Should show practice week error, NOT a menu
+    expect(calls[0].payload.reply_markup).toBeUndefined();
+    expect(calls[0].payload.text).toContain('practice');
   });
 });
