@@ -1,9 +1,13 @@
 import type { Bot } from 'grammy';
-import { formatDateRange } from '../../../lib/format';
+import { formatDateRange, formatDay } from '../../../lib/format';
 import { daySchema, timeSchema } from '../../../lib/schemas';
-import { getWeekDateRange, getWeekNumber, getWeekYear } from '../../../lib/week';
+import { getCurrentWeek, getWeekDateRange, getWeekNumber, getWeekYear } from '../../../lib/week';
 import { getLineupMenuMessage, lineupMenu } from '../../../menus/lineup';
-import { clearLineup, setLineup, setMatchTime } from '../../../services/match';
+import {
+  buildLineupAnnouncement,
+  buildMatchScheduledAnnouncement,
+} from '../../../services/announcements';
+import { clearLineup, getLineup, setLineup, setMatchTime } from '../../../services/match';
 import { isPlayerInRoster } from '../../../services/roster';
 import type { AdminSeasonContext, BotContext } from '../../context';
 import { adminSeasonCommand } from '../../middleware';
@@ -35,7 +39,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
   bot.command(
     'setmatch',
     adminSeasonCommand(async (ctx: AdminSeasonContext) => {
-      const { db, season, i18n } = ctx;
+      const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
       const [dayStr, timeStr] = args.split(/\s+/);
 
@@ -67,7 +71,14 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
 
       const { start, end } = getWeekDateRange(year, weekNumber);
       const dateRange = formatDateRange(start, end);
+      const lang = config.language as 'fi' | 'en';
       const dayName = i18n.poll.days[dayResult.data];
+      const dayFormatted = formatDay(dayResult.data, lang);
+
+      if (config.announcementsChatId) {
+        const announcement = buildMatchScheduledAnnouncement(i18n, dayFormatted, timeResult.data);
+        await ctx.api.sendMessage(config.announcementsChatId, announcement);
+      }
 
       return ctx.reply(i18n.match.scheduled(dayName, timeResult.data, weekNumber, dateRange));
     }),
@@ -76,7 +87,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
   bot.command(
     'setlineup',
     adminSeasonCommand(async (ctx: AdminSeasonContext) => {
-      const { db, season, i18n } = ctx;
+      const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
 
       if (args.toLowerCase() === 'clear') {
@@ -101,16 +112,22 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         }
       }
 
-      const now = new Date();
-      const weekNumber = getWeekNumber(now);
-      const year = getWeekYear(now);
+      const { week, year } = getCurrentWeek();
 
       await setLineup(db, {
         seasonId: season.id,
-        weekNumber,
+        weekNumber: week,
         year,
         playerIds: mentionedUsers.map((u) => u.id),
       });
+
+      if (config.announcementsChatId) {
+        const { start, end } = getWeekDateRange(year, week);
+        const dateRange = formatDateRange(start, end);
+        const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
+        const announcement = buildLineupAnnouncement(i18n, week, dateRange, lineup);
+        await ctx.api.sendMessage(config.announcementsChatId, announcement);
+      }
 
       const playerList = mentionedUsers.map((u) => `• ${u.name}`).join('\n');
       return ctx.reply(i18n.lineup.set(mentionedUsers.length, playerList));

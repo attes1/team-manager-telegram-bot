@@ -4,6 +4,7 @@ import { db } from '../db';
 import { getTranslations } from '../i18n';
 import { formatDateRange } from '../lib/format';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
+import { buildLineupAnnouncement } from '../services/announcements';
 import { getConfig } from '../services/config';
 import { getLineup, setLineup } from '../services/match';
 import { getRoster } from '../services/roster';
@@ -64,6 +65,7 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
   range
     .text(i18n.lineup.done, async (ctx) => {
       const latestI18n = await getTranslations(db, season.id);
+      const latestConfig = await getConfig(db, season.id);
       const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
 
       if (lineup.length !== lineupSize) {
@@ -72,6 +74,13 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
       }
 
       await ctx.answerCallbackQuery(latestI18n.lineup.saved(lineup.length));
+
+      if (latestConfig?.announcementsChatId) {
+        const { start, end } = getWeekDateRange(year, week);
+        const dateRange = formatDateRange(start, end);
+        const announcement = buildLineupAnnouncement(latestI18n, week, dateRange, lineup);
+        await ctx.api.sendMessage(latestConfig.announcementsChatId, announcement);
+      }
 
       const playerList = lineup.map((p) => `• ${p.displayName}`).join('\n');
       await ctx.editMessageText(latestI18n.lineup.set(lineup.length, playerList));
