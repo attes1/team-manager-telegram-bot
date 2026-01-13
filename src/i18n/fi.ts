@@ -8,6 +8,7 @@ export interface Translations {
     noUserMentioned: string;
     playerNotFound: string;
     playerNotInRoster: string;
+    missingSeasonName: string;
   };
   roster: {
     added: (name: string) => string;
@@ -16,6 +17,14 @@ export interface Translations {
     empty: string;
     title: string;
     playerLine: (name: string, username: string | null) => string;
+  };
+  season: {
+    started: (name: string) => string;
+    ended: (name: string) => string;
+    alreadyEnded: string;
+    info: (name: string, status: string, createdAt: string) => string;
+    statusActive: string;
+    statusEnded: string;
   };
 }
 
@@ -29,6 +38,7 @@ export const fi: Translations = {
     noUserMentioned: 'Mainitse käyttäjä komennossa (esim. /addplayer @käyttäjä)',
     playerNotFound: 'Pelaajaa ei löytynyt.',
     playerNotInRoster: 'Pelaaja ei ole rosterissa.',
+    missingSeasonName: 'Anna kauden nimi (esim. /season start Kevät 2025)',
   },
   roster: {
     added: (name) => `${name} lisätty rosteriin.`,
@@ -37,5 +47,13 @@ export const fi: Translations = {
     empty: 'Rosteri on tyhjä.',
     title: 'Rosteri:',
     playerLine: (name, username) => (username ? `• ${name} (@${username})` : `• ${name}`),
+  },
+  season: {
+    started: (name) => `Kausi "${name}" aloitettu!`,
+    ended: (name) => `Kausi "${name}" päättynyt.`,
+    alreadyEnded: 'Ei aktiivista kautta päätettäväksi.',
+    info: (name, status, createdAt) => `Kausi: ${name}\nTila: ${status}\nAloitettu: ${createdAt}`,
+    statusActive: 'Aktiivinen',
+    statusEnded: 'Päättynyt',
   },
 };

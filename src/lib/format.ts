@@ -47,6 +47,8 @@ export const formatDateRange = (start: Date, end: Date): string => {
   return `${startStr} - ${endStr}`;
 };
 
+export const formatDate = (date: Date): string => format(date, 'd.M.yyyy');
+
 export const formatDay = (day: Day, lang: 'fi' | 'en'): string =>
   lang === 'fi' ? DAY_NAMES_FI[day] : DAY_NAMES_EN[day];
 
