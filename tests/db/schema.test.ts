@@ -1,7 +1,7 @@
+import type { DB } from '@/types/db';
+import { createTestDb } from '@tests/helpers';
 import type { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import type { DB } from '../../src/types/db';
-import { createTestDb } from '../helpers';
 
 describe('seasons', () => {
   let db: Kysely<DB>;

@@ -1,9 +1,9 @@
+import { getConfig, updateConfig } from '@/services/config';
+import { startSeason } from '@/services/season';
+import type { DB } from '@/types/db';
+import { createTestDb } from '@tests/helpers';
 import type { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { getConfig, updateConfig } from '../../src/services/config';
-import { startSeason } from '../../src/services/season';
-import type { DB } from '../../src/types/db';
-import { createTestDb } from '../helpers';
 
 describe('config service', () => {
   let db: Kysely<DB>;

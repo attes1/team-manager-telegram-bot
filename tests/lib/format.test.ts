@@ -1,5 +1,5 @@
+import { formatDateRange, formatDay, formatDayShort } from '@/lib/format';
 import { describe, expect, test } from 'vitest';
-import { formatDateRange, formatDay, formatDayShort } from '../../src/lib/format';
 
 describe('formatDateRange', () => {
   test('formats date range for same month', () => {

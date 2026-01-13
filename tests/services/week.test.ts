@@ -1,9 +1,9 @@
+import { startSeason } from '@/services/season';
+import { getWeek, setWeekType } from '@/services/week';
+import type { DB } from '@/types/db';
+import { createTestDb } from '@tests/helpers';
 import type { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { startSeason } from '../../src/services/season';
-import { getWeek, setWeekType } from '../../src/services/week';
-import type { DB } from '../../src/types/db';
-import { createTestDb } from '../helpers';
 
 describe('week service', () => {
   let db: Kysely<DB>;
