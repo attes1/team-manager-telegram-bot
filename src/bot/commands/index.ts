@@ -8,6 +8,7 @@ import { registerRemindCommand } from './admin/remind';
 import { registerSeasonCommands } from './admin/season';
 import { registerStatusCommand } from './admin/status';
 import { registerWeekCommand } from './admin/week';
+import { registerHelpCommand } from './player/help';
 import { registerMatchInfoCommand } from './player/match';
 import { registerPracticeCommand } from './player/practice';
 import { registerRosterCommand } from './player/roster';
@@ -16,6 +17,7 @@ export const registerCommands = (bot: Bot<BotContext>) => {
   registerPollCommand(bot);
   registerRemindCommand(bot);
   registerStatusCommand(bot);
+  registerHelpCommand(bot);
   registerPlayerCommands(bot);
   registerSeasonCommands(bot);
   registerConfigCommand(bot);

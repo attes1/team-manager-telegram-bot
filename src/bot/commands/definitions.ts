@@ -3,6 +3,7 @@ import type { Language } from '../../i18n';
 
 const commandsEn: BotCommand[] = [
   { command: 'start', description: 'Start the bot' },
+  { command: 'help', description: 'Show available commands' },
   { command: 'roster', description: 'View team roster' },
   { command: 'match', description: 'View match info and lineup' },
   { command: 'practice', description: 'View practice availability' },
@@ -22,6 +23,7 @@ const commandsEn: BotCommand[] = [
 
 const commandsFi: BotCommand[] = [
   { command: 'start', description: 'Käynnistä botti' },
+  { command: 'help', description: 'Näytä käytettävissä olevat komennot' },
   { command: 'roster', description: 'Näytä joukkueen rosteri' },
   { command: 'match', description: 'Näytä matsitiedot ja kokoonpano' },
   { command: 'practice', description: 'Näytä treenien saatavuudet' },

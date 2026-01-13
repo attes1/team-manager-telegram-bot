@@ -126,6 +126,28 @@ export interface Translations {
     matchTime: string;
     lineup: string;
   };
+  help: {
+    title: string;
+    playerCommands: string;
+    adminCommands: string;
+    commands: {
+      roster: string;
+      match: string;
+      practice: string;
+      startseason: string;
+      endseason: string;
+      season: string;
+      config: string;
+      addplayer: string;
+      removeplayer: string;
+      setweek: string;
+      setmatch: string;
+      setlineup: string;
+      poll: string;
+      remind: string;
+      status: string;
+    };
+  };
 }
 
 export const fi: Translations = {
@@ -259,5 +281,27 @@ export const fi: Translations = {
     responses: 'Vastauksia',
     matchTime: 'Matsin aika',
     lineup: 'Kokoonpano',
+  },
+  help: {
+    title: 'Pappaliiga Bot - Komennot',
+    playerCommands: 'Pelaajan komennot',
+    adminCommands: 'Admin-komennot',
+    commands: {
+      roster: 'Näytä joukkueen rosteri',
+      match: 'Näytä matsin tiedot ja kokoonpano',
+      practice: 'Näytä treenien saatavuudet',
+      startseason: 'Aloita uusi kausi',
+      endseason: 'Päätä nykyinen kausi',
+      season: 'Näytä kauden tiedot',
+      config: 'Näytä/muokkaa asetuksia',
+      addplayer: 'Lisää pelaaja rosteriin',
+      removeplayer: 'Poista pelaaja rosterista',
+      setweek: 'Aseta viikon tyyppi',
+      setmatch: 'Ajoita matsi',
+      setlineup: 'Aseta matsikokoonpano',
+      poll: 'Lähetä saatavuuskysely',
+      remind: 'Lähetä muistutus vastaamattomille',
+      status: 'Näytä tilannekatsaus',
+    },
   },
 };
