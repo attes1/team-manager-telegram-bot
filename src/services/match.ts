@@ -1,7 +1,7 @@
 import type { Kysely } from 'kysely';
 import { formatDateRange, formatDay, formatPlayerName } from '@/lib/format';
 import type { Day, ParsedConfig } from '@/lib/schemas';
-import { getCurrentWeek, getWeekDateRange, isMatchInFuture } from '@/lib/week';
+import { getCurrentWeek, getWeekDateRange, isMatchInFuture } from '@/lib/temporal';
 import type { DB, Player, Week } from '@/types/db';
 import type { Translations } from '../i18n';
 

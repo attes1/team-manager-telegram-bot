@@ -1,18 +1,9 @@
 import type { Bot } from 'grammy';
 import type { AdminSeasonContext, BotContext } from '@/bot/context';
 import { adminSeasonCommand } from '@/bot/middleware';
+import { escapeHtml } from '@/lib/format';
 import { addInvitation } from '@/services/pending-invitations';
 import { removePlayerFromRoster } from '@/services/roster';
-
-// Escape HTML special characters to prevent injection
-const escapeHtml = (text: string): string => {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-};
 
 // Extract user info from text_mention entity (user without username)
 const getTextMention = (

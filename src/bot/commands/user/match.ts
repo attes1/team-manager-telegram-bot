@@ -4,7 +4,7 @@ import { captainSeasonCommand } from '@/bot/middleware';
 import { env } from '@/env';
 import { formatDateRange, formatDay } from '@/lib/format';
 import { daySchema, timeSchema } from '@/lib/schemas';
-import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/week';
+import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/temporal';
 import { getLineupMenuMessage, lineupMenu } from '@/menus/lineup';
 import {
   buildLineupMessage,

@@ -10,7 +10,7 @@ import {
   parseDayOrWeekInput,
   parseDayWeekInput,
   parseWeekInput,
-} from '@/lib/week';
+} from '@/lib/temporal';
 
 const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 

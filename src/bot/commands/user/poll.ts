@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
 import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
-import { getSchedulingWeek, parseWeekInput } from '@/lib/week';
+import { getSchedulingWeek, parseWeekInput } from '@/lib/temporal';
 import { getPollMessage, pollMenu } from '@/menus/poll';
 import { deleteActiveMenu, getActiveMenu, saveActiveMenu } from '@/services/menu';
 

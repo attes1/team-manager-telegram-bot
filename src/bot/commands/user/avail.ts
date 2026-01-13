@@ -2,9 +2,14 @@ import type { Bot } from 'grammy';
 import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
 import type { Translations } from '@/i18n';
-import { formatDateRange, formatPlayerName } from '@/lib/format';
+import { formatDateRange, formatDayDate, formatPlayerName } from '@/lib/format';
 import { type AvailabilityStatus, availFilterSchema, type Day } from '@/lib/schemas';
-import { getSchedulingWeek, getTodayDay, getWeekDateRange, parseDayOrWeekInput } from '@/lib/week';
+import {
+  getSchedulingWeek,
+  getTodayDay,
+  getWeekDateRange,
+  parseDayOrWeekInput,
+} from '@/lib/temporal';
 import type { PlayerWeekAvailability } from '@/services/availability';
 import { getWeekAvailability } from '@/services/availability';
 
@@ -45,14 +50,6 @@ const formatPlayerLine = (
   const timesStr = response.timeSlots.length > 0 ? response.timeSlots.join(', ') : '-';
   const statusIcon = STATUS_ICONS[response.status];
   return `${indent}• ${formatPlayerName(player)}: ${timesStr} ${statusIcon}`;
-};
-
-const formatDayDate = (year: number, week: number, day: Day): string => {
-  const { start } = getWeekDateRange(year, week);
-  const dayIndex = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].indexOf(day);
-  const dayDate = new Date(start);
-  dayDate.setDate(dayDate.getDate() + dayIndex);
-  return `${dayDate.getDate()}.${dayDate.getMonth() + 1}.`;
 };
 
 const getTitle = (

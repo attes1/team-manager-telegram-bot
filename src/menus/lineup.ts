@@ -2,7 +2,7 @@ import { Menu } from '@grammyjs/menu';
 import type { BotContext } from '@/bot/context';
 import { env } from '@/env';
 import { formatDateRange, formatPlayerName } from '@/lib/format';
-import { getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
 import { buildLineupMessage, getLineup, setLineup } from '@/services/match';
 import { getRoster } from '@/services/roster';
 

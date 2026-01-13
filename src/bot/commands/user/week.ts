@@ -3,7 +3,7 @@ import type { BotContext, CaptainSeasonContext } from '@/bot/context';
 import { captainSeasonCommand } from '@/bot/middleware';
 import { formatDateRange } from '@/lib/format';
 import { weekTypeSchema } from '@/lib/schemas';
-import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/week';
+import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/temporal';
 import { setWeekType } from '@/services/week';
 
 export const registerWeekCommand = (bot: Bot<BotContext>) => {

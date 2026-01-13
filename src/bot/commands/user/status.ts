@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
 import { formatDateRange } from '@/lib/format';
-import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
 import { getWeekAvailability } from '@/services/availability';
 import { getLineup, getMatchInfo } from '@/services/match';
 import { getRoster } from '@/services/roster';

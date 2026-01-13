@@ -3,7 +3,7 @@ import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
 import { getTranslations } from '@/i18n';
 import { formatPlayerName } from '@/lib/format';
-import { getCurrentWeek } from '@/lib/week';
+import { getCurrentWeek } from '@/lib/temporal';
 import { getConfig } from '@/services/config';
 import { getLineup, getMatchInfo } from '@/services/match';
 import { getActiveSeason } from '@/services/season';

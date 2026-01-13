@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
 import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
-import { getSchedulingWeek } from '@/lib/week';
+import { getSchedulingWeek } from '@/lib/temporal';
 import { getPollMessage, pollMenu } from '@/menus/poll';
 import { getConfig } from '@/services/config';
 import { getActiveSeason } from '@/services/season';

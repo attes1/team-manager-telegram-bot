@@ -4,7 +4,7 @@ import { db } from '@/db';
 import { getTranslations } from '@/i18n';
 import { formatDateRange } from '@/lib/format';
 import type { AvailabilityStatus } from '@/lib/schemas';
-import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
 import { getPlayerWeekAvailability, setDayAvailability } from '@/services/availability';
 import { isPlayerInRoster } from '@/services/roster';
 import { getWeek } from '@/services/week';

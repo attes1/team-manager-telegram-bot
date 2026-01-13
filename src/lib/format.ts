@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import type { Day } from './schemas';
+import { getWeekDateRange } from './temporal';
 
 const DAY_NAMES_FI: Record<Day, string> = {
   mon: 'maanantai',
@@ -65,4 +66,25 @@ export const formatPlayerName = (
     return player.displayName;
   }
   return options?.ping ? `@${player.username}` : player.username;
+};
+
+const DAY_INDICES: Day[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+// Format a specific day of a week as a date string (e.g., "7.1.2025")
+export const formatDayDate = (year: number, week: number, day: Day): string => {
+  const { start } = getWeekDateRange(year, week);
+  const dayIndex = DAY_INDICES.indexOf(day);
+  const dayDate = new Date(start);
+  dayDate.setDate(dayDate.getDate() + dayIndex);
+  return formatDate(dayDate);
+};
+
+// Escape HTML special characters to prevent injection
+export const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 };

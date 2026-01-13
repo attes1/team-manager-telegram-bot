@@ -2,7 +2,7 @@ import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerMatchCommands } from '@/bot/commands/user/match';
-import { getSchedulingWeek } from '@/lib/week';
+import { getSchedulingWeek } from '@/lib/temporal';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
 import { setWeekType } from '@/services/week';
