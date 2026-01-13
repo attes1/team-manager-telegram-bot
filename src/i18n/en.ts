@@ -149,6 +149,7 @@ export const en: Translations = {
     notCaptain: 'Menu is only available for captains.',
     practiceWeek: 'Cannot set lineup for a practice week.',
     invalidWeek: 'Invalid week number.',
+    weekInPast: (schedulingWeek) => `Week must be ${schedulingWeek} or later.`,
   },
   reminder: {
     title: (week, dateRange) => `📋 Reminder: Week ${week} (${dateRange}) availability poll`,

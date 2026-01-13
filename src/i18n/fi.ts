@@ -144,6 +144,7 @@ export interface Translations {
     notCaptain: string;
     practiceWeek: string;
     invalidWeek: string;
+    weekInPast: (schedulingWeek: number) => string;
   };
   reminder: {
     title: (week: number, dateRange: string) => string;
@@ -373,6 +374,7 @@ export const fi: Translations = {
     notCaptain: 'Valikko on vain kapteeneille.',
     practiceWeek: 'Linaria ei voi asettaa treeniviikolla.',
     invalidWeek: 'Virheellinen viikkonumero.',
+    weekInPast: (schedulingWeek) => `Viikon pitää olla ${schedulingWeek} tai myöhemmin.`,
   },
   reminder: {
     title: (week, dateRange) => `📋 Muistutus: Vko ${week} (${dateRange}) aikataulukysely`,

@@ -16,6 +16,7 @@ import {
   setMatchTime,
   setOpponent,
 } from '@/services/match';
+import { deleteActiveMenu, getActiveMenu, saveActiveMenu } from '@/services/menu';
 import { isPlayerInRoster } from '@/services/roster';
 
 interface MentionedUser {
@@ -140,8 +141,57 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const mentionedUsers = getAllMentionedUsers(ctx);
 
       if (mentionedUsers.length === 0) {
-        const message = getLineupMenuMessage(i18n, config);
-        return ctx.reply(message, { reply_markup: lineupMenu });
+        // Check for optional week parameter
+        const weekArg = args.match(/^(\d+)$/);
+        let lineupWeek = schedulingWeek;
+
+        if (weekArg) {
+          const result = parseWeekInput(weekArg[1], schedulingWeek, { allowPast: false });
+          if (!result.success) {
+            if (result.error === 'past') {
+              return ctx.reply(i18n.lineup.weekInPast(schedulingWeek.week));
+            }
+            return ctx.reply(i18n.lineup.invalidWeek);
+          }
+          lineupWeek = { week: result.week, year: result.year };
+        }
+
+        const chatId = ctx.chat?.id;
+        const userId = ctx.from?.id;
+
+        // Delete existing lineup menu if any
+        if (chatId && userId) {
+          const existing = await getActiveMenu(db, chatId, userId, 'lineup');
+          if (existing) {
+            try {
+              await ctx.api.deleteMessage(chatId, existing.messageId);
+            } catch {
+              // Message already deleted or >48h old, ignore
+            }
+            await deleteActiveMenu(db, chatId, userId, 'lineup');
+          }
+        }
+
+        // Set target week in context for menu's initial render
+        ctx.lineupTargetWeek = lineupWeek;
+
+        const message = getLineupMenuMessage(i18n, lineupWeek.week, lineupWeek.year);
+        const sent = await ctx.reply(message, { reply_markup: lineupMenu });
+
+        // Track the new menu
+        if (chatId && userId) {
+          await saveActiveMenu(db, {
+            seasonId: season.id,
+            chatId,
+            userId,
+            menuType: 'lineup',
+            messageId: sent.message_id,
+            weekNumber: lineupWeek.week,
+            year: lineupWeek.year,
+          });
+        }
+
+        return sent;
       }
 
       for (const user of mentionedUsers) {
