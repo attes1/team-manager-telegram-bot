@@ -13,6 +13,7 @@ export const en: Translations = {
     missingSeasonName: 'Provide a season name (e.g. /season start Spring 2025)',
     invalidConfigKey: 'Unknown setting. Use /config to see options.',
     invalidConfigValue: (key) => `Invalid value for "${key}".`,
+    notInRoster: 'You are not in the roster. Ask an admin to add you.',
   },
   roster: {
     added: (name) => `${name} added to roster.`,
@@ -55,5 +56,21 @@ export const en: Translations = {
     usage: 'Usage: /setweek <week> practice|match',
     invalidWeek: 'Invalid week number.',
     invalidType: 'Invalid type. Use "practice" or "match".',
+  },
+  poll: {
+    title: (week, dateRange) =>
+      `Week ${week} (${dateRange}) availability poll.\nMark when you can play:`,
+    matchWeekTitle: (week, dateRange) =>
+      `Week ${week} (${dateRange}) - MATCH WEEK!\nDefault: Sun 20:00. Mark your availability:`,
+    legend: '✅ Available | 🏋️ Practice | 🏆 Match | ⚠️ If needed | ❌ Unavailable',
+    days: {
+      mon: 'Mon',
+      tue: 'Tue',
+      wed: 'Wed',
+      thu: 'Thu',
+      fri: 'Fri',
+      sat: 'Sat',
+      sun: 'Sun',
+    },
   },
 };

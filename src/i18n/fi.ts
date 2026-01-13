@@ -11,6 +11,7 @@ export interface Translations {
     missingSeasonName: string;
     invalidConfigKey: string;
     invalidConfigValue: (key: string) => string;
+    notInRoster: string;
   };
   roster: {
     added: (name: string) => string;
@@ -54,6 +55,20 @@ export interface Translations {
     invalidWeek: string;
     invalidType: string;
   };
+  poll: {
+    title: (week: number, dateRange: string) => string;
+    matchWeekTitle: (week: number, dateRange: string) => string;
+    legend: string;
+    days: {
+      mon: string;
+      tue: string;
+      wed: string;
+      thu: string;
+      fri: string;
+      sat: string;
+      sun: string;
+    };
+  };
 }
 
 export const fi: Translations = {
@@ -69,6 +84,7 @@ export const fi: Translations = {
     missingSeasonName: 'Anna kauden nimi (esim. /season start Kevät 2025)',
     invalidConfigKey: 'Tuntematon asetus. Käytä /config nähdäksesi vaihtoehdot.',
     invalidConfigValue: (key) => `Virheellinen arvo asetukselle "${key}".`,
+    notInRoster: 'Et ole rosterissa. Pyydä adminia lisäämään sinut.',
   },
   roster: {
     added: (name) => `${name} lisätty rosteriin.`,
@@ -111,5 +127,21 @@ export const fi: Translations = {
     usage: 'Käyttö: /setweek <viikko> practice|match',
     invalidWeek: 'Virheellinen viikkonumero.',
     invalidType: 'Virheellinen tyyppi. Käytä "practice" tai "match".',
+  },
+  poll: {
+    title: (week, dateRange) =>
+      `Vko ${week} (${dateRange}) saatavuuskysely.\nMerkkaa milloin pääset pelaamaan:`,
+    matchWeekTitle: (week, dateRange) =>
+      `Vko ${week} (${dateRange}) - MATSI!\nOletusaika su 20:00. Merkkaa milloin pääset:`,
+    legend: '✅ Vapaa | 🏋️ Treeni | 🏆 Matsi | ⚠️ Jos tarve | ❌ Ei pääse',
+    days: {
+      mon: 'Ma',
+      tue: 'Ti',
+      wed: 'Ke',
+      thu: 'To',
+      fri: 'Pe',
+      sat: 'La',
+      sun: 'Su',
+    },
   },
 };
