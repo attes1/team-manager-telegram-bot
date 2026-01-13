@@ -1,31 +1,20 @@
 import { Menu } from '@grammyjs/menu';
 import type { BotContext } from '../bot/context';
-import { db } from '../db';
 import { env } from '../env';
-import { getTranslations } from '../i18n';
 import { formatDateRange } from '../lib/format';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { buildLineupAnnouncement } from '../services/announcements';
-import { getConfig } from '../services/config';
 import { getLineup, setLineup } from '../services/match';
 import { getRoster } from '../services/roster';
-import { getActiveSeason } from '../services/season';
-
-// getConfig is used in the dynamic menu handler for lineupSize
 
 export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, range) => {
-  if (!ctx.isAdmin) {
+  const { db, season, config, i18n } = ctx;
+
+  if (!ctx.isAdmin || !season || !config) {
     return;
   }
 
-  const season = await getActiveSeason(db);
-  if (!season) {
-    return;
-  }
-
-  const i18n = await getTranslations(db, season.id);
-  const config = await getConfig(db, season.id);
-  const lineupSize = config?.lineupSize ?? 5;
+  const lineupSize = config.lineupSize;
 
   const { week, year } = getCurrentWeek();
   const roster = await getRoster(db, season.id);
@@ -67,32 +56,29 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
 
   range
     .text(i18n.lineup.done, async (ctx) => {
-      const latestI18n = await getTranslations(db, season.id);
       const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
 
       if (lineup.length !== lineupSize) {
-        await ctx.answerCallbackQuery(latestI18n.lineup.needExact(lineupSize));
+        await ctx.answerCallbackQuery(ctx.i18n.lineup.needExact(lineupSize));
         return;
       }
 
-      await ctx.answerCallbackQuery(latestI18n.lineup.saved(lineup.length));
+      await ctx.answerCallbackQuery(ctx.i18n.lineup.saved(lineup.length));
 
       if (env.PUBLIC_CHANNEL_ID) {
         const { start, end } = getWeekDateRange(year, week);
         const dateRange = formatDateRange(start, end);
-        const announcement = buildLineupAnnouncement(latestI18n, week, dateRange, lineup);
+        const announcement = buildLineupAnnouncement(ctx.i18n, week, dateRange, lineup);
         await ctx.api.sendMessage(env.PUBLIC_CHANNEL_ID, announcement);
       }
 
       const playerList = lineup.map((p) => `• ${p.displayName}`).join('\n');
-      await ctx.editMessageText(latestI18n.lineup.set(lineup.length, playerList));
+      await ctx.editMessageText(ctx.i18n.lineup.set(lineup.length, playerList));
     })
     .row();
 });
 
-export const getLineupMenuMessage = async (seasonId: number): Promise<string> => {
-  const i18n = await getTranslations(db, seasonId);
-
+export const getLineupMenuMessage = (i18n: BotContext['i18n']): string => {
   const { week, year } = getCurrentWeek();
   const { start, end } = getWeekDateRange(year, week);
   const dateRange = formatDateRange(start, end);

@@ -9,7 +9,6 @@ import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { getPlayerWeekAvailability, setDayAvailability } from '../services/availability';
 import { getConfig } from '../services/config';
 import { isPlayerInRoster } from '../services/roster';
-import { getActiveSeason } from '../services/season';
 import { getWeek } from '../services/week';
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
@@ -34,13 +33,10 @@ const getNextStatus = (current: AvailabilityStatus): AvailabilityStatus => {
 };
 
 export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) => {
+  const { db, season, config, i18n } = ctx;
   const userId = ctx.from?.id;
-  if (!userId) {
-    return;
-  }
 
-  const season = await getActiveSeason(db);
-  if (!season) {
+  if (!userId || !season || !config) {
     return;
   }
 
@@ -49,12 +45,6 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
     return;
   }
 
-  const config = await getConfig(db, season.id);
-  if (!config) {
-    return;
-  }
-
-  const i18n = await getTranslations(db, season.id);
   const { week, year } = getCurrentWeek();
   const days = daysListSchema.parse(config.pollDays);
   const times = config.pollTimes.split(',');

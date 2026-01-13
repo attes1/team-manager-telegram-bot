@@ -102,7 +102,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const mentionedUsers = getAllMentionedUsers(ctx);
 
       if (mentionedUsers.length === 0) {
-        const message = await getLineupMenuMessage(season.id);
+        const message = getLineupMenuMessage(i18n);
         return ctx.reply(message, { reply_markup: lineupMenu });
       }
 
