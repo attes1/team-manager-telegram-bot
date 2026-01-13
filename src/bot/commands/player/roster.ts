@@ -1,5 +1,4 @@
 import type { Bot } from 'grammy';
-import { formatPlayerName } from '../../../lib/format';
 import { getRoster } from '../../../services/roster';
 import type { BotContext, SeasonContext } from '../../context';
 import { seasonCommand } from '../../middleware';
@@ -15,11 +14,11 @@ export const registerRosterCommand = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.roster.empty);
       }
 
-      const lines = players.map((p) => {
-        const name = formatPlayerName(p);
-        const suffix = p.role === 'captain' ? ' (cpt.)' : '';
-        return `• ${name}${suffix}`;
-      });
+      const lines = players.map((p) =>
+        p.role === 'captain'
+          ? i18n.roster.captainLine(p.displayName, p.username)
+          : i18n.roster.playerLine(p.displayName, p.username),
+      );
       const message = `${i18n.roster.title}\n${lines.join('\n')}`;
 
       return ctx.reply(message);

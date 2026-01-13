@@ -236,8 +236,7 @@ export const fi: Translations = {
     invitationAccepted: (name) => `${name} lisätty rosteriin!`,
     invitationDeclined: (name) => `${name} hylkäsi kutsun.`,
     invitationExpired: 'Kutsu vanhentunut.',
-    addplayerUsage:
-      'Käyttö: /addplayer <käyttäjänimi>\nTai napauta käyttäjän nimeä viestissä ja kirjoita /addplayer',
+    addplayerUsage: 'Käyttö: /addplayer <käyttäjänimi>',
   },
   captain: {
     promoted: (name) => `${name} ylennetty kapteniksi.`,
@@ -273,8 +272,8 @@ export const fi: Translations = {
       reminder_day: 'Muistutuksen päivä',
       reminder_time: 'Muistutuksen aika',
       reminders_mode: 'Muistutustila',
-      match_day: 'Oletusmatsin päivä',
-      match_time: 'Oletusmatsin aika',
+      match_day: 'Matsin oletuspäivä',
+      match_time: 'Matsin oletusaika',
       lineup_size: 'Linarin koko',
       match_day_reminder_mode: 'Matsipäivän muistutustila',
       match_day_reminder_time: 'Matsipäivän muistutusaika',
@@ -308,9 +307,9 @@ export const fi: Translations = {
   },
   poll: {
     title: (week, dateRange) =>
-      `Vko ${week} (${dateRange}) aikataulukysely.\nMerkkaa milloin pääset pelaamaan.`,
+      `Vko ${week} (${dateRange}) - treeniviikko!\nMerkkaa milloin pääset peleille.`,
     matchWeekTitle: (week, dateRange) =>
-      `Vko ${week} (${dateRange}) - MATSI!\nOletusaika su 20:00. Merkkaa milloin pääset.`,
+      `Vko ${week} (${dateRange}) - matsiviikko!\nOletusaika su 20:00. Merkkaa milloin pääset.`,
     legend: '✅ Vapaa | 🏋️ Vain treeni | 🏆 Vain matsi | ⚠️ Jos tarve | ❌ Ei pääse',
     notInRoster: 'Valikko on vain rosterissa oleville pelaajille.',
     invalidWeek: 'Virheellinen viikkonumero (1-53).',
@@ -374,7 +373,7 @@ export const fi: Translations = {
     roster: 'Rosteri',
     players: 'pelaajaa',
     responses: 'Vastauksia',
-    matchTime: 'Matsin aika',
+    matchTime: 'Seuraava matsi:',
     lineup: 'Linari',
   },
   help: {

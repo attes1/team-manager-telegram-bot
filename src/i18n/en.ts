@@ -30,8 +30,7 @@ export const en: Translations = {
     invitationAccepted: (name) => `${name} added to roster!`,
     invitationDeclined: (name) => `${name} declined the invitation.`,
     invitationExpired: 'Invitation expired.',
-    addplayerUsage:
-      'Usage: /addplayer <username>\nOr tap a user name in a message and type /addplayer',
+    addplayerUsage: 'Usage: /addplayer <username>',
   },
   captain: {
     promoted: (name) => `${name} promoted to captain.`,
@@ -102,7 +101,7 @@ export const en: Translations = {
   },
   poll: {
     title: (week, dateRange) =>
-      `Week ${week} (${dateRange}) availability poll.\nMark when you can play.`,
+      `Week ${week} (${dateRange}) - practice week!\nMark when you can play.`,
     matchWeekTitle: (week, dateRange) =>
       `Week ${week} (${dateRange}) - MATCH WEEK!\nDefault: Sun 20:00. Mark your availability.`,
     legend: '✅ Available | 🏋️ Practice only | 🏆 Match only | ⚠️ If needed | ❌ Unavailable',

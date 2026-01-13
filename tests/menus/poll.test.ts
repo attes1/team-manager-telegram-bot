@@ -171,7 +171,7 @@ describe('getPollMessage', () => {
 
     const message = await getPollMessage(season.id, { week: 5, year: 2025 });
 
-    expect(message).toContain('availability poll');
+    expect(message).toContain('practice week');
   });
 });
 
