@@ -1,6 +1,6 @@
 import type { Bot, Context } from 'grammy';
 import { db } from '../../db';
-import { t } from '../../i18n';
+import { getTranslations, t } from '../../i18n';
 import { isAdmin } from '../../lib/admin';
 import { formatDateRange } from '../../lib/format';
 import { daySchema, timeSchema } from '../../lib/schemas';
@@ -45,21 +45,22 @@ export const registerMatchCommands = (bot: Bot) => {
       return ctx.reply(t().errors.noActiveSeason);
     }
 
+    const i18n = await getTranslations(db, season.id);
     const args = ctx.match?.toString().trim() ?? '';
     const [dayStr, timeStr] = args.split(/\s+/);
 
     if (!dayStr || !timeStr) {
-      return ctx.reply(t().match.usage);
+      return ctx.reply(i18n.match.usage);
     }
 
     const dayResult = daySchema.safeParse(dayStr.toLowerCase());
     if (!dayResult.success) {
-      return ctx.reply(t().match.invalidDay);
+      return ctx.reply(i18n.match.invalidDay);
     }
 
     const timeResult = timeSchema.safeParse(timeStr);
     if (!timeResult.success) {
-      return ctx.reply(t().match.invalidTime);
+      return ctx.reply(i18n.match.invalidTime);
     }
 
     const now = new Date();
@@ -76,9 +77,9 @@ export const registerMatchCommands = (bot: Bot) => {
 
     const { start, end } = getWeekDateRange(year, weekNumber);
     const dateRange = formatDateRange(start, end);
-    const dayName = t().poll.days[dayResult.data];
+    const dayName = i18n.poll.days[dayResult.data];
 
-    return ctx.reply(t().match.scheduled(dayName, timeResult.data, weekNumber, dateRange));
+    return ctx.reply(i18n.match.scheduled(dayName, timeResult.data, weekNumber, dateRange));
   });
 
   bot.command('setlineup', async (ctx) => {
@@ -92,6 +93,7 @@ export const registerMatchCommands = (bot: Bot) => {
       return ctx.reply(t().errors.noActiveSeason);
     }
 
+    const i18n = await getTranslations(db, season.id);
     const args = ctx.match?.toString().trim() ?? '';
 
     if (args.toLowerCase() === 'clear') {
@@ -99,7 +101,7 @@ export const registerMatchCommands = (bot: Bot) => {
       const weekNumber = getWeekNumber(now);
       const year = getWeekYear(now);
       await clearLineup(db, { seasonId: season.id, weekNumber, year });
-      return ctx.reply(t().lineup.cleared);
+      return ctx.reply(i18n.lineup.cleared);
     }
 
     const mentionedUsers = getAllMentionedUsers(ctx);
@@ -112,7 +114,7 @@ export const registerMatchCommands = (bot: Bot) => {
     for (const user of mentionedUsers) {
       const inRoster = await isPlayerInRoster(db, season.id, user.id);
       if (!inRoster) {
-        return ctx.reply(t().lineup.playerNotInRoster(user.name));
+        return ctx.reply(i18n.lineup.playerNotInRoster(user.name));
       }
     }
 
@@ -128,6 +130,6 @@ export const registerMatchCommands = (bot: Bot) => {
     });
 
     const playerList = mentionedUsers.map((u) => `• ${u.name}`).join('\n');
-    return ctx.reply(t().lineup.set(mentionedUsers.length, playerList));
+    return ctx.reply(i18n.lineup.set(mentionedUsers.length, playerList));
   });
 };

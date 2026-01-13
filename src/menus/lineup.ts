@@ -1,10 +1,9 @@
 import { Menu } from '@grammyjs/menu';
 import type { Context } from 'grammy';
 import { db } from '../db';
-import { t } from '../i18n';
+import { getTranslations } from '../i18n';
 import { isAdmin } from '../lib/admin';
 import { formatDateRange } from '../lib/format';
-import { languageSchema } from '../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { getConfig } from '../services/config';
 import { getLineup, setLineup } from '../services/match';
@@ -22,8 +21,8 @@ export const lineupMenu = new Menu<Context>('lineup').dynamic(async (ctx, range)
     return;
   }
 
+  const i18n = await getTranslations(db, season.id);
   const config = await getConfig(db, season.id);
-  const lang = languageSchema.catch('fi').parse(config?.language);
   const lineupSize = config?.lineupSize ?? 5;
 
   const { week, year } = getCurrentWeek();
@@ -65,29 +64,29 @@ export const lineupMenu = new Menu<Context>('lineup').dynamic(async (ctx, range)
   }
 
   range
-    .text(t(lang).lineup.done, async (ctx) => {
+    .text(i18n.lineup.done, async (ctx) => {
+      const latestI18n = await getTranslations(db, season.id);
       const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
 
       if (lineup.length !== lineupSize) {
-        await ctx.answerCallbackQuery(t(lang).lineup.needExact(lineupSize));
+        await ctx.answerCallbackQuery(latestI18n.lineup.needExact(lineupSize));
         return;
       }
 
-      await ctx.answerCallbackQuery(t(lang).lineup.saved(lineup.length));
+      await ctx.answerCallbackQuery(latestI18n.lineup.saved(lineup.length));
 
       const playerList = lineup.map((p) => `• ${p.displayName}`).join('\n');
-      await ctx.editMessageText(t(lang).lineup.set(lineup.length, playerList));
+      await ctx.editMessageText(latestI18n.lineup.set(lineup.length, playerList));
     })
     .row();
 });
 
 export const getLineupMenuMessage = async (seasonId: number): Promise<string> => {
-  const config = await getConfig(db, seasonId);
-  const lang = languageSchema.catch('fi').parse(config?.language);
+  const i18n = await getTranslations(db, seasonId);
 
   const { week, year } = getCurrentWeek();
   const { start, end } = getWeekDateRange(year, week);
   const dateRange = formatDateRange(start, end);
 
-  return `${t(lang).lineup.menuTitle(week, dateRange)}\n\n${t(lang).lineup.selectPlayers}`;
+  return `${i18n.lineup.menuTitle(week, dateRange)}\n\n${i18n.lineup.selectPlayers}`;
 };

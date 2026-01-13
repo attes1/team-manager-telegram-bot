@@ -3,6 +3,7 @@ import { getISOWeek } from 'date-fns';
 import type { Kysely } from 'kysely';
 import { CamelCasePlugin, Kysely as KyselyClass, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { registerPracticeCommand } from '@/commands/player/practice';
 import { up } from '@/db/migrations/001_initial';
 import type { DB } from '@/types/db';
 import { createCommandUpdate, createTestBot } from './helpers';
@@ -17,8 +18,6 @@ const CHAT_ID = -100123456789;
 
 vi.mock('@/db', () => mockDb);
 vi.mock('@/env', () => mockEnv);
-
-const { registerPracticeCommand } = await import('@/commands/player/practice');
 
 describe('/practice command', () => {
   beforeEach(async () => {

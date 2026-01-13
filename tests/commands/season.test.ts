@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { registerSeasonCommands } from '@/commands/admin/season';
 import { up } from '@/db/migrations/001_initial';
 import type { DB } from '@/types/db';
 import { createCommandUpdate, createTestBot } from './helpers';
@@ -19,8 +20,6 @@ const TEST_CHAT_ID = -100123;
 
 vi.mock('@/db', () => mockDb);
 vi.mock('@/env', () => mockEnv);
-
-const { registerSeasonCommands } = await import('@/commands/admin/season');
 
 describe('/season command', () => {
   beforeEach(async () => {

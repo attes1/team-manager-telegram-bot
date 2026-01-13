@@ -1,7 +1,13 @@
 import Database from 'better-sqlite3';
 import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { registerMatchCommands } from '@/commands/admin/match';
+import { registerMatchInfoCommand } from '@/commands/player/match';
 import { up } from '@/db/migrations/001_initial';
+import { getCurrentWeek } from '@/lib/week';
+import { setLineup, setMatchTime } from '@/services/match';
+import { addPlayerToRoster } from '@/services/roster';
+import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
 import { createCommandUpdate, createMultiMentionUpdate, createTestBot } from './helpers';
 
@@ -19,10 +25,6 @@ const TEST_CHAT_ID = -100123;
 
 vi.mock('@/db', () => mockDb);
 vi.mock('@/env', () => mockEnv);
-
-const { registerMatchCommands } = await import('@/commands/admin/match');
-const { startSeason } = await import('@/services/season');
-const { addPlayerToRoster } = await import('@/services/roster');
 
 describe('/setmatch command', () => {
   beforeEach(async () => {
@@ -273,10 +275,6 @@ describe('/setlineup command', () => {
     expect(calls[0].payload.text).toContain('not in the roster');
   });
 });
-
-const { registerMatchInfoCommand } = await import('@/commands/player/match');
-const { setMatchTime, setLineup } = await import('@/services/match');
-const { getCurrentWeek } = await import('@/lib/week');
 
 describe('/match command', () => {
   let seasonId: number;

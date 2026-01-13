@@ -1,9 +1,9 @@
 import type { Bot, Context } from 'grammy';
 import { db } from '../../db';
-import { t } from '../../i18n';
+import { getTranslations, type Translations, t } from '../../i18n';
 import { formatDateRange } from '../../lib/format';
 import type { AvailabilityStatus, Day } from '../../lib/schemas';
-import { daySchema, daysListSchema, languageSchema } from '../../lib/schemas';
+import { daySchema, daysListSchema } from '../../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../../lib/week';
 import { getWeekAvailability } from '../../services/availability';
 import { getConfig } from '../../services/config';
@@ -29,8 +29,8 @@ export const registerPracticeCommand = (bot: Bot) => {
       return ctx.reply(t().errors.noActiveSeason);
     }
 
+    const i18n = await getTranslations(db, season.id);
     const config = await getConfig(db, season.id);
-    const lang = languageSchema.catch('en').parse(config?.language);
 
     const args = ctx.match?.toString().trim().toLowerCase() ?? '';
     const { week, year } = getCurrentWeek();
@@ -38,15 +38,15 @@ export const registerPracticeCommand = (bot: Bot) => {
     const dateRange = formatDateRange(start, end);
 
     if (args === 'today') {
-      return showDayAvailability(ctx, season.id, getTodayDay(), lang, week, year);
+      return showDayAvailability(ctx, season.id, getTodayDay(), i18n, week, year);
     }
 
     if (args && args !== '') {
       const parseResult = daySchema.safeParse(args);
       if (!parseResult.success) {
-        return ctx.reply(t(lang).practice.invalidDay);
+        return ctx.reply(i18n.practice.invalidDay);
       }
-      return showDayAvailability(ctx, season.id, parseResult.data, lang, week, year);
+      return showDayAvailability(ctx, season.id, parseResult.data, i18n, week, year);
     }
 
     const availability = await getWeekAvailability(db, {
@@ -56,17 +56,17 @@ export const registerPracticeCommand = (bot: Bot) => {
     });
 
     if (availability.length === 0) {
-      return ctx.reply(t(lang).practice.noResponses);
+      return ctx.reply(i18n.practice.noResponses);
     }
 
-    const lines: string[] = [t(lang).practice.title(week, dateRange), ''];
+    const lines: string[] = [i18n.practice.title(week, dateRange), ''];
 
     const days = daysListSchema
       .catch(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])
       .parse(config?.pollDays);
 
     for (const day of days) {
-      const dayHeader = t(lang).poll.days[day];
+      const dayHeader = i18n.poll.days[day];
       const playersForDay = availability.filter((p) => p.responses[day]);
 
       if (playersForDay.length === 0) {
@@ -93,7 +93,7 @@ const showDayAvailability = async (
   ctx: Context,
   seasonId: number,
   day: Day,
-  lang: 'fi' | 'en',
+  i18n: Translations,
   week: number,
   year: number,
 ) => {
@@ -106,7 +106,7 @@ const showDayAvailability = async (
   const playersForDay = availability.filter((p) => p.responses[day]);
 
   if (playersForDay.length === 0) {
-    return ctx.reply(t(lang).practice.noResponsesForDay(t(lang).poll.days[day]));
+    return ctx.reply(i18n.practice.noResponsesForDay(i18n.poll.days[day]));
   }
 
   const { start } = getWeekDateRange(year, week);
@@ -115,7 +115,7 @@ const showDayAvailability = async (
   dayDate.setDate(dayDate.getDate() + dayIndex);
   const dateStr = `${dayDate.getDate()}.${dayDate.getMonth() + 1}.`;
 
-  const lines: string[] = [t(lang).practice.dayTitle(t(lang).poll.days[day], dateStr), ''];
+  const lines: string[] = [i18n.practice.dayTitle(i18n.poll.days[day], dateStr), ''];
 
   for (const player of playersForDay) {
     const response = player.responses[day];

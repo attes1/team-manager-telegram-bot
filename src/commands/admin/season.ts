@@ -1,6 +1,6 @@
 import type { Bot } from 'grammy';
 import { db } from '../../db';
-import { t } from '../../i18n';
+import { getTranslations, t } from '../../i18n';
 import { isAdmin } from '../../lib/admin';
 import { formatDate } from '../../lib/format';
 import { endSeason, getActiveSeason, startSeason } from '../../services/season';
@@ -22,7 +22,8 @@ export const registerSeasonCommands = (bot: Bot) => {
       }
 
       const season = await startSeason(db, name);
-      return ctx.reply(t().season.started(season.name));
+      const i18n = await getTranslations(db, season.id);
+      return ctx.reply(i18n.season.started(season.name));
     }
 
     if (subcommand === 'end') {
@@ -35,8 +36,9 @@ export const registerSeasonCommands = (bot: Bot) => {
         return ctx.reply(t().season.alreadyEnded);
       }
 
+      const i18n = await getTranslations(db, activeSeason.id);
       await endSeason(db);
-      return ctx.reply(t().season.ended(activeSeason.name));
+      return ctx.reply(i18n.season.ended(activeSeason.name));
     }
 
     const season = await getActiveSeason(db);
@@ -44,8 +46,9 @@ export const registerSeasonCommands = (bot: Bot) => {
       return ctx.reply(t().errors.noActiveSeason);
     }
 
-    const status = season.status === 'active' ? t().season.statusActive : t().season.statusEnded;
+    const i18n = await getTranslations(db, season.id);
+    const status = season.status === 'active' ? i18n.season.statusActive : i18n.season.statusEnded;
     const createdAt = formatDate(new Date(season.createdAt));
-    return ctx.reply(t().season.info(season.name, status, createdAt));
+    return ctx.reply(i18n.season.info(season.name, status, createdAt));
   });
 };

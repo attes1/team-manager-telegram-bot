@@ -1,6 +1,6 @@
 import type { Bot, Context } from 'grammy';
 import { db } from '../../db';
-import { t } from '../../i18n';
+import { getTranslations, t } from '../../i18n';
 import { isAdmin } from '../../lib/admin';
 import { addPlayerToRoster, isPlayerInRoster, removePlayerFromRoster } from '../../services/roster';
 import { getActiveSeason } from '../../services/season';
@@ -34,14 +34,15 @@ export const registerPlayerCommands = (bot: Bot) => {
       return ctx.reply(t().errors.noActiveSeason);
     }
 
+    const i18n = await getTranslations(db, season.id);
     const mentionedUser = getMentionedUser(ctx);
     if (!mentionedUser || mentionedUser.id === 0) {
-      return ctx.reply(t().errors.noUserMentioned);
+      return ctx.reply(i18n.errors.noUserMentioned);
     }
 
     const alreadyInRoster = await isPlayerInRoster(db, season.id, mentionedUser.id);
     if (alreadyInRoster) {
-      return ctx.reply(t().roster.alreadyInRoster(mentionedUser.name));
+      return ctx.reply(i18n.roster.alreadyInRoster(mentionedUser.name));
     }
 
     await addPlayerToRoster(db, {
@@ -51,7 +52,7 @@ export const registerPlayerCommands = (bot: Bot) => {
       username: mentionedUser.username,
     });
 
-    return ctx.reply(t().roster.added(mentionedUser.name));
+    return ctx.reply(i18n.roster.added(mentionedUser.name));
   });
 
   bot.command('removeplayer', async (ctx) => {
@@ -65,16 +66,17 @@ export const registerPlayerCommands = (bot: Bot) => {
       return ctx.reply(t().errors.noActiveSeason);
     }
 
+    const i18n = await getTranslations(db, season.id);
     const mentionedUser = getMentionedUser(ctx);
     if (!mentionedUser || mentionedUser.id === 0) {
-      return ctx.reply(t().errors.noUserMentioned);
+      return ctx.reply(i18n.errors.noUserMentioned);
     }
 
     const removed = await removePlayerFromRoster(db, season.id, mentionedUser.id);
     if (!removed) {
-      return ctx.reply(t().errors.playerNotInRoster);
+      return ctx.reply(i18n.errors.playerNotInRoster);
     }
 
-    return ctx.reply(t().roster.removed(mentionedUser.name));
+    return ctx.reply(i18n.roster.removed(mentionedUser.name));
   });
 };

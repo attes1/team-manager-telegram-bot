@@ -1,5 +1,6 @@
 import type { Kysely } from 'kysely';
 import { sql } from 'kysely';
+import { env } from '../env';
 import type { DB, Season } from '../types/db';
 
 export type { Season };
@@ -17,7 +18,13 @@ export const startSeason = async (db: Kysely<DB>, name: string): Promise<Season>
     .returningAll()
     .executeTakeFirstOrThrow();
 
-  await db.insertInto('config').values({ seasonId: season.id }).execute();
+  await db
+    .insertInto('config')
+    .values({
+      seasonId: season.id,
+      language: env.DEFAULT_LANGUAGE,
+    })
+    .execute();
 
   return season;
 };

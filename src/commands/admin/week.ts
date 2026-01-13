@@ -1,6 +1,6 @@
 import type { Bot } from 'grammy';
 import { db } from '../../db';
-import { t } from '../../i18n';
+import { getTranslations, t } from '../../i18n';
 import { isAdmin } from '../../lib/admin';
 import { formatDateRange } from '../../lib/format';
 import type { WeekType } from '../../lib/schemas';
@@ -22,21 +22,22 @@ export const registerWeekCommand = (bot: Bot) => {
       return ctx.reply(t().errors.noActiveSeason);
     }
 
+    const i18n = await getTranslations(db, season.id);
     const args = ctx.match?.toString().trim() ?? '';
     const [weekStr, typeStr] = args.split(/\s+/);
 
     if (!weekStr || !typeStr) {
-      return ctx.reply(t().week.usage);
+      return ctx.reply(i18n.week.usage);
     }
 
     const weekNumber = Number.parseInt(weekStr, 10);
     if (Number.isNaN(weekNumber) || weekNumber < 1 || weekNumber > 53) {
-      return ctx.reply(t().week.invalidWeek);
+      return ctx.reply(i18n.week.invalidWeek);
     }
 
     const type = typeStr.toLowerCase();
     if (!isValidWeekType(type)) {
-      return ctx.reply(t().week.invalidType);
+      return ctx.reply(i18n.week.invalidType);
     }
 
     const year = getWeekYear(new Date());
@@ -46,8 +47,8 @@ export const registerWeekCommand = (bot: Bot) => {
     const dateRange = formatDateRange(start, end);
 
     if (type === 'practice') {
-      return ctx.reply(t().week.setPractice(weekNumber, dateRange));
+      return ctx.reply(i18n.week.setPractice(weekNumber, dateRange));
     }
-    return ctx.reply(t().week.setMatch(weekNumber, dateRange));
+    return ctx.reply(i18n.week.setMatch(weekNumber, dateRange));
   });
 };

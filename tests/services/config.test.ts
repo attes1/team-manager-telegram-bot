@@ -1,9 +1,15 @@
 import { createTestDb } from '@tests/helpers';
 import type { Kysely } from 'kysely';
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { getConfig, updateConfig } from '@/services/config';
 import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
+
+vi.mock('@/env', () => ({
+  env: {
+    DEFAULT_LANGUAGE: 'en',
+  },
+}));
 
 describe('config service', () => {
   let db: Kysely<DB>;
@@ -25,7 +31,7 @@ describe('config service', () => {
 
       expect(config).toBeDefined();
       expect(config?.seasonId).toBe(seasonId);
-      expect(config?.language).toBe('fi');
+      expect(config?.language).toBe('en');
       expect(config?.pollDay).toBe('sun');
       expect(config?.pollTime).toBe('10:00');
       expect(config?.lineupSize).toBe(5);
@@ -41,7 +47,7 @@ describe('config service', () => {
 
       expect(config).toMatchObject({
         seasonId,
-        language: 'fi',
+        language: 'en',
         pollDay: 'sun',
         pollTime: '10:00',
         pollDays: 'mon,tue,wed,thu,fri,sat,sun',

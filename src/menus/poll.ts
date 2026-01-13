@@ -1,10 +1,10 @@
 import { Menu } from '@grammyjs/menu';
 import type { Context } from 'grammy';
 import { db } from '../db';
-import { t } from '../i18n';
+import { getTranslations } from '../i18n';
 import { formatDateRange } from '../lib/format';
 import type { AvailabilityStatus } from '../lib/schemas';
-import { daysListSchema, languageSchema } from '../lib/schemas';
+import { daysListSchema } from '../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { getPlayerWeekAvailability, setDayAvailability } from '../services/availability';
 import { getConfig } from '../services/config';
@@ -54,6 +54,7 @@ export const pollMenu = new Menu<Context>('poll').dynamic(async (ctx, range) => 
     return;
   }
 
+  const i18n = await getTranslations(db, season.id);
   const { week, year } = getCurrentWeek();
   const days = daysListSchema.parse(config.pollDays);
   const times = config.pollTimes.split(',');
@@ -70,8 +71,7 @@ export const pollMenu = new Menu<Context>('poll').dynamic(async (ctx, range) => 
     const currentStatus: AvailabilityStatus = dayData?.status ?? 'available';
     const currentSlots = dayData?.timeSlots ?? [];
 
-    const lang = languageSchema.catch('fi').parse(config.language);
-    range.text(t(lang).poll.days[day], (ctx) => ctx.answerCallbackQuery());
+    range.text(i18n.poll.days[day], (ctx) => ctx.answerCallbackQuery());
 
     for (const time of times) {
       const hasSlot = currentSlots.includes(time);
@@ -116,8 +116,8 @@ export const pollMenu = new Menu<Context>('poll').dynamic(async (ctx, range) => 
 });
 
 export const getPollMessage = async (seasonId: number): Promise<string> => {
+  const i18n = await getTranslations(db, seasonId);
   const config = await getConfig(db, seasonId);
-  const lang = languageSchema.catch('fi').parse(config?.language);
 
   const { week, year } = getCurrentWeek();
   const { start, end } = getWeekDateRange(year, week);
@@ -133,8 +133,8 @@ export const getPollMessage = async (seasonId: number): Promise<string> => {
     .join('  ')}`;
 
   const title = isMatchWeek
-    ? t(lang).poll.matchWeekTitle(week, dateRange)
-    : t(lang).poll.title(week, dateRange);
+    ? i18n.poll.matchWeekTitle(week, dateRange)
+    : i18n.poll.title(week, dateRange);
 
-  return `${title}\n\n${header}\n\n${t(lang).poll.legend}`;
+  return `${title}\n\n${header}\n\n${i18n.poll.legend}`;
 };

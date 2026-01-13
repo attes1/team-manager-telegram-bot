@@ -1,6 +1,6 @@
 import { createTestDb } from '@tests/helpers';
 import type { Kysely } from 'kysely';
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   addPlayerToLineup,
   clearLineup,
@@ -13,6 +13,12 @@ import {
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
 import type { DB } from '@/types/db';
+
+vi.mock('@/env', () => ({
+  env: {
+    DEFAULT_LANGUAGE: 'en',
+  },
+}));
 
 describe('match service', () => {
   let db: Kysely<DB>;

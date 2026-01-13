@@ -1,22 +1,16 @@
 import type { Bot } from 'grammy';
 import { db } from '../../db';
-import { env } from '../../env';
 import { t } from '../../i18n';
+import { isAdmin } from '../../lib/admin';
 import { getPollMessage, pollMenu } from '../../menus/poll';
 import { getActiveSeason } from '../../services/season';
-
-const isAdmin = (userId: number | undefined): boolean => {
-  if (!userId) {
-    return false;
-  }
-  return env.ADMIN_IDS.includes(userId);
-};
 
 export const registerPollCommand = (bot: Bot) => {
   bot.use(pollMenu);
 
   bot.command('poll', async (ctx) => {
-    if (!isAdmin(ctx.from?.id)) {
+    const userId = ctx.from?.id;
+    if (!userId || !isAdmin(userId)) {
       return ctx.reply(t().errors.notAdmin);
     }
 
