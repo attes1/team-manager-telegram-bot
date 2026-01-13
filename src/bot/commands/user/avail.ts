@@ -5,7 +5,7 @@ import type { Translations } from '@/i18n';
 import { formatDateRange, formatPlayerName } from '@/lib/format';
 import type { AvailabilityStatus, Day } from '@/lib/schemas';
 import { dayWeekInputSchema, weekInputSchema } from '@/lib/schemas';
-import { getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { getSchedulingWeek, getTodayDay, getWeekDateRange } from '@/lib/week';
 import { getWeekAvailability } from '@/services/availability';
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
@@ -32,11 +32,6 @@ const matchesFilter = (status: AvailabilityStatus, filter: AvailFilter): boolean
     return MATCH_STATUSES.includes(status);
   }
   return true;
-};
-
-const getTodayDay = (): Day => {
-  const days: Day[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-  return days[new Date().getDay()];
 };
 
 const showDayAvailability = async (

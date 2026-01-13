@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   getCurrentWeek,
   getSchedulingWeek,
+  getTodayDay,
   getWeekDateRange,
   getWeekNumber,
   getWeekYear,
@@ -67,6 +68,51 @@ describe('getCurrentWeek', () => {
     const { week } = getCurrentWeek();
     expect(week).toBeGreaterThanOrEqual(1);
     expect(week).toBeLessThanOrEqual(53);
+  });
+});
+
+describe('getTodayDay', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('returns mon for Monday', () => {
+    vi.setSystemTime(new Date('2025-01-06T12:00:00')); // Monday
+    expect(getTodayDay()).toBe('mon');
+  });
+
+  test('returns tue for Tuesday', () => {
+    vi.setSystemTime(new Date('2025-01-07T12:00:00')); // Tuesday
+    expect(getTodayDay()).toBe('tue');
+  });
+
+  test('returns wed for Wednesday', () => {
+    vi.setSystemTime(new Date('2025-01-08T12:00:00')); // Wednesday
+    expect(getTodayDay()).toBe('wed');
+  });
+
+  test('returns thu for Thursday', () => {
+    vi.setSystemTime(new Date('2025-01-09T12:00:00')); // Thursday
+    expect(getTodayDay()).toBe('thu');
+  });
+
+  test('returns fri for Friday', () => {
+    vi.setSystemTime(new Date('2025-01-10T12:00:00')); // Friday
+    expect(getTodayDay()).toBe('fri');
+  });
+
+  test('returns sat for Saturday', () => {
+    vi.setSystemTime(new Date('2025-01-11T12:00:00')); // Saturday
+    expect(getTodayDay()).toBe('sat');
+  });
+
+  test('returns sun for Sunday', () => {
+    vi.setSystemTime(new Date('2025-01-12T12:00:00')); // Sunday
+    expect(getTodayDay()).toBe('sun');
   });
 });
 

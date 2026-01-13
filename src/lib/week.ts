@@ -40,6 +40,19 @@ export const getCurrentWeek = (): { week: number; year: number } => {
   };
 };
 
+const ISO_WEEKDAY_TO_DAY: Day[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+/**
+ * Get today's day of week as a Day type.
+ * Uses JavaScript's getDay() (0=Sunday) and converts to ISO weekday format.
+ */
+export const getTodayDay = (): Day => {
+  const jsDay = new Date().getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  // Convert: Sun(0)->6, Mon(1)->0, Tue(2)->1, etc.
+  const isoIndex = jsDay === 0 ? 6 : jsDay - 1;
+  return ISO_WEEKDAY_TO_DAY[isoIndex];
+};
+
 /**
  * Get the scheduling week based on the week change boundary.
  * Before the boundary, returns current week. After boundary, returns next week.
