@@ -1,31 +1,36 @@
 import type { Bot } from 'grammy';
-import type { BotContext } from '../context';
+import type { BotContext } from '@/bot/context';
 import { registerCaptainCommands } from './admin/captain';
 import { registerConfigCommand } from './admin/config';
-import { registerMatchCommands } from './admin/match';
 import { registerPlayerCommands } from './admin/players';
-import { registerPollCommand } from './admin/poll';
-import { registerRemindCommand } from './admin/remind';
 import { registerSeasonCommands } from './admin/season';
-import { registerStatusCommand } from './admin/status';
-import { registerWeekCommand } from './admin/week';
-import { registerAvailCommand } from './player/avail';
-import { registerHelpCommand } from './player/help';
-import { registerNextMatchCommand } from './player/nextmatch';
-import { registerRosterCommand } from './player/roster';
+import { registerHelpCommand } from './public/help';
+import { registerNextMatchCommand } from './public/nextmatch';
+import { registerRosterCommand } from './public/roster';
+import { registerAvailCommand } from './user/avail';
+import { registerMatchCommands } from './user/match';
+import { registerPollCommand } from './user/poll';
+import { registerRemindCommand } from './user/remind';
+import { registerStatusCommand } from './user/status';
+import { registerWeekCommand } from './user/week';
 
 export const registerCommands = (bot: Bot<BotContext>) => {
-  registerPollCommand(bot);
-  registerRemindCommand(bot);
-  registerStatusCommand(bot);
+  // Public commands (no auth required, just season)
   registerHelpCommand(bot);
-  registerPlayerCommands(bot);
-  registerCaptainCommands(bot);
-  registerSeasonCommands(bot);
-  registerConfigCommand(bot);
-  registerWeekCommand(bot);
-  registerMatchCommands(bot);
-  registerAvailCommand(bot);
   registerRosterCommand(bot);
   registerNextMatchCommand(bot);
+
+  // User commands (roster/captain required)
+  registerAvailCommand(bot);
+  registerPollCommand(bot);
+  registerStatusCommand(bot);
+  registerWeekCommand(bot);
+  registerMatchCommands(bot);
+  registerRemindCommand(bot);
+
+  // Admin commands
+  registerSeasonCommands(bot);
+  registerConfigCommand(bot);
+  registerPlayerCommands(bot);
+  registerCaptainCommands(bot);
 };

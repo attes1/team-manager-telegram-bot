@@ -1,7 +1,7 @@
 import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerWeekCommand } from '@/bot/commands/admin/week';
+import { registerWeekCommand } from '@/bot/commands/user/week';
 import { startSeason } from '@/services/season';
 import { createCommandUpdate, createTestBot } from './helpers';
 

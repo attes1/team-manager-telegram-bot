@@ -1,8 +1,8 @@
 import type { Bot } from 'grammy';
+import type { AdminSeasonContext, BotContext } from '@/bot/context';
+import { adminSeasonCommand } from '@/bot/middleware';
 import { addInvitation } from '@/services/pending-invitations';
 import { removePlayerFromRoster } from '@/services/roster';
-import type { AdminSeasonContext, BotContext } from '../../context';
-import { adminSeasonCommand } from '../../middleware';
 
 // Escape HTML special characters to prevent injection
 const escapeHtml = (text: string): string => {

@@ -1,12 +1,12 @@
 import type { Bot } from 'grammy';
-import type { Translations } from '../../../i18n';
-import { formatDateRange, formatPlayerName } from '../../../lib/format';
-import type { AvailabilityStatus, Day } from '../../../lib/schemas';
-import { daySchema, weekNumberSchema } from '../../../lib/schemas';
-import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '../../../lib/week';
-import { getWeekAvailability } from '../../../services/availability';
-import type { BotContext, RosterContext } from '../../context';
-import { rosterCommand } from '../../middleware';
+import type { BotContext, RosterContext } from '@/bot/context';
+import { rosterCommand } from '@/bot/middleware';
+import type { Translations } from '@/i18n';
+import { formatDateRange, formatPlayerName } from '@/lib/format';
+import type { AvailabilityStatus, Day } from '@/lib/schemas';
+import { daySchema, weekNumberSchema } from '@/lib/schemas';
+import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/week';
+import { getWeekAvailability } from '@/services/availability';
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   available: '✅',

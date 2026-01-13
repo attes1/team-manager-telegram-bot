@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
-import { getRoster } from '../../../services/roster';
-import type { BotContext, SeasonContext } from '../../context';
-import { seasonCommand } from '../../middleware';
+import type { BotContext, SeasonContext } from '@/bot/context';
+import { seasonCommand } from '@/bot/middleware';
+import { getRoster } from '@/services/roster';
 
 export const registerRosterCommand = (bot: Bot<BotContext>) => {
   bot.command(

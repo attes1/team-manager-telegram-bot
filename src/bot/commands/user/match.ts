@@ -1,9 +1,11 @@
 import type { Bot } from 'grammy';
-import { env } from '../../../env';
-import { formatDateRange, formatDay } from '../../../lib/format';
-import { daySchema, timeSchema } from '../../../lib/schemas';
-import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '../../../lib/week';
-import { getLineupMenuMessage, lineupMenu } from '../../../menus/lineup';
+import type { BotContext, CaptainSeasonContext } from '@/bot/context';
+import { captainSeasonCommand } from '@/bot/middleware';
+import { env } from '@/env';
+import { formatDateRange, formatDay } from '@/lib/format';
+import { daySchema, timeSchema } from '@/lib/schemas';
+import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/week';
+import { getLineupMenuMessage, lineupMenu } from '@/menus/lineup';
 import {
   buildLineupMessage,
   buildMatchScheduledMessage,
@@ -13,10 +15,8 @@ import {
   setLineup,
   setMatchTime,
   setOpponent,
-} from '../../../services/match';
-import { isPlayerInRoster } from '../../../services/roster';
-import type { BotContext, CaptainSeasonContext } from '../../context';
-import { captainSeasonCommand } from '../../middleware';
+} from '@/services/match';
+import { isPlayerInRoster } from '@/services/roster';
 
 interface MentionedUser {
   id: number;

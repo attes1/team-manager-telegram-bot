@@ -1,8 +1,8 @@
 import type { Bot } from 'grammy';
-import { getSchedulingWeek, parseWeekInput } from '../../../lib/week';
-import { getPollMessage, pollMenu } from '../../../menus/poll';
-import type { BotContext, RosterContext } from '../../context';
-import { rosterCommand } from '../../middleware';
+import type { BotContext, RosterContext } from '@/bot/context';
+import { rosterCommand } from '@/bot/middleware';
+import { getSchedulingWeek, parseWeekInput } from '@/lib/week';
+import { getPollMessage, pollMenu } from '@/menus/poll';
 
 export const registerPollCommand = (bot: Bot<BotContext>) => {
   bot.use(pollMenu);

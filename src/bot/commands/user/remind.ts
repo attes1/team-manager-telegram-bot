@@ -1,10 +1,10 @@
 import type { Bot } from 'grammy';
-import { formatDateRange, formatPlayerName } from '../../../lib/format';
-import { getSchedulingWeek, getWeekDateRange } from '../../../lib/week';
-import { hasRespondedForWeek } from '../../../services/availability';
-import { getRoster } from '../../../services/roster';
-import type { BotContext, CaptainSeasonContext } from '../../context';
-import { captainSeasonCommand } from '../../middleware';
+import type { BotContext, CaptainSeasonContext } from '@/bot/context';
+import { captainSeasonCommand } from '@/bot/middleware';
+import { formatDateRange, formatPlayerName } from '@/lib/format';
+import { getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { hasRespondedForWeek } from '@/services/availability';
+import { getRoster } from '@/services/roster';
 
 export const registerRemindCommand = (bot: Bot<BotContext>) => {
   bot.command(

@@ -1,10 +1,10 @@
 import type { Bot } from 'grammy';
-import { formatDateRange } from '../../../lib/format';
-import { weekTypeSchema } from '../../../lib/schemas';
-import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '../../../lib/week';
-import { setWeekType } from '../../../services/week';
-import type { BotContext, CaptainSeasonContext } from '../../context';
-import { captainSeasonCommand } from '../../middleware';
+import type { BotContext, CaptainSeasonContext } from '@/bot/context';
+import { captainSeasonCommand } from '@/bot/middleware';
+import { formatDateRange } from '@/lib/format';
+import { weekTypeSchema } from '@/lib/schemas';
+import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/week';
+import { setWeekType } from '@/services/week';
 
 export const registerWeekCommand = (bot: Bot<BotContext>) => {
   bot.command(

@@ -1,12 +1,12 @@
 import type { Bot } from 'grammy';
-import { formatDateRange } from '../../../lib/format';
-import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '../../../lib/week';
-import { getWeekAvailability } from '../../../services/availability';
-import { getLineup, getMatchInfo } from '../../../services/match';
-import { getRoster } from '../../../services/roster';
-import { getWeek } from '../../../services/week';
-import type { BotContext, RosterContext } from '../../context';
-import { rosterCommand } from '../../middleware';
+import type { BotContext, RosterContext } from '@/bot/context';
+import { rosterCommand } from '@/bot/middleware';
+import { formatDateRange } from '@/lib/format';
+import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { getWeekAvailability } from '@/services/availability';
+import { getLineup, getMatchInfo } from '@/services/match';
+import { getRoster } from '@/services/roster';
+import { getWeek } from '@/services/week';
 
 export const registerStatusCommand = (bot: Bot<BotContext>) => {
   bot.command(

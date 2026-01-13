@@ -1,7 +1,7 @@
 import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerRemindCommand } from '@/bot/commands/admin/remind';
+import { registerRemindCommand } from '@/bot/commands/user/remind';
 import { createCommandUpdate, createTestBot } from './helpers';
 
 const ADMIN_ID = 123456;

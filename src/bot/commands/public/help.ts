@@ -1,5 +1,5 @@
 import type { Bot } from 'grammy';
-import type { BotContext } from '../../context';
+import type { BotContext } from '@/bot/context';
 
 const formatCommand = (cmd: string, desc: string | string[]): string[] => {
   if (Array.isArray(desc)) {

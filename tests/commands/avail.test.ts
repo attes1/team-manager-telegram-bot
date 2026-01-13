@@ -2,7 +2,7 @@ import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { getISOWeek } from 'date-fns';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { registerAvailCommand } from '@/bot/commands/player/avail';
+import { registerAvailCommand } from '@/bot/commands/user/avail';
 import { createCommandUpdate, createTestBot } from './helpers';
 
 const ADMIN_ID = 123456;

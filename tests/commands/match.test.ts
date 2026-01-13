@@ -1,7 +1,7 @@
 import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { registerMatchCommands } from '@/bot/commands/admin/match';
+import { registerMatchCommands } from '@/bot/commands/user/match';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
 import { createCommandUpdate, createMultiMentionUpdate, createTestBot } from './helpers';

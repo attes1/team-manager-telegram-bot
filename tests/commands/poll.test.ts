@@ -1,7 +1,7 @@
 import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { registerPollCommand } from '@/bot/commands/admin/poll';
+import { registerPollCommand } from '@/bot/commands/user/poll';
 import { createCommandUpdate, createTestBot } from './helpers';
 
 const PLAYER_ID = 111;

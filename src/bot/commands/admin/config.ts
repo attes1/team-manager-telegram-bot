@@ -1,11 +1,11 @@
 import type { Bot } from 'grammy';
 import { ZodError } from 'zod';
-import type { Language, Translations } from '../../../i18n';
-import type { ParsedConfig } from '../../../lib/schemas';
-import { refreshScheduler } from '../../../scheduler';
-import { updateConfig } from '../../../services/config';
-import type { AdminSeasonContext, BotContext } from '../../context';
-import { adminSeasonCommand } from '../../middleware';
+import type { AdminSeasonContext, BotContext } from '@/bot/context';
+import { adminSeasonCommand } from '@/bot/middleware';
+import type { Language, Translations } from '@/i18n';
+import type { ParsedConfig } from '@/lib/schemas';
+import { refreshScheduler } from '@/scheduler';
+import { updateConfig } from '@/services/config';
 import { commandDefinitions } from '../definitions';
 
 const USER_TO_DB_KEY: Record<string, string> = {

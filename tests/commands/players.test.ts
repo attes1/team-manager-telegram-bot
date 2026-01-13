@@ -2,7 +2,7 @@ import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerPlayerCommands } from '@/bot/commands/admin/players';
-import { registerRosterCommand } from '@/bot/commands/player/roster';
+import { registerRosterCommand } from '@/bot/commands/public/roster';
 import { clearAll } from '@/services/pending-invitations';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';

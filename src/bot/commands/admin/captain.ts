@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
+import type { AdminSeasonContext, BotContext } from '@/bot/context';
+import { adminSeasonCommand } from '@/bot/middleware';
 import { getPlayerRole, setPlayerRole } from '@/services/roster';
-import type { AdminSeasonContext, BotContext } from '../../context';
-import { adminSeasonCommand } from '../../middleware';
 
 // Extract user info from text_mention entity (user without username)
 const getTextMention = (

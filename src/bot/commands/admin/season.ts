@@ -1,9 +1,9 @@
 import type { Bot } from 'grammy';
-import { formatDate } from '../../../lib/format';
-import { refreshScheduler } from '../../../scheduler';
-import { endSeason, startSeason } from '../../../services/season';
-import type { BotContext, SeasonContext } from '../../context';
-import { adminCommand, seasonCommand } from '../../middleware';
+import type { BotContext, SeasonContext } from '@/bot/context';
+import { adminCommand, seasonCommand } from '@/bot/middleware';
+import { formatDate } from '@/lib/format';
+import { refreshScheduler } from '@/scheduler';
+import { endSeason, startSeason } from '@/services/season';
 
 export const registerSeasonCommands = (bot: Bot<BotContext>) => {
   bot.command(
