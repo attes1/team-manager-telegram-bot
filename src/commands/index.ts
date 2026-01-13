@@ -1,5 +1,6 @@
 import type { Bot } from 'grammy';
 import { registerConfigCommand } from './admin/config';
+import { registerMatchCommands } from './admin/match';
 import { registerPlayerCommands } from './admin/players';
 import { registerPollCommand } from './admin/poll';
 import { registerSeasonCommands } from './admin/season';
@@ -13,6 +14,7 @@ export const registerCommands = (bot: Bot) => {
   registerSeasonCommands(bot);
   registerConfigCommand(bot);
   registerWeekCommand(bot);
+  registerMatchCommands(bot);
   registerRosterCommand(bot);
   registerPracticeCommand(bot);
 };

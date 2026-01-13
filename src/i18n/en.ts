@@ -82,4 +82,11 @@ export const en: Translations = {
     invalidDay: 'Invalid day. Use: mon, tue, wed, thu, fri, sat, sun',
     usage: 'Usage: /practice [today|<day>]',
   },
+  match: {
+    scheduled: (day, time, week, dateRange) =>
+      `Match scheduled: ${day} at ${time} (week ${week}, ${dateRange})`,
+    usage: 'Usage: /setmatch <day> <time>\nExample: /setmatch sun 20:00',
+    invalidDay: 'Invalid day. Use: mon, tue, wed, thu, fri, sat, sun',
+    invalidTime: 'Invalid time format. Use HH:MM (e.g. 20:00)',
+  },
 };

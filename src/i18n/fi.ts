@@ -78,6 +78,12 @@ export interface Translations {
     invalidDay: string;
     usage: string;
   };
+  match: {
+    scheduled: (day: string, time: string, week: number, dateRange: string) => string;
+    usage: string;
+    invalidDay: string;
+    invalidTime: string;
+  };
 }
 
 export const fi: Translations = {
@@ -162,5 +168,12 @@ export const fi: Translations = {
       `• ${name}: ${times.join(', ')} ${status}`,
     invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
     usage: 'Käyttö: /practice [today|<päivä>]',
+  },
+  match: {
+    scheduled: (day, time, week, dateRange) =>
+      `Matsi sovittu: ${day} klo ${time} (vko ${week}, ${dateRange})`,
+    usage: 'Käyttö: /setmatch <päivä> <aika>\nEsim: /setmatch sun 20:00',
+    invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
+    invalidTime: 'Virheellinen aika. Käytä muotoa HH:MM (esim. 20:00)',
   },
 };
