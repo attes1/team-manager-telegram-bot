@@ -3,7 +3,7 @@ import type { BotContext } from '../bot/context';
 import { db } from '../db';
 import { getTranslations } from '../i18n';
 import { formatDateRange, formatPlayerName } from '../lib/format';
-import { getTargetWeek, getWeekDateRange } from '../lib/week';
+import { getSchedulingWeek, getWeekDateRange } from '../lib/week';
 import { hasRespondedForWeek } from '../services/availability';
 import { getConfig } from '../services/config';
 import { getRoster } from '../services/roster';
@@ -24,7 +24,7 @@ export const sendReminder = async (bot: Bot<BotContext>, chatId: number): Promis
 
   const i18n = await getTranslations(db, season.id);
   // Use target week based on cutoff logic
-  const { week, year } = getTargetWeek(config.weekChangeDay, config.weekChangeTime);
+  const { week, year } = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
   const { start, end } = getWeekDateRange(year, week);
   const dateRange = formatDateRange(start, end);
 

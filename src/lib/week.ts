@@ -40,7 +40,11 @@ export const getCurrentWeek = (): { week: number; year: number } => {
   };
 };
 
-export const getTargetWeek = (
+/**
+ * Get the scheduling week based on the week change boundary.
+ * Before the boundary, returns current week. After boundary, returns next week.
+ */
+export const getSchedulingWeek = (
   cutoffDay: Day,
   cutoffTime: string,
 ): { week: number; year: number } => {

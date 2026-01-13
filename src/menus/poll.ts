@@ -4,7 +4,7 @@ import { db } from '../db';
 import { getTranslations } from '../i18n';
 import { formatDateRange } from '../lib/format';
 import type { AvailabilityStatus } from '../lib/schemas';
-import { getCurrentWeek, getTargetWeek, getWeekDateRange } from '../lib/week';
+import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '../lib/week';
 import { getPlayerWeekAvailability, setDayAvailability } from '../services/availability';
 import { isPlayerInRoster } from '../services/roster';
 import { getWeek } from '../services/week';
@@ -92,7 +92,8 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
   // Parse week from message, fall back to target week
   const messageText = ctx.callbackQuery?.message?.text;
   const parsedWeek = parseWeekFromMessage(messageText);
-  const { week, year } = parsedWeek ?? getTargetWeek(config.weekChangeDay, config.weekChangeTime);
+  const { week, year } =
+    parsedWeek ?? getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
   const days = config.pollDays;
   const times = config.pollTimes.split(',');
 

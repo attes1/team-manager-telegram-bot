@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   getCurrentWeek,
-  getTargetWeek,
+  getSchedulingWeek,
   getWeekDateRange,
   getWeekNumber,
   getWeekYear,
@@ -70,7 +70,7 @@ describe('getCurrentWeek', () => {
   });
 });
 
-describe('getTargetWeek', () => {
+describe('getSchedulingWeek', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -83,7 +83,7 @@ describe('getTargetWeek', () => {
     // Wednesday 09:00 of week 2, 2025 - before Thursday 10:00 cutoff
     vi.setSystemTime(new Date('2025-01-08T09:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 2, year: 2025 });
   });
 
@@ -91,7 +91,7 @@ describe('getTargetWeek', () => {
     // Thursday 11:00 of week 2, 2025 - after Thursday 10:00 cutoff
     vi.setSystemTime(new Date('2025-01-09T11:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -99,7 +99,7 @@ describe('getTargetWeek', () => {
     // Thursday 10:00 of week 2, 2025 - exactly at cutoff
     vi.setSystemTime(new Date('2025-01-09T10:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -107,7 +107,7 @@ describe('getTargetWeek', () => {
     // Thursday 09:59 of week 2, 2025 - just before cutoff
     vi.setSystemTime(new Date('2025-01-09T09:59:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 2, year: 2025 });
   });
 
@@ -115,7 +115,7 @@ describe('getTargetWeek', () => {
     // Friday of week 52, 2025 - after Thursday cutoff, should return week 1 of 2026
     vi.setSystemTime(new Date('2025-12-26T11:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 1, year: 2026 });
   });
 
@@ -123,7 +123,7 @@ describe('getTargetWeek', () => {
     // Tuesday of week 2, 2025 - after Monday cutoff
     vi.setSystemTime(new Date('2025-01-07T11:00:00'));
 
-    const result = getTargetWeek('mon', '10:00');
+    const result = getSchedulingWeek('mon', '10:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -131,7 +131,7 @@ describe('getTargetWeek', () => {
     // Sunday 20:00 of week 2, 2025 - after Sunday 10:00 cutoff
     vi.setSystemTime(new Date('2025-01-12T20:00:00'));
 
-    const result = getTargetWeek('sun', '10:00');
+    const result = getSchedulingWeek('sun', '10:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -139,7 +139,7 @@ describe('getTargetWeek', () => {
     // Thursday 06:00 of week 2, 2025 - after Thursday 05:00 cutoff
     vi.setSystemTime(new Date('2025-01-09T06:00:00'));
 
-    const result = getTargetWeek('thu', '05:00');
+    const result = getSchedulingWeek('thu', '05:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -147,7 +147,7 @@ describe('getTargetWeek', () => {
     // Saturday 15:00 of week 2, 2025 - after Saturday 12:00 cutoff
     vi.setSystemTime(new Date('2025-01-11T15:00:00'));
 
-    const result = getTargetWeek('sat', '12:00');
+    const result = getSchedulingWeek('sat', '12:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -155,7 +155,7 @@ describe('getTargetWeek', () => {
     // Thursday 23:30 of week 2, 2025 - after Thursday 23:00 cutoff
     vi.setSystemTime(new Date('2025-01-09T23:30:00'));
 
-    const result = getTargetWeek('thu', '23:00');
+    const result = getSchedulingWeek('thu', '23:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -163,7 +163,7 @@ describe('getTargetWeek', () => {
     // Monday 09:00 of week 2, 2025 - before Friday 10:00 cutoff
     vi.setSystemTime(new Date('2025-01-06T09:00:00'));
 
-    const result = getTargetWeek('fri', '10:00');
+    const result = getSchedulingWeek('fri', '10:00');
     expect(result).toEqual({ week: 2, year: 2025 });
   });
 
@@ -171,7 +171,7 @@ describe('getTargetWeek', () => {
     // Saturday 09:00 of week 2, 2025 - after Friday 10:00 cutoff
     vi.setSystemTime(new Date('2025-01-11T09:00:00'));
 
-    const result = getTargetWeek('fri', '10:00');
+    const result = getSchedulingWeek('fri', '10:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -179,7 +179,7 @@ describe('getTargetWeek', () => {
     // Wednesday of week 1, 2025 - before Thursday cutoff
     vi.setSystemTime(new Date('2025-01-01T09:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 1, year: 2025 });
   });
 
@@ -187,7 +187,7 @@ describe('getTargetWeek', () => {
     // Friday of week 1, 2025 - after Thursday cutoff
     vi.setSystemTime(new Date('2025-01-03T11:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 2, year: 2025 });
   });
 
@@ -195,7 +195,7 @@ describe('getTargetWeek', () => {
     // Thursday 23:59 of week 2, 2025 - before Friday 00:00 cutoff
     vi.setSystemTime(new Date('2025-01-09T23:59:00'));
 
-    const result = getTargetWeek('fri', '00:00');
+    const result = getSchedulingWeek('fri', '00:00');
     expect(result).toEqual({ week: 2, year: 2025 });
   });
 
@@ -203,7 +203,7 @@ describe('getTargetWeek', () => {
     // Friday 00:00 of week 2, 2025 - at Friday 00:00 cutoff
     vi.setSystemTime(new Date('2025-01-10T00:00:00'));
 
-    const result = getTargetWeek('fri', '00:00');
+    const result = getSchedulingWeek('fri', '00:00');
     expect(result).toEqual({ week: 3, year: 2025 });
   });
 
@@ -211,7 +211,7 @@ describe('getTargetWeek', () => {
     // Tuesday 18:00 of week 2, 2025 - before Wednesday 10:00 cutoff
     vi.setSystemTime(new Date('2025-01-07T18:00:00'));
 
-    const result = getTargetWeek('wed', '10:00');
+    const result = getSchedulingWeek('wed', '10:00');
     expect(result).toEqual({ week: 2, year: 2025 });
   });
 
@@ -219,7 +219,7 @@ describe('getTargetWeek', () => {
     // Monday of week 1, 2025 (Dec 30, 2024) - before Thursday cutoff
     vi.setSystemTime(new Date('2024-12-30T09:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 1, year: 2025 });
   });
 
@@ -227,7 +227,7 @@ describe('getTargetWeek', () => {
     // Friday of week 1, 2025 (Jan 3, 2025) - after Thursday cutoff
     vi.setSystemTime(new Date('2025-01-03T11:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 2, year: 2025 });
   });
 
@@ -235,7 +235,7 @@ describe('getTargetWeek', () => {
     // Friday of week 53, 2026 - after Thursday cutoff, should return week 1 of 2027
     vi.setSystemTime(new Date('2027-01-01T11:00:00'));
 
-    const result = getTargetWeek('thu', '10:00');
+    const result = getSchedulingWeek('thu', '10:00');
     expect(result).toEqual({ week: 1, year: 2027 });
   });
 });

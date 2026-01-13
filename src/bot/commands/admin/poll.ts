@@ -1,5 +1,5 @@
 import type { Bot } from 'grammy';
-import { getTargetWeek, parseWeekInput } from '../../../lib/week';
+import { getSchedulingWeek, parseWeekInput } from '../../../lib/week';
 import { getPollMessage, pollMenu } from '../../../menus/poll';
 import type { BotContext, RosterContext } from '../../context';
 import { rosterCommand } from '../../middleware';
@@ -13,7 +13,7 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
       const { season, config, i18n } = ctx;
 
       // Get target week using cutoff logic
-      const targetWeek = getTargetWeek(config.weekChangeDay, config.weekChangeTime);
+      const targetWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       // Parse optional week parameter
       const args = ctx.message?.text?.split(' ').slice(1) ?? [];
