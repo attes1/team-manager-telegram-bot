@@ -79,21 +79,40 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
     return;
   }
 
-  const inRoster = await isPlayerInRoster(db, season.id, userId);
-  if (!inRoster) {
-    // If this is a button click (callback query), show error alert without modifying menu
-    if (ctx.callbackQuery) {
-      await ctx.answerCallbackQuery({ text: i18n.poll.notInRoster, show_alert: true });
-    }
-    return;
-  }
-
   // Get week from: 1) payload (button click), 2) context (initial render from command), 3) scheduling week
   const payloadWeek = decodeWeekPayload(ctx.match);
   const { week, year } = payloadWeek ?? ctx.pollTargetWeek ?? schedulingWeek;
   const weekPayload = encodeWeekPayload(week, year);
   const days = config.pollDays;
   const times = config.pollTimes.split(',');
+
+  const inRoster = await isPlayerInRoster(db, season.id, userId);
+
+  // For unauthorized users: render static grid that shows error on any click
+  if (!inRoster) {
+    const showError = async (ctx: BotContext) => {
+      await ctx.answerCallbackQuery({ text: i18n.poll.notInRoster, show_alert: true });
+    };
+
+    // Header row
+    range.text(' ', showError);
+    for (const time of times) {
+      range.text(time, showError);
+    }
+    range.text(' ', showError);
+    range.row();
+
+    // Day rows with placeholder dots
+    for (const day of days) {
+      range.text(i18n.poll.days[day], showError);
+      for (const _ of times) {
+        range.text({ text: '·', payload: weekPayload }, showError);
+      }
+      range.text({ text: '·', payload: weekPayload }, showError);
+      range.row();
+    }
+    return;
+  }
 
   // Fetch week type for practice week handling
   const weekData = await getWeek(db, season.id, week, year);
