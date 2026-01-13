@@ -16,6 +16,7 @@ export interface ScheduledTask {
 }
 
 const tasks: ScheduledTask[] = [];
+let storedBot: Bot<BotContext> | null = null;
 
 const stopAllTasks = () => {
   for (const { task } of tasks) {
@@ -44,25 +45,18 @@ const scheduleTask = (
   return { name, task };
 };
 
-export const initScheduler = async (
-  bot: Bot<BotContext>,
-  handlers: {
-    onWeeklyPoll: (bot: Bot<BotContext>, chatId: number) => Promise<void>;
-    onReminder: (bot: Bot<BotContext>, chatId: number) => Promise<void>;
-    onMatchDay: (bot: Bot<BotContext>, chatId: number) => Promise<void>;
-  },
-): Promise<void> => {
+const initScheduler = async (bot: Bot<BotContext>): Promise<void> => {
   stopAllTasks();
 
   const season = await getActiveSeason(db);
   if (!season) {
-    console.log('Scheduler: No active season, skipping initialization');
+    console.log('Scheduler: No active season, tasks stopped');
     return;
   }
 
   const config = await getConfig(db, season.id);
   if (!config) {
-    console.log('Scheduler: No config found, skipping initialization');
+    console.log('Scheduler: No config found, tasks stopped');
     return;
   }
 
@@ -70,13 +64,13 @@ export const initScheduler = async (
 
   // Weekly poll
   const pollCron = buildCronExpression(config.pollDay, config.pollTime);
-  tasks.push(scheduleTask('weekly-poll', pollCron, () => handlers.onWeeklyPoll(bot, chatId)));
+  tasks.push(scheduleTask('weekly-poll', pollCron, () => sendWeeklyPoll(bot, chatId)));
   console.log(`Scheduler: Weekly poll scheduled for ${config.pollDay} at ${config.pollTime}`);
 
   // Mid-week reminder
   if (config.remindersMode !== 'off') {
     const reminderCron = buildCronExpression(config.reminderDay, config.reminderTime);
-    tasks.push(scheduleTask('reminder', reminderCron, () => handlers.onReminder(bot, chatId)));
+    tasks.push(scheduleTask('reminder', reminderCron, () => sendReminder(bot, chatId)));
     console.log(
       `Scheduler: Reminder scheduled for ${config.reminderDay} at ${config.reminderTime}`,
     );
@@ -85,7 +79,7 @@ export const initScheduler = async (
   // Match day reminder
   if (config.matchDayReminderEnabled) {
     const matchDayCron = buildCronExpression(config.matchDay, config.matchDayReminderTime);
-    tasks.push(scheduleTask('match-day', matchDayCron, () => handlers.onMatchDay(bot, chatId)));
+    tasks.push(scheduleTask('match-day', matchDayCron, () => sendMatchDayReminder(bot, chatId)));
     console.log(
       `Scheduler: Match day reminder scheduled for ${config.matchDay} at ${config.matchDayReminderTime}`,
     );
@@ -94,26 +88,20 @@ export const initScheduler = async (
   console.log(`Scheduler: ${tasks.length} task(s) scheduled`);
 };
 
-export const refreshScheduler = async (
-  bot: Bot<BotContext>,
-  handlers: {
-    onWeeklyPoll: (bot: Bot<BotContext>, chatId: number) => Promise<void>;
-    onReminder: (bot: Bot<BotContext>, chatId: number) => Promise<void>;
-    onMatchDay: (bot: Bot<BotContext>, chatId: number) => Promise<void>;
-  },
-): Promise<void> => {
+export const refreshScheduler = async (): Promise<void> => {
+  if (!storedBot) {
+    console.log('Scheduler: Bot not initialized, cannot refresh');
+    return;
+  }
   console.log('Scheduler: Refreshing tasks...');
-  await initScheduler(bot, handlers);
+  await initScheduler(storedBot);
 };
 
 export const getScheduledTasks = (): ScheduledTask[] => [...tasks];
 
 export const startScheduler = async (bot: Bot<BotContext>): Promise<void> => {
-  await initScheduler(bot, {
-    onWeeklyPoll: sendWeeklyPoll,
-    onReminder: sendReminder,
-    onMatchDay: sendMatchDayReminder,
-  });
+  storedBot = bot;
+  await initScheduler(bot);
 };
 
 export { sendMatchDayReminder } from './match-day';

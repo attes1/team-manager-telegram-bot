@@ -22,8 +22,11 @@ const mockEnv = vi.hoisted(() => ({
     DEFAULT_MATCH_DAY: 'sun',
     DEFAULT_MATCH_TIME: '20:00',
     DEFAULT_LINEUP_SIZE: 5,
+    DEFAULT_MATCH_DAY_REMINDER_ENABLED: true,
+    DEFAULT_MATCH_DAY_REMINDER_TIME: '18:00',
   },
 }));
+const mockRefreshScheduler = vi.hoisted(() => vi.fn());
 
 const TEST_ADMIN_ID = 123456;
 const TEST_USER_ID = 999999;
@@ -31,6 +34,7 @@ const TEST_CHAT_ID = -100123;
 
 vi.mock('@/db', () => mockDb);
 vi.mock('@/env', () => mockEnv);
+vi.mock('@/scheduler', () => ({ refreshScheduler: mockRefreshScheduler }));
 
 describe('/config command', () => {
   beforeEach(async () => {
@@ -42,6 +46,7 @@ describe('/config command', () => {
     });
     await up(db);
     mockDb.db = db;
+    mockRefreshScheduler.mockClear();
   });
 
   afterEach(async () => {
@@ -184,6 +189,74 @@ describe('/config command', () => {
 
       expect(calls).toHaveLength(1);
       expect(calls[0].payload.text).toContain('Settings');
+    });
+
+    test('refreshes scheduler when updating poll_day', async () => {
+      await startSeason(mockDb.db, 'Test Season');
+
+      const { bot } = createTestBot();
+      registerConfigCommand(bot);
+
+      const update = createCommandUpdate('/config poll_day mon', TEST_ADMIN_ID, TEST_CHAT_ID);
+      await bot.handleUpdate(update);
+
+      expect(mockRefreshScheduler).toHaveBeenCalledTimes(1);
+    });
+
+    test('refreshes scheduler when updating reminder_time', async () => {
+      await startSeason(mockDb.db, 'Test Season');
+
+      const { bot } = createTestBot();
+      registerConfigCommand(bot);
+
+      const update = createCommandUpdate(
+        '/config reminder_time 19:00',
+        TEST_ADMIN_ID,
+        TEST_CHAT_ID,
+      );
+      await bot.handleUpdate(update);
+
+      expect(mockRefreshScheduler).toHaveBeenCalledTimes(1);
+    });
+
+    test('refreshes scheduler when updating match_day_reminder_enabled', async () => {
+      await startSeason(mockDb.db, 'Test Season');
+
+      const { bot } = createTestBot();
+      registerConfigCommand(bot);
+
+      const update = createCommandUpdate(
+        '/config match_day_reminder_enabled off',
+        TEST_ADMIN_ID,
+        TEST_CHAT_ID,
+      );
+      await bot.handleUpdate(update);
+
+      expect(mockRefreshScheduler).toHaveBeenCalledTimes(1);
+    });
+
+    test('does not refresh scheduler when updating language', async () => {
+      await startSeason(mockDb.db, 'Test Season');
+
+      const { bot } = createTestBot();
+      registerConfigCommand(bot);
+
+      const update = createCommandUpdate('/config language fi', TEST_ADMIN_ID, TEST_CHAT_ID);
+      await bot.handleUpdate(update);
+
+      expect(mockRefreshScheduler).not.toHaveBeenCalled();
+    });
+
+    test('does not refresh scheduler when updating lineup_size', async () => {
+      await startSeason(mockDb.db, 'Test Season');
+
+      const { bot } = createTestBot();
+      registerConfigCommand(bot);
+
+      const update = createCommandUpdate('/config lineup_size 6', TEST_ADMIN_ID, TEST_CHAT_ID);
+      await bot.handleUpdate(update);
+
+      expect(mockRefreshScheduler).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,6 +1,7 @@
 import type { Bot } from 'grammy';
 import type { Translations } from '../../../i18n';
 import type { ParsedConfig } from '../../../lib/schemas';
+import { refreshScheduler } from '../../../scheduler';
 import { updateConfig } from '../../../services/config';
 import type { AdminSeasonContext, BotContext } from '../../context';
 import { adminSeasonCommand } from '../../middleware';
@@ -21,10 +22,22 @@ const USER_TO_DB_KEY: Record<string, string> = {
   match_day_reminder_time: 'matchDayReminderTime',
 };
 
+const SCHEDULER_KEYS = [
+  'poll_day',
+  'poll_time',
+  'reminder_day',
+  'reminder_time',
+  'reminders_mode',
+  'match_day',
+  'match_day_reminder_enabled',
+  'match_day_reminder_time',
+];
+
 const USER_KEYS = Object.keys(USER_TO_DB_KEY);
 
 const isValidUserKey = (key: string): boolean => USER_KEYS.includes(key);
 const toDbKey = (userKey: string): string => USER_TO_DB_KEY[userKey];
+const affectsScheduler = (key: string): boolean => SCHEDULER_KEYS.includes(key);
 
 const formatConfigDisplay = (i18n: Translations, config: ParsedConfig): string => {
   const keys = i18n.config.keys;
@@ -68,6 +81,9 @@ export const registerConfigCommand = (bot: Bot<BotContext>) => {
       try {
         const dbKey = toDbKey(key);
         await updateConfig(db, season.id, dbKey, value);
+        if (affectsScheduler(key)) {
+          await refreshScheduler();
+        }
         return ctx.reply(i18n.config.updated(key, value));
       } catch {
         return ctx.reply(i18n.errors.invalidConfigValue(key));

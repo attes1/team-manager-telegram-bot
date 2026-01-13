@@ -1,5 +1,6 @@
 import type { Bot } from 'grammy';
 import { formatDate } from '../../../lib/format';
+import { refreshScheduler } from '../../../scheduler';
 import { endSeason, startSeason } from '../../../services/season';
 import type { BotContext, SeasonContext } from '../../context';
 import { adminCommand, seasonCommand } from '../../middleware';
@@ -16,6 +17,7 @@ export const registerSeasonCommands = (bot: Bot<BotContext>) => {
       }
 
       const season = await startSeason(db, args);
+      await refreshScheduler();
       return ctx.reply(i18n.season.started(season.name));
     }),
   );
@@ -30,6 +32,7 @@ export const registerSeasonCommands = (bot: Bot<BotContext>) => {
       }
 
       await endSeason(db);
+      await refreshScheduler();
       return ctx.reply(i18n.season.ended(season.name));
     }),
   );
