@@ -36,6 +36,10 @@ export const hoursListSchema = z
   .string()
   .transform((val) => val.split(',').map((v) => hourSchema.parse(v.trim())));
 
+export const pollTimesSchema = z
+  .string()
+  .refine((val) => val.split(',').length <= 5, 'Maximum 5 time slots allowed');
+
 export type Day = z.infer<typeof daySchema>;
 export type AvailabilityStatus = z.infer<typeof availabilityStatusSchema>;
 export type WeekType = z.infer<typeof weekTypeSchema>;
@@ -49,7 +53,7 @@ export const configSchema = z.object({
   pollDay: daySchema.catch('sun'),
   pollTime: timeSchema.catch('10:00'),
   pollDays: daysListSchema.catch(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']),
-  pollTimes: z.string().catch('19,20,21'),
+  pollTimes: pollTimesSchema.catch('19,20,21'),
   reminderDay: daySchema.catch('wed'),
   reminderTime: timeSchema.catch('18:00'),
   remindersMode: remindersModeSchema.catch('quiet'),
