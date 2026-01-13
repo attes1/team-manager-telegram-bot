@@ -87,16 +87,31 @@ pnpm dev
 
 ## Bot Commands
 
+The bot uses a hierarchical permission system: **Admin > Captain > Player > Public**
+
 ### Public Commands
 Available to everyone:
+- `/help` - Show command list
 - `/roster` - View team roster
 - `/nextmatch` - View upcoming match info
-- `/help` - Show command list
 
 ### Player Commands
-Available to roster members only:
-- `/match` - View match info and lineup
-- `/practice [day]` - View practice availability
+Available to roster members, captains, and admins:
+- `/avail` - View all player availability
+- `/avail practice` - View practice availability only
+- `/avail match` - View match availability only
+- `/avail today` - View today's availability
+- `/avail <day>` - View specific day (mon, tue, wed, etc.)
+- `/avail practice mon` - Combine filters
+- `/poll` - View/respond to availability poll
+- `/status` - View status overview
+
+### Captain Commands
+Available to captains and admins:
+- `/setweek <week> practice|match` - Set week type
+- `/setmatch <day> <time>` - Schedule a match
+- `/setlineup @users...` - Set match lineup
+- `/remind` - Send reminder to non-responders
 
 ### Admin Commands
 - `/startseason <name>` - Start a new season
@@ -105,6 +120,8 @@ Available to roster members only:
 - `/config [key] [value]` - View/edit settings
 - `/addplayer <username>` - Invite player to roster (see below)
 - `/removeplayer @user` - Remove player from roster
+- `/setcaptain @user` - Promote player to captain
+- `/removecaptain @user` - Demote captain to player
 
 ### Adding Players
 
@@ -123,14 +140,6 @@ Due to Telegram API limitations, the bot cannot directly add players by username
 4. User reacts to accept/decline
 
 This approach ensures only the actual user can accept roster invitations.
-
-### Other Admin Commands
-- `/setweek <week> practice|match` - Set week type
-- `/setmatch <day> <time>` - Schedule a match
-- `/setlineup @users...` - Set match lineup
-- `/poll` - Send availability poll
-- `/remind` - Send reminder to non-responders
-- `/status` - View status overview
 
 ## Configuration Options
 

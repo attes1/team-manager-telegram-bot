@@ -154,7 +154,7 @@ export const en: Translations = {
       help: 'Show command list',
       roster: 'View team roster',
       nextmatch: 'Show upcoming match info',
-      avail: 'View player availability',
+      avail: 'View availability [practice|match] [today|day]',
       poll: 'View availability poll',
       status: 'View status overview',
       setweek: 'Set week type',

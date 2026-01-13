@@ -333,7 +333,7 @@ export const fi: Translations = {
       help: 'Näytä komennot',
       roster: 'Näytä joukkueen rosteri',
       nextmatch: 'Näytä seuraavan matsin tiedot',
-      avail: 'Näytä pelaajien saatavuus',
+      avail: 'Näytä aikataulut [practice|match] [today|päivä]',
       poll: 'Näytä aikataulukysely',
       status: 'Näytä tilannekatsaus',
       setweek: 'Aseta viikon tyyppi',
