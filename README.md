@@ -1,6 +1,6 @@
 # Pappaliiga Bot
 
-A Telegram bot for managing CS league team schedules, availability polling, and match coordination.
+A Telegram bot for managing team schedules, availability polling, and match coordination.
 
 ## Features
 
@@ -85,8 +85,14 @@ pnpm dev
 
 ## Bot Commands
 
-### Player Commands
+### Public Commands
+Available to everyone:
 - `/roster` - View team roster
+- `/nextmatch` - View upcoming match info
+- `/help` - Show command list
+
+### Player Commands
+Available to roster members only:
 - `/match` - View match info and lineup
 - `/practice [day]` - View practice availability
 
@@ -103,7 +109,6 @@ pnpm dev
 - `/poll` - Send availability poll
 - `/remind` - Send reminder to non-responders
 - `/status` - View status overview
-- `/nextmatch` - Send match info to announcements channel
 
 ## Configuration Options
 
@@ -112,17 +117,18 @@ Use `/config` to view all settings. Available options:
 | Key | Description | Example |
 |-----|-------------|---------|
 | `language` | Bot language (fi/en) | `fi` |
-| `pollDay` | Day to send poll | `sun` |
-| `pollTime` | Time to send poll | `10:00` |
-| `pollDays` | Days shown in poll | `mon,tue,wed,thu,fri,sat,sun` |
-| `pollTimes` | Time slots in poll | `19,20,21` |
-| `reminderDay` | Day for reminders | `wed` |
-| `reminderTime` | Time for reminders | `18:00` |
-| `remindersMode` | ping/quiet/off | `quiet` |
-| `matchDay` | Default match day | `sun` |
-| `matchTime` | Default match time | `20:00` |
-| `lineupSize` | Players in lineup | `5` |
-| `announcementsChatId` | Public channel ID | `-1001234567890` |
+| `poll_day` | Day to send poll | `sun` |
+| `poll_time` | Time to send poll | `10:00` |
+| `poll_days` | Days shown in poll | `mon,tue,wed,thu,fri,sat,sun` |
+| `poll_times` | Time slots in poll | `19,20,21` |
+| `reminder_day` | Day for reminders | `wed` |
+| `reminder_time` | Time for reminders | `18:00` |
+| `reminders_mode` | ping/quiet/off | `quiet` |
+| `match_day` | Default match day | `sun` |
+| `match_time` | Default match time | `20:00` |
+| `lineup_size` | Players in lineup | `5` |
+| `match_day_reminder_enabled` | Enable match day reminder | `on` |
+| `match_day_reminder_time` | Time for match day reminder | `18:00` |
 
 ## Project Structure
 
