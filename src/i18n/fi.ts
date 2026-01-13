@@ -240,9 +240,9 @@ export const fi: Translations = {
   },
   poll: {
     title: (week, dateRange) =>
-      `Vko ${week} (${dateRange}) aikataulukysely.\nMerkkaa milloin pääset pelaamaan:`,
+      `Vko ${week} (${dateRange}) aikataulukysely.\nMerkkaa milloin pääset pelaamaan.`,
     matchWeekTitle: (week, dateRange) =>
-      `Vko ${week} (${dateRange}) - MATSI!\nOletusaika su 20:00. Merkkaa milloin pääset:`,
+      `Vko ${week} (${dateRange}) - MATSI!\nOletusaika su 20:00. Merkkaa milloin pääset.`,
     legend: '✅ Vapaa | 🏋️ Vain treeni | 🏆 Vain matsi | ⚠️ Jos tarve | ❌ Ei pääse',
     days: {
       mon: 'Ma',

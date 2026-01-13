@@ -6,7 +6,6 @@ import { formatDateRange } from '../lib/format';
 import type { AvailabilityStatus } from '../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { getPlayerWeekAvailability, setDayAvailability } from '../services/availability';
-import { getConfig } from '../services/config';
 import { isPlayerInRoster } from '../services/roster';
 import { getWeek } from '../services/week';
 
@@ -47,6 +46,14 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
   const { week, year } = getCurrentWeek();
   const days = config.pollDays;
   const times = config.pollTimes.split(',');
+
+  // Header row with time slots
+  range.text(' ', (ctx) => ctx.answerCallbackQuery());
+  for (const time of times) {
+    range.text(time, (ctx) => ctx.answerCallbackQuery());
+  }
+  range.text(' ', (ctx) => ctx.answerCallbackQuery());
+  range.row();
 
   const availability = await getPlayerWeekAvailability(db, {
     seasonId: season.id,
@@ -106,7 +113,6 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
 
 export const getPollMessage = async (seasonId: number): Promise<string> => {
   const i18n = await getTranslations(db, seasonId);
-  const config = await getConfig(db, seasonId);
 
   const { week, year } = getCurrentWeek();
   const { start, end } = getWeekDateRange(year, week);
@@ -115,15 +121,9 @@ export const getPollMessage = async (seasonId: number): Promise<string> => {
   const weekData = await getWeek(db, seasonId, week, year);
   const isMatchWeek = weekData?.type === 'match' || !weekData;
 
-  const times = config?.pollTimes ?? '19,20,21';
-  const header = `      ${times
-    .split(',')
-    .map((t) => t.padStart(2))
-    .join('  ')}`;
-
   const title = isMatchWeek
     ? i18n.poll.matchWeekTitle(week, dateRange)
     : i18n.poll.title(week, dateRange);
 
-  return `${title}\n\n${header}\n\n${i18n.poll.legend}`;
+  return `${title}\n\n${i18n.poll.legend}`;
 };
