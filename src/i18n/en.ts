@@ -38,8 +38,8 @@ export const en: Translations = {
     demoted: (name) => `${name} demoted to player.`,
     alreadyCaptain: (name) => `${name} is already a captain.`,
     notACaptain: (name) => `${name} is not a captain.`,
-    usage: 'Usage: /setcaptain @player',
-    removeUsage: 'Usage: /removecaptain @player',
+    usage: 'Usage: /promote @player',
+    removeUsage: 'Usage: /demote @player',
   },
   season: {
     started: (name) => `Season "${name}" started!`,
@@ -198,8 +198,8 @@ export const en: Translations = {
       ],
       addplayer: 'Add player to roster @player',
       removeplayer: 'Remove player from roster @player',
-      setcaptain: 'Promote player to captain @player',
-      removecaptain: 'Demote captain to player @player',
+      promote: 'Promote player to captain @player',
+      demote: 'Demote captain to player @player',
     },
   },
   announcements: {

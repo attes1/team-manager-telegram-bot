@@ -28,7 +28,7 @@ const getUsernameFromArgs = (ctx: AdminSeasonContext): string | null => {
 
 export const registerCaptainCommands = (bot: Bot<BotContext>) => {
   bot.command(
-    'setcaptain',
+    'promote',
     adminSeasonCommand(async (ctx: AdminSeasonContext) => {
       const { db, season, i18n } = ctx;
 
@@ -72,7 +72,7 @@ export const registerCaptainCommands = (bot: Bot<BotContext>) => {
   );
 
   bot.command(
-    'removecaptain',
+    'demote',
     adminSeasonCommand(async (ctx: AdminSeasonContext) => {
       const { db, season, i18n } = ctx;
 

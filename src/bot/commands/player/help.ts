@@ -46,8 +46,8 @@ export const registerHelpCommand = (bot: Bot<BotContext>) => {
       lines.push(...formatCommand('/config', cmds.config));
       lines.push(...formatCommand('/addplayer', cmds.addplayer));
       lines.push(...formatCommand('/removeplayer', cmds.removeplayer));
-      lines.push(...formatCommand('/setcaptain', cmds.setcaptain));
-      lines.push(...formatCommand('/removecaptain', cmds.removecaptain));
+      lines.push(...formatCommand('/promote', cmds.promote));
+      lines.push(...formatCommand('/demote', cmds.demote));
     }
 
     lines.push('');

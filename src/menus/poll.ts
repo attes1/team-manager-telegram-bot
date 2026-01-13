@@ -9,8 +9,9 @@ import { getPlayerWeekAvailability, setDayAvailability } from '../services/avail
 import { isPlayerInRoster } from '../services/roster';
 import { getWeek } from '../services/week';
 
-// Week marker format: [w:5/2025] - appended to poll message for parsing
-const WEEK_MARKER_REGEX = /\[w:(\d+)\/(\d+)\]$/;
+// Week marker: hidden in an invisible HTML link
+// Format: <a href="w:5/2025">​</a> - zero-width space as link text
+const WEEK_MARKER_REGEX = /href="w:(\d+)\/(\d+)"/;
 
 const parseWeekFromMessage = (text: string | undefined): { week: number; year: number } | null => {
   if (!text) {
@@ -23,7 +24,9 @@ const parseWeekFromMessage = (text: string | undefined): { week: number; year: n
   return null;
 };
 
-const createWeekMarker = (week: number, year: number): string => `[w:${week}/${year}]`;
+// Creates invisible marker using zero-width space in a link
+const createWeekMarker = (week: number, year: number): string =>
+  `<a href="w:${week}/${year}">\u200B</a>`;
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   available: '✅',

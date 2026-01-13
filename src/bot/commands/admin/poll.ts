@@ -39,7 +39,7 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
       }
 
       const message = await getPollMessage(season.id, pollWeek);
-      return ctx.reply(message, { reply_markup: pollMenu });
+      return ctx.reply(message, { reply_markup: pollMenu, parse_mode: 'HTML' });
     }),
   );
 };

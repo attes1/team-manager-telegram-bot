@@ -134,8 +134,8 @@ Available to captains and admins:
 - `/config [key] [value]` - View/edit settings
 - `/addplayer <username>` - Invite player to roster (see below)
 - `/removeplayer @user` - Remove player from roster
-- `/setcaptain @user` - Promote player to captain
-- `/removecaptain @user` - Demote captain to player
+- `/promote @user` - Promote player to captain
+- `/demote @user` - Demote captain to player
 
 ### Adding Players
 

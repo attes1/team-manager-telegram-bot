@@ -42,8 +42,8 @@ const DAY_NAMES_SHORT_EN: Record<Day, string> = {
 };
 
 export const formatDateRange = (start: Date, end: Date): string => {
-  const startStr = format(start, 'd.M.');
-  const endStr = format(end, 'd.M.');
+  const startStr = format(start, 'd.M.yyyy');
+  const endStr = format(end, 'd.M.yyyy');
   return `${startStr} - ${endStr}`;
 };
 

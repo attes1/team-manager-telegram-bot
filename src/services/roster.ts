@@ -4,6 +4,10 @@ import type { DB, Player } from '../types/db';
 
 export type { Player };
 
+export interface PlayerWithRole extends Player {
+  role: RosterRole;
+}
+
 export interface AddPlayerParams {
   seasonId: number;
   telegramId: number;
@@ -47,11 +51,12 @@ export const removePlayerFromRoster = async (
   return result.numDeletedRows > 0n;
 };
 
-export const getRoster = async (db: Kysely<DB>, seasonId: number): Promise<Player[]> => {
+export const getRoster = async (db: Kysely<DB>, seasonId: number): Promise<PlayerWithRole[]> => {
   const rows = await db
     .selectFrom('seasonRoster')
     .innerJoin('players', 'players.telegramId', 'seasonRoster.playerId')
     .selectAll('players')
+    .select('seasonRoster.role')
     .where('seasonRoster.seasonId', '=', seasonId)
     .orderBy('players.displayName', 'asc')
     .execute();

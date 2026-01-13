@@ -35,8 +35,6 @@ const getAllMentionedUsers = (ctx: CaptainSeasonContext): MentionedUser[] => {
 };
 
 export const registerMatchCommands = (bot: Bot<BotContext>) => {
-  bot.use(lineupMenu);
-
   bot.command(
     'setmatch',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {

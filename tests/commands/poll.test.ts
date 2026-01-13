@@ -94,7 +94,7 @@ describe('/poll command', () => {
     expect(calls[0].method).toBe('sendMessage');
     // Week 2 is target (before Thursday cutoff)
     expect(calls[0].payload.text).toContain('Week 2');
-    expect(calls[0].payload.text).toContain('[w:2/2025]');
+    expect(calls[0].payload.text).toContain('href="w:2/2025"');
   });
 
   test('sends poll for specified week when parameter provided', async () => {
@@ -108,7 +108,7 @@ describe('/poll command', () => {
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Week 5');
-    expect(calls[0].payload.text).toContain('[w:5/2025]');
+    expect(calls[0].payload.text).toContain('href="w:5/2025"');
   });
 
   test('includes week marker for menu parsing', async () => {
@@ -120,7 +120,7 @@ describe('/poll command', () => {
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toMatch(/\[w:\d+\/\d+\]$/);
+    expect(calls[0].payload.text).toMatch(/href="w:\d+\/\d+"/);
   });
 
   test('week 1 when on week 2 infers next year (not past)', async () => {
@@ -135,7 +135,7 @@ describe('/poll command', () => {
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Week 1');
-    expect(calls[0].payload.text).toContain('[w:1/2026]');
+    expect(calls[0].payload.text).toContain('href="w:1/2026"');
   });
 
   test('accepts current target week', async () => {
@@ -167,7 +167,7 @@ describe('/poll command', () => {
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Week 2');
-    expect(calls[0].payload.text).toContain('[w:2/2026]');
+    expect(calls[0].payload.text).toContain('href="w:2/2026"');
   });
 
   test('uses current year when week >= target week', async () => {
@@ -180,7 +180,7 @@ describe('/poll command', () => {
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('[w:10/2025]');
+    expect(calls[0].payload.text).toContain('href="w:10/2025"');
   });
 
   test('rejects invalid week number - too low', async () => {
@@ -231,7 +231,7 @@ describe('/poll command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].payload.text).toContain('Week 3');
-    expect(calls[0].payload.text).toContain('[w:3/2025]');
+    expect(calls[0].payload.text).toContain('href="w:3/2025"');
   });
 
   test('week 2 when target is week 3 infers next year', async () => {
@@ -247,7 +247,7 @@ describe('/poll command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].payload.text).toContain('Week 2');
-    expect(calls[0].payload.text).toContain('[w:2/2026]');
+    expect(calls[0].payload.text).toContain('href="w:2/2026"');
   });
 
   test('returns error when no active season', async () => {
@@ -370,6 +370,6 @@ describe('/poll command', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].payload.text).toContain('Week 1');
-    expect(calls[0].payload.text).toContain('[w:1/2026]');
+    expect(calls[0].payload.text).toContain('href="w:1/2026"');
   });
 });

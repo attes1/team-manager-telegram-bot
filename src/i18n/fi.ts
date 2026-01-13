@@ -188,8 +188,8 @@ export interface Translations {
       config: string[];
       addplayer: string;
       removeplayer: string;
-      setcaptain: string;
-      removecaptain: string;
+      promote: string;
+      demote: string;
     };
   };
   announcements: {
@@ -244,8 +244,8 @@ export const fi: Translations = {
     demoted: (name) => `${name} alennettu pelaajaksi.`,
     alreadyCaptain: (name) => `${name} on jo kapteeni.`,
     notACaptain: (name) => `${name} ei ole kapteeni.`,
-    usage: 'Käyttö: /setcaptain @pelaaja',
-    removeUsage: 'Käyttö: /removecaptain @pelaaja',
+    usage: 'Käyttö: /promote @pelaaja',
+    removeUsage: 'Käyttö: /demote @pelaaja',
   },
   season: {
     started: (name) => `Kausi "${name}" aloitettu!`,
@@ -404,8 +404,8 @@ export const fi: Translations = {
       ],
       addplayer: 'Lisää pelaaja rosteriin @player',
       removeplayer: 'Poista pelaaja rosterista @player',
-      setcaptain: 'Ylennä pelaaja kapteniksi @player',
-      removecaptain: 'Alenna kapteeni pelaajaksi @player',
+      promote: 'Ylennä pelaaja kapteniksi @player',
+      demote: 'Alenna kapteeni pelaajaksi @player',
     },
   },
   announcements: {

@@ -15,7 +15,11 @@ export const registerRosterCommand = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.roster.empty);
       }
 
-      const lines = players.map((p) => `• ${formatPlayerName(p)}`);
+      const lines = players.map((p) => {
+        const name = formatPlayerName(p);
+        const suffix = p.role === 'captain' ? ' (cpt.)' : '';
+        return `• ${name}${suffix}`;
+      });
       const message = `${i18n.roster.title}\n${lines.join('\n')}`;
 
       return ctx.reply(message);

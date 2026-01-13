@@ -19,8 +19,8 @@ const commandsEn: BotCommand[] = [
   { command: 'config', description: 'View/edit settings (admin)' },
   { command: 'addplayer', description: 'Add player to roster (admin)' },
   { command: 'removeplayer', description: 'Remove player from roster (admin)' },
-  { command: 'setcaptain', description: 'Promote player to captain (admin)' },
-  { command: 'removecaptain', description: 'Demote captain to player (admin)' },
+  { command: 'promote', description: 'Promote player to captain (admin)' },
+  { command: 'demote', description: 'Demote captain to player (admin)' },
 ];
 
 const commandsFi: BotCommand[] = [
@@ -41,8 +41,8 @@ const commandsFi: BotCommand[] = [
   { command: 'config', description: 'Näytä/muokkaa asetuksia (admin)' },
   { command: 'addplayer', description: 'Lisää pelaaja rosteriin (admin)' },
   { command: 'removeplayer', description: 'Poista pelaaja rosterista (admin)' },
-  { command: 'setcaptain', description: 'Ylennä pelaaja kapteniksi (admin)' },
-  { command: 'removecaptain', description: 'Alenna kapteeni pelaajaksi (admin)' },
+  { command: 'promote', description: 'Ylennä pelaaja kapteniksi (admin)' },
+  { command: 'demote', description: 'Alenna kapteeni pelaajaksi (admin)' },
 ];
 
 export const commandDefinitions: Record<Language, BotCommand[]> = {
