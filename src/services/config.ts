@@ -1,7 +1,8 @@
 import type { Kysely } from 'kysely';
-import type { Config, DB } from '../types/db';
+import { configSchema, type ParsedConfig } from '../lib/schemas';
+import type { DB } from '../types/db';
 
-export type { Config };
+export type { ParsedConfig as Config };
 
 const VALID_CONFIG_KEYS = [
   'language',
@@ -24,8 +25,21 @@ type ConfigKey = (typeof VALID_CONFIG_KEYS)[number];
 const isValidConfigKey = (key: string): key is ConfigKey =>
   VALID_CONFIG_KEYS.includes(key as ConfigKey);
 
-export const getConfig = async (db: Kysely<DB>, seasonId: number): Promise<Config | undefined> => {
-  return db.selectFrom('config').selectAll().where('seasonId', '=', seasonId).executeTakeFirst();
+export const getConfig = async (
+  db: Kysely<DB>,
+  seasonId: number,
+): Promise<ParsedConfig | undefined> => {
+  const raw = await db
+    .selectFrom('config')
+    .selectAll()
+    .where('seasonId', '=', seasonId)
+    .executeTakeFirst();
+
+  if (!raw) {
+    return undefined;
+  }
+
+  return configSchema.parse(raw);
 };
 
 export const updateConfig = async (

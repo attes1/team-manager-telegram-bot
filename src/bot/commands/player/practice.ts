@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { Translations } from '../../../i18n';
 import { formatDateRange } from '../../../lib/format';
 import type { AvailabilityStatus, Day } from '../../../lib/schemas';
-import { daySchema, daysListSchema } from '../../../lib/schemas';
+import { daySchema } from '../../../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
 import { getWeekAvailability } from '../../../services/availability';
 import type { BotContext, RosterContext } from '../../context';
@@ -96,11 +96,7 @@ export const registerPracticeCommand = (bot: Bot<BotContext>) => {
 
       const lines: string[] = [i18n.practice.title(week, dateRange), ''];
 
-      const days = daysListSchema
-        .catch(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])
-        .parse(config.pollDays);
-
-      for (const day of days) {
+      for (const day of config.pollDays) {
         const dayHeader = i18n.poll.days[day];
         const playersForDay = availability.filter((p) => p.responses[day]);
 

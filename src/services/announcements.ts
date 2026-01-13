@@ -1,15 +1,15 @@
 import type { Kysely } from 'kysely';
 import { formatDateRange, formatDay } from '@/lib/format';
-import type { Day } from '@/lib/schemas';
+import type { ParsedConfig } from '@/lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '@/lib/week';
-import type { Config, DB, Player } from '@/types/db';
+import type { DB, Player } from '@/types/db';
 import type { Translations } from '../i18n';
 import { getLineup, getMatchInfo } from './match';
 import { getWeek } from './week';
 
 export interface AnnouncementContext {
   db: Kysely<DB>;
-  config: Config;
+  config: ParsedConfig;
   i18n: Translations;
   season: { id: number };
 }
@@ -86,7 +86,6 @@ export const getMatchAnnouncementData = async (
   const { week, year } = getCurrentWeek();
   const { start, end } = getWeekDateRange(year, week);
   const dateRange = formatDateRange(start, end);
-  const lang = config.language as 'fi' | 'en';
 
   const weekInfo = await getWeek(db, seasonId, week, year);
 
@@ -102,11 +101,11 @@ export const getMatchAnnouncementData = async (
   let isDefault = false;
 
   if (matchInfo?.matchDay && matchInfo?.matchTime) {
-    matchDay = formatDay(matchInfo.matchDay, lang);
+    matchDay = formatDay(matchInfo.matchDay, config.language);
     matchTime = matchInfo.matchTime;
     isDefault = false;
-  } else if (config.matchDay && config.matchTime) {
-    matchDay = formatDay(config.matchDay as Day, lang);
+  } else {
+    matchDay = formatDay(config.matchDay, config.language);
     matchTime = config.matchTime;
     isDefault = true;
   }

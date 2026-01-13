@@ -2,7 +2,6 @@ import type { NextFunction } from 'grammy';
 import { db } from '../../db';
 import { t } from '../../i18n';
 import { isAdmin } from '../../lib/admin';
-import { languageSchema } from '../../lib/schemas';
 import { getConfig } from '../../services/config';
 import { isPlayerInRoster } from '../../services/roster';
 import { getActiveSeason } from '../../services/season';
@@ -20,8 +19,7 @@ export const contextMiddleware = async (ctx: BotContext, next: NextFunction) => 
     const config = await getConfig(db, season.id);
     if (config) {
       ctx.config = config;
-      const lang = languageSchema.catch('en').parse(config.language);
-      ctx.i18n = t(lang);
+      ctx.i18n = t(config.language);
     } else {
       ctx.i18n = t();
     }

@@ -42,3 +42,22 @@ export type WeekType = z.infer<typeof weekTypeSchema>;
 export type RemindersMode = z.infer<typeof remindersModeSchema>;
 export type SeasonStatus = z.infer<typeof seasonStatusSchema>;
 export type Language = z.infer<typeof languageSchema>;
+
+export const configSchema = z.object({
+  seasonId: z.number(),
+  language: languageSchema.catch('fi'),
+  pollDay: daySchema.catch('sun'),
+  pollTime: timeSchema.catch('10:00'),
+  pollDays: daysListSchema.catch(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']),
+  pollTimes: z.string().catch('19,20,21'),
+  reminderDay: daySchema.catch('wed'),
+  reminderTime: timeSchema.catch('18:00'),
+  remindersMode: remindersModeSchema.catch('quiet'),
+  matchDay: daySchema.catch('sun'),
+  matchTime: timeSchema.catch('20:00'),
+  lineupSize: z.number().catch(5),
+  matchDayReminderEnabled: z.boolean().catch(true),
+  matchDayReminderTime: timeSchema.catch('18:00'),
+});
+
+export type ParsedConfig = z.infer<typeof configSchema>;

@@ -4,7 +4,6 @@ import { db } from '../db';
 import { getTranslations } from '../i18n';
 import { formatDateRange } from '../lib/format';
 import type { AvailabilityStatus } from '../lib/schemas';
-import { daysListSchema } from '../lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '../lib/week';
 import { getPlayerWeekAvailability, setDayAvailability } from '../services/availability';
 import { getConfig } from '../services/config';
@@ -46,7 +45,7 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
   }
 
   const { week, year } = getCurrentWeek();
-  const days = daysListSchema.parse(config.pollDays);
+  const days = config.pollDays;
   const times = config.pollTimes.split(',');
 
   const availability = await getPlayerWeekAvailability(db, {

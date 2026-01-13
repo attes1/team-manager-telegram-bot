@@ -46,7 +46,7 @@ describe('config service', () => {
         language: 'en',
         pollDay: 'sun',
         pollTime: '10:00',
-        pollDays: 'mon,tue,wed,thu,fri,sat,sun',
+        pollDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
         pollTimes: '19,20,21',
         reminderDay: 'wed',
         reminderTime: '18:00',
@@ -88,7 +88,7 @@ describe('config service', () => {
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
-      expect(config?.pollDays).toBe('mon,wed,fri');
+      expect(config?.pollDays).toEqual(['mon', 'wed', 'fri']);
     });
 
     test('updates pollTimes', async () => {

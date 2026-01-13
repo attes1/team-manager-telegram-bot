@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
 import type { Translations } from '../../../i18n';
+import type { ParsedConfig } from '../../../lib/schemas';
 import { updateConfig } from '../../../services/config';
-import type { Config } from '../../../types/db';
 import type { AdminSeasonContext, BotContext } from '../../context';
 import { adminSeasonCommand } from '../../middleware';
 
@@ -26,13 +26,13 @@ const USER_KEYS = Object.keys(USER_TO_DB_KEY);
 const isValidUserKey = (key: string): boolean => USER_KEYS.includes(key);
 const toDbKey = (userKey: string): string => USER_TO_DB_KEY[userKey];
 
-const formatConfigDisplay = (i18n: Translations, config: Config): string => {
+const formatConfigDisplay = (i18n: Translations, config: ParsedConfig): string => {
   const keys = i18n.config.keys;
   const lines = [
     i18n.config.line(keys.language, config.language),
     i18n.config.line(keys.poll_day, config.pollDay),
     i18n.config.line(keys.poll_time, config.pollTime),
-    i18n.config.line(keys.poll_days, config.pollDays),
+    i18n.config.line(keys.poll_days, config.pollDays.join(',')),
     i18n.config.line(keys.poll_times, config.pollTimes),
     i18n.config.line(keys.reminder_day, config.reminderDay),
     i18n.config.line(keys.reminder_time, config.reminderTime),

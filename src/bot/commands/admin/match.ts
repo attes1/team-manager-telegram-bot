@@ -72,9 +72,8 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
 
       const { start, end } = getWeekDateRange(year, weekNumber);
       const dateRange = formatDateRange(start, end);
-      const lang = config.language as 'fi' | 'en';
       const dayName = i18n.poll.days[dayResult.data];
-      const dayFormatted = formatDay(dayResult.data, lang);
+      const dayFormatted = formatDay(dayResult.data, config.language);
 
       if (env.PUBLIC_CHANNEL_ID) {
         const announcement = buildMatchScheduledAnnouncement(i18n, dayFormatted, timeResult.data);

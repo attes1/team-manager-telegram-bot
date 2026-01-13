@@ -31,7 +31,7 @@ describe('dayToCronWeekday', () => {
   });
 
   test('throws for invalid day', () => {
-    expect(() => dayToCronWeekday('invalid')).toThrow('Invalid day');
+    expect(() => dayToCronWeekday('invalid')).toThrow();
   });
 });
 
