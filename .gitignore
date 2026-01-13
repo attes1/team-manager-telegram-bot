@@ -4,6 +4,7 @@ data/
 *.log
 dist/
 coverage/
+.serena/
 
 # Claude Code docs
 AGENTS.md
