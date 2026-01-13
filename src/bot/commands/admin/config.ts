@@ -1,5 +1,5 @@
 import type { Bot } from 'grammy';
-import type { Translations } from '../../../i18n';
+import type { Language, Translations } from '../../../i18n';
 import type { ParsedConfig } from '../../../lib/schemas';
 import { refreshScheduler } from '../../../scheduler';
 import { updateConfig } from '../../../services/config';
@@ -94,8 +94,14 @@ export const registerConfigCommand = (bot: Bot<BotContext>) => {
           await refreshScheduler();
         }
         // Update bot command descriptions when language changes
-        if (key === 'language' && (value === 'en' || value === 'fi')) {
-          await ctx.api.setMyCommands(commandDefinitions[value]);
+        if (key === 'language' && (value === 'en' || value === 'fi') && ctx.chat) {
+          const lang = value as Language;
+          const commands = commandDefinitions[lang];
+          // Set commands globally and for this specific chat
+          await ctx.api.setMyCommands(commands);
+          await ctx.api.setMyCommands(commands, {
+            scope: { type: 'chat', chat_id: ctx.chat.id },
+          });
         }
         return ctx.reply(i18n.config.updated(key, value));
       } catch {
