@@ -1,5 +1,4 @@
 import type { Bot } from 'grammy';
-import { t } from '../../../i18n';
 import { formatDate } from '../../../lib/format';
 import { endSeason, startSeason } from '../../../services/season';
 import type { BotContext, SeasonContext } from '../../context';
@@ -13,7 +12,7 @@ export const registerSeasonCommands = (bot: Bot<BotContext>) => {
       const args = ctx.match?.toString().trim() ?? '';
 
       if (!args) {
-        return ctx.reply(t().errors.missingSeasonName);
+        return ctx.reply(i18n.errors.missingSeasonName);
       }
 
       const season = await startSeason(db, args);

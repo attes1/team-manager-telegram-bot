@@ -6,11 +6,11 @@ export const en: Translations = {
   },
   errors: {
     notAdmin: 'You do not have permission for this command.',
-    noActiveSeason: 'No active season. Start one with /season start <name>',
+    noActiveSeason: 'No active season. Start one with /startseason <name>',
     noUserMentioned: 'Mention a user in the command (e.g. /addplayer @user)',
     playerNotFound: 'Player not found.',
     playerNotInRoster: 'Player is not in the roster.',
-    missingSeasonName: 'Provide a season name (e.g. /season start Spring 2025)',
+    missingSeasonName: 'Provide a season name (e.g. /startseason Spring 2025)',
     invalidConfigKey: 'Unknown setting. Use /config to see options.',
     invalidConfigValue: (key) => `Invalid value for "${key}".`,
     notInRoster: 'You are not in the roster. Ask an admin to add you.',

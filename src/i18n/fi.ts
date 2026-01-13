@@ -171,11 +171,11 @@ export const fi: Translations = {
   },
   errors: {
     notAdmin: 'Sinulla ei ole oikeuksia tähän komentoon.',
-    noActiveSeason: 'Ei aktiivista kautta. Aloita kausi komennolla /season start <nimi>',
+    noActiveSeason: 'Ei aktiivista kautta. Aloita kausi komennolla /startseason <nimi>',
     noUserMentioned: 'Mainitse käyttäjä komennossa (esim. /addplayer @käyttäjä)',
     playerNotFound: 'Pelaajaa ei löytynyt.',
     playerNotInRoster: 'Pelaaja ei ole rosterissa.',
-    missingSeasonName: 'Anna kauden nimi (esim. /season start Kevät 2025)',
+    missingSeasonName: 'Anna kauden nimi (esim. /startseason Kevät 2025)',
     invalidConfigKey: 'Tuntematon asetus. Käytä /config nähdäksesi vaihtoehdot.',
     invalidConfigValue: (key) => `Virheellinen arvo asetukselle "${key}".`,
     notInRoster: 'Et ole rosterissa. Pyydä adminia lisäämään sinut.',
