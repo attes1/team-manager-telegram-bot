@@ -2,6 +2,8 @@ import { Bot } from 'grammy';
 import { db } from '../db';
 import { env } from '../env';
 import { languageSchema } from '../lib/schemas';
+import { lineupMenu } from '../menus/lineup';
+import { pollMenu } from '../menus/poll';
 import { getConfig } from '../services/config';
 import { getActiveSeason } from '../services/season';
 import { registerCommands } from './commands';
@@ -13,6 +15,8 @@ export const createBot = () => {
   const bot = new Bot<BotContext>(env.BOT_TOKEN);
 
   bot.use(contextMiddleware);
+  bot.use(pollMenu);
+  bot.use(lineupMenu);
 
   bot.command('start', (ctx) => ctx.reply(ctx.i18n.bot.started));
 
