@@ -2,6 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext } from '../context';
 import { registerConfigCommand } from './admin/config';
 import { registerMatchCommands } from './admin/match';
+import { registerNextMatchCommand } from './admin/nextmatch';
 import { registerPlayerCommands } from './admin/players';
 import { registerPollCommand } from './admin/poll';
 import { registerRemindCommand } from './admin/remind';
@@ -26,4 +27,5 @@ export const registerCommands = (bot: Bot<BotContext>) => {
   registerMatchInfoCommand(bot);
   registerRosterCommand(bot);
   registerPracticeCommand(bot);
+  registerNextMatchCommand(bot);
 };

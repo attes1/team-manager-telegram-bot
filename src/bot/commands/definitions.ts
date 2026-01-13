@@ -19,6 +19,7 @@ const commandsEn: BotCommand[] = [
   { command: 'poll', description: 'Send availability poll (admin)' },
   { command: 'remind', description: 'Send reminder to non-responders (admin)' },
   { command: 'status', description: 'View status overview (admin)' },
+  { command: 'nextmatch', description: 'Send match info to channel (admin)' },
 ];
 
 const commandsFi: BotCommand[] = [
@@ -39,6 +40,7 @@ const commandsFi: BotCommand[] = [
   { command: 'poll', description: 'Lähetä saatavuuskysely (admin)' },
   { command: 'remind', description: 'Lähetä muistutus vastaamattomille (admin)' },
   { command: 'status', description: 'Näytä tilannekatsaus (admin)' },
+  { command: 'nextmatch', description: 'Lähetä matsitiedot kanavalle (admin)' },
 ];
 
 export const commandDefinitions: Record<Language, BotCommand[]> = {

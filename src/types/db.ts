@@ -28,6 +28,7 @@ export interface ConfigTable {
   matchDay: Generated<string>;
   matchTime: Generated<string>;
   lineupSize: Generated<number>;
+  announcementsChatId: string | null;
 }
 
 export interface PlayersTable {

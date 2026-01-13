@@ -15,6 +15,7 @@ const VALID_CONFIG_KEYS = [
   'matchDay',
   'matchTime',
   'lineupSize',
+  'announcementsChatId',
 ] as const;
 
 type ConfigKey = (typeof VALID_CONFIG_KEYS)[number];

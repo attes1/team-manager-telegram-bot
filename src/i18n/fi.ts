@@ -46,6 +46,7 @@ export interface Translations {
       match_day: string;
       match_time: string;
       lineup_size: string;
+      announcements_chat_id: string;
     };
   };
   week: {
@@ -146,7 +147,22 @@ export interface Translations {
       poll: string;
       remind: string;
       status: string;
+      nextmatch: string;
     };
+  };
+  announcements: {
+    noChannel: string;
+    nextMatch: (week: number, dateRange: string) => string;
+    matchTime: (day: string, time: string) => string;
+    matchTimeDefault: (day: string, time: string) => string;
+    matchTimeNotSet: string;
+    lineupTitle: string;
+    lineupEmpty: string;
+    lineupPlayer: (name: string) => string;
+    lineupSet: (count: number) => string;
+    matchScheduled: (day: string, time: string) => string;
+    noMatchWeek: string;
+    sent: string;
   };
 }
 
@@ -198,6 +214,7 @@ export const fi: Translations = {
       match_day: 'Oletusmatsin päivä',
       match_time: 'Oletusmatsin aika',
       lineup_size: 'Kokoonpanon koko',
+      announcements_chat_id: 'Ilmoituskanava',
     },
   },
   week: {
@@ -302,6 +319,21 @@ export const fi: Translations = {
       poll: 'Lähetä saatavuuskysely',
       remind: 'Lähetä muistutus vastaamattomille',
       status: 'Näytä tilannekatsaus',
+      nextmatch: 'Lähetä matsitiedot kanavalle',
     },
+  },
+  announcements: {
+    noChannel: 'Ilmoituskanavaa ei ole asetettu. Käytä /config announcementsChatId <kanava_id>',
+    nextMatch: (week, dateRange) => `🎮 Vko ${week} (${dateRange}) matsi`,
+    matchTime: (day, time) => `📅 ${day} klo ${time}`,
+    matchTimeDefault: (day, time) => `📅 Oletusaika: ${day} klo ${time}`,
+    matchTimeNotSet: '📅 Aikaa ei vielä sovittu',
+    lineupTitle: '👥 Kokoonpano:',
+    lineupEmpty: 'Kokoonpanoa ei ole vielä asetettu',
+    lineupPlayer: (name) => `• ${name}`,
+    lineupSet: (count) => `🎮 Kokoonpano asetettu (${count} pelaajaa)!`,
+    matchScheduled: (day, time) => `📅 Matsi sovittu: ${day} klo ${time}`,
+    noMatchWeek: 'Tällä viikolla ei ole matsia.',
+    sent: 'Ilmoitus lähetetty kanavalle.',
   },
 };

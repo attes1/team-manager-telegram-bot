@@ -29,6 +29,7 @@ export const registerHelpCommand = (bot: Bot<BotContext>) => {
       lines.push(`• /poll - ${i18n.help.commands.poll}`);
       lines.push(`• /remind - ${i18n.help.commands.remind}`);
       lines.push(`• /status - ${i18n.help.commands.status}`);
+      lines.push(`• /nextmatch - ${i18n.help.commands.nextmatch}`);
     }
 
     return ctx.reply(lines.join('\n'), { parse_mode: 'HTML' });
