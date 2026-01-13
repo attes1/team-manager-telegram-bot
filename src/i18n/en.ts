@@ -123,10 +123,10 @@ export const en: Translations = {
     title: (week, dateRange) => `Week ${week} (${dateRange}) availability:`,
     practiceTitle: (week, dateRange) => `Week ${week} (${dateRange}) practice availability:`,
     matchTitle: (week, dateRange) => `Week ${week} (${dateRange}) match availability:`,
-    dayTitle: (day, date) => `${day} ${date} availability:`,
+    dayTitle: (day, date, week) => `Week ${week}: ${day} ${date} availability:`,
     noResponses: 'No responses yet.',
     noResponsesForDay: (day) => `No availability for ${day}.`,
-    usage: 'Usage: /avail [practice|match] [today|<day>]',
+    usage: 'Usage: /avail [practice|match] [today|<day>] [week]',
   },
   match: {
     scheduled: (day, time, week, dateRange) =>

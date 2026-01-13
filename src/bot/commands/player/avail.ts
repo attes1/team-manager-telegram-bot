@@ -2,8 +2,8 @@ import type { Bot } from 'grammy';
 import type { Translations } from '../../../i18n';
 import { formatDateRange, formatPlayerName } from '../../../lib/format';
 import type { AvailabilityStatus, Day } from '../../../lib/schemas';
-import { daySchema } from '../../../lib/schemas';
-import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
+import { daySchema, weekNumberSchema } from '../../../lib/schemas';
+import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '../../../lib/week';
 import { getWeekAvailability } from '../../../services/availability';
 import type { BotContext, RosterContext } from '../../context';
 import { rosterCommand } from '../../middleware';
@@ -70,7 +70,7 @@ const showDayAvailability = async (
   dayDate.setDate(dayDate.getDate() + dayIndex);
   const dateStr = `${dayDate.getDate()}.${dayDate.getMonth() + 1}.`;
 
-  const lines: string[] = [i18n.avail.dayTitle(i18n.poll.days[day], dateStr), ''];
+  const lines: string[] = [i18n.avail.dayTitle(i18n.poll.days[day], dateStr, week), ''];
 
   for (const player of playersForDay) {
     const response = player.responses[day];
@@ -84,11 +84,18 @@ const showDayAvailability = async (
   await ctx.reply(lines.join('\n'));
 };
 
-const parseArgs = (args: string): { filter: AvailFilter; day: Day | 'today' | null } => {
+type ParsedArgs = {
+  filter: AvailFilter;
+  day: Day | 'today' | null;
+  weekInput: string | null;
+};
+
+const parseArgs = (args: string): ParsedArgs => {
   const parts = args.split(/\s+/).filter(Boolean);
 
   let filter: AvailFilter = 'all';
   let day: Day | 'today' | null = null;
+  let weekInput: string | null = null;
 
   for (const part of parts) {
     const lower = part.toLowerCase();
@@ -99,14 +106,21 @@ const parseArgs = (args: string): { filter: AvailFilter; day: Day | 'today' | nu
     } else if (lower === 'today' || lower === 'tänään') {
       day = 'today';
     } else {
-      const parseResult = daySchema.safeParse(lower);
-      if (parseResult.success) {
-        day = parseResult.data;
+      // Try parsing as day first
+      const dayResult = daySchema.safeParse(lower);
+      if (dayResult.success) {
+        day = dayResult.data;
+      } else {
+        // Try parsing as week number
+        const weekResult = weekNumberSchema.safeParse(part);
+        if (weekResult.success) {
+          weekInput = part;
+        }
       }
     }
   }
 
-  return { filter, day };
+  return { filter, day, weekInput };
 };
 
 export const registerAvailCommand = (bot: Bot<BotContext>) => {
@@ -115,11 +129,27 @@ export const registerAvailCommand = (bot: Bot<BotContext>) => {
     rosterCommand(async (ctx: RosterContext) => {
       const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
-      const { week, year } = getCurrentWeek();
+
+      // Default to scheduling week
+      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+
+      const { filter, day, weekInput } = parseArgs(args);
+
+      // Parse optional week parameter
+      let week = schedulingWeek.week;
+      let year = schedulingWeek.year;
+
+      if (weekInput) {
+        const weekResult = parseWeekInput(weekInput, schedulingWeek, { allowPast: true });
+        if (!weekResult.success) {
+          return ctx.reply(i18n.poll.invalidWeek);
+        }
+        week = weekResult.week;
+        year = weekResult.year;
+      }
+
       const { start, end } = getWeekDateRange(year, week);
       const dateRange = formatDateRange(start, end);
-
-      const { filter, day } = parseArgs(args);
 
       if (day === 'today') {
         return showDayAvailability(ctx, getTodayDay(), i18n, week, year, filter);

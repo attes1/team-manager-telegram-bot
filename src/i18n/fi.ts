@@ -119,7 +119,7 @@ export interface Translations {
     title: (week: number, dateRange: string) => string;
     practiceTitle: (week: number, dateRange: string) => string;
     matchTitle: (week: number, dateRange: string) => string;
-    dayTitle: (day: string, date: string) => string;
+    dayTitle: (day: string, date: string, week: number) => string;
     noResponses: string;
     noResponsesForDay: (day: string) => string;
     usage: string;
@@ -342,10 +342,10 @@ export const fi: Translations = {
     title: (week, dateRange) => `Vko ${week} (${dateRange}) aikataulut:`,
     practiceTitle: (week, dateRange) => `Vko ${week} (${dateRange}) treenivalmius:`,
     matchTitle: (week, dateRange) => `Vko ${week} (${dateRange}) matsivalmius:`,
-    dayTitle: (day, date) => `${day} ${date} aikataulut:`,
+    dayTitle: (day, date, week) => `Vko ${week}: ${day} ${date} aikataulut:`,
     noResponses: 'Ei vastauksia.',
     noResponsesForDay: (day) => `Ei vastauksia päivälle ${day}.`,
-    usage: 'Käyttö: /avail [practice|match] [today|<päivä>]',
+    usage: 'Käyttö: /avail [practice|match] [today|<päivä>] [viikko]',
   },
   match: {
     scheduled: (day, time, week, dateRange) =>
