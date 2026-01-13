@@ -50,6 +50,9 @@ const envSchema = z.object({
   DEFAULT_MATCH_DAY_REMINDER_TIME: z.string().default('18:00'),
 
   DEFAULT_LINEUP_SIZE: z.coerce.number().default(5),
+
+  DEFAULT_MENU_EXPIRATION_HOURS: z.coerce.number().min(1).max(168).default(24),
+  DEFAULT_MENU_CLEANUP_TIME: z.string().default('04:00'),
 });
 
 export const env = envSchema.parse(process.env);

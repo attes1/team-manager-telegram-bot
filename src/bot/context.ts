@@ -16,6 +16,8 @@ export interface BotContext extends Context {
   i18n: Translations;
   // Used by /poll command to pass target week to menu on initial render
   pollTargetWeek?: { week: number; year: number };
+  // Used by /match command to pass target week to lineup menu on initial render
+  lineupTargetWeek?: { week: number; year: number };
 }
 
 export type SeasonContext = BotContext & {

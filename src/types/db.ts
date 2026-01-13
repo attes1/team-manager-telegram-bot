@@ -34,6 +34,8 @@ export interface ConfigTable {
   matchDayReminderMode: Generated<RemindersMode>;
   matchDayReminderTime: Generated<string>;
   publicAnnouncements: Generated<string>;
+  menuExpirationHours: Generated<number>;
+  menuCleanupTime: Generated<string>;
 }
 
 export interface PlayersTable {
@@ -85,6 +87,20 @@ export interface LineupsTable {
   playerId: number;
 }
 
+export type MenuType = 'poll' | 'lineup';
+
+export interface ActiveMenusTable {
+  id: Generated<number>;
+  seasonId: number;
+  chatId: number;
+  userId: number;
+  menuType: MenuType;
+  messageId: number;
+  weekNumber: number;
+  year: number;
+  createdAt: Generated<string>;
+}
+
 export interface DB {
   seasons: SeasonsTable;
   config: ConfigTable;
@@ -94,9 +110,11 @@ export interface DB {
   timeSlots: TimeSlotsTable;
   weeks: WeeksTable;
   lineups: LineupsTable;
+  activeMenus: ActiveMenusTable;
 }
 
 export type Season = Selectable<SeasonsTable>;
 export type Config = Selectable<ConfigTable>;
 export type Player = Selectable<PlayersTable>;
 export type Week = Selectable<WeeksTable>;
+export type ActiveMenu = Selectable<ActiveMenusTable>;

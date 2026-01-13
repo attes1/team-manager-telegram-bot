@@ -73,6 +73,8 @@ export const configSchema = z.object({
   matchDayReminderMode: remindersModeSchema.catch('quiet'),
   matchDayReminderTime: timeSchema.catch('18:00'),
   publicAnnouncements: onOffSchema.catch('on'),
+  menuExpirationHours: z.number().int().min(1).max(168).catch(24),
+  menuCleanupTime: timeSchema.catch('04:00'),
 });
 
 export type ParsedConfig = z.infer<typeof configSchema>;
