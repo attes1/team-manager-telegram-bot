@@ -5,6 +5,7 @@ import {
   daySchema,
   daysListSchema,
   languageSchema,
+  onOffSchema,
   type ParsedConfig,
   pollTimesSchema,
   remindersModeSchema,
@@ -28,6 +29,7 @@ const configValidators: Record<string, z.ZodTypeAny> = {
   lineupSize: z.coerce.number().int().min(1).max(20),
   matchDayReminderMode: remindersModeSchema,
   matchDayReminderTime: timeSchema,
+  publicAnnouncements: onOffSchema,
 };
 
 export type { ParsedConfig as Config };
@@ -48,6 +50,7 @@ const VALID_CONFIG_KEYS = [
   'lineupSize',
   'matchDayReminderMode',
   'matchDayReminderTime',
+  'publicAnnouncements',
 ] as const;
 
 type ConfigKey = (typeof VALID_CONFIG_KEYS)[number];

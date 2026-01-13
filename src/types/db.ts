@@ -33,6 +33,7 @@ export interface ConfigTable {
   lineupSize: Generated<number>;
   matchDayReminderMode: Generated<RemindersMode>;
   matchDayReminderTime: Generated<string>;
+  publicAnnouncements: Generated<string>;
 }
 
 export interface PlayersTable {

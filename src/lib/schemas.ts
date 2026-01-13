@@ -23,6 +23,8 @@ export const weekTypeSchema = z.enum(['match', 'practice']);
 
 export const remindersModeSchema = z.enum(['ping', 'quiet', 'off']);
 
+export const onOffSchema = z.enum(['on', 'off']);
+
 export const seasonStatusSchema = z.enum(['active', 'ended']);
 
 export const rosterRoleSchema = z.enum(['player', 'captain']);
@@ -46,6 +48,7 @@ export type Day = z.infer<typeof daySchema>;
 export type AvailabilityStatus = z.infer<typeof availabilityStatusSchema>;
 export type WeekType = z.infer<typeof weekTypeSchema>;
 export type RemindersMode = z.infer<typeof remindersModeSchema>;
+export type OnOff = z.infer<typeof onOffSchema>;
 export type SeasonStatus = z.infer<typeof seasonStatusSchema>;
 export type RosterRole = z.infer<typeof rosterRoleSchema>;
 export type Language = z.infer<typeof languageSchema>;
@@ -67,6 +70,7 @@ export const configSchema = z.object({
   lineupSize: z.number().catch(5),
   matchDayReminderMode: remindersModeSchema.catch('quiet'),
   matchDayReminderTime: timeSchema.catch('18:00'),
+  publicAnnouncements: onOffSchema.catch('on'),
 });
 
 export type ParsedConfig = z.infer<typeof configSchema>;

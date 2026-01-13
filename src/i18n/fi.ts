@@ -67,6 +67,7 @@ export interface Translations {
       lineup_size: string;
       match_day_reminder_mode: string;
       match_day_reminder_time: string;
+      public_announcements: string;
     };
   };
   week: {
@@ -254,6 +255,7 @@ export const fi: Translations = {
       lineup_size: 'Linarin koko',
       match_day_reminder_mode: 'Matsipäivän muistutustila',
       match_day_reminder_time: 'Matsipäivän muistutusaika',
+      public_announcements: 'Julkiset ilmoitukset',
     },
   },
   week: {

@@ -71,7 +71,7 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
 
       await ctx.answerCallbackQuery(ctx.i18n.lineup.saved(lineup.length));
 
-      if (env.PUBLIC_GROUP_ID) {
+      if (env.PUBLIC_GROUP_ID && config.publicAnnouncements === 'on') {
         const { start, end } = getWeekDateRange(year, week);
         const dateRange = formatDateRange(start, end);
         const announcement = buildLineupAnnouncement(ctx.i18n, week, dateRange, lineup);

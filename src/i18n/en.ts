@@ -70,6 +70,7 @@ export const en: Translations = {
       lineup_size: 'Lineup size',
       match_day_reminder_mode: 'Match day reminder mode',
       match_day_reminder_time: 'Match day reminder time',
+      public_announcements: 'Public announcements',
     },
   },
   week: {
