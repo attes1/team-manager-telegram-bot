@@ -1,4 +1,4 @@
-# Pappaliiga Bot
+# Team Manager Bot
 
 A Telegram bot for managing team schedules, availability polling, and match coordination.
 
@@ -22,7 +22,7 @@ A Telegram bot for managing team schedules, availability polling, and match coor
 1. Clone the repository:
 ```bash
 git clone <repo-url>
-cd pappaliigabot
+cd team-manager-bot
 ```
 
 2. Install dependencies:

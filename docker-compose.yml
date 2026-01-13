@@ -1,7 +1,7 @@
 services:
-  pappaliigabot:
+  team-manager-bot:
     build: .
-    container_name: pappaliigabot
+    container_name: team-manager-bot
     restart: unless-stopped
     env_file:
       - .env

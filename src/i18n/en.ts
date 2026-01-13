@@ -2,7 +2,7 @@ import type { Translations } from './fi';
 
 export const en: Translations = {
   bot: {
-    started: 'Pappaliiga Bot started!',
+    started: 'Team Manager Bot started!',
   },
   errors: {
     notAdmin: 'You do not have permission for this command.',

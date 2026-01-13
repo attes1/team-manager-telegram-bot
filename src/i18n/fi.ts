@@ -181,7 +181,7 @@ export interface Translations {
 
 export const fi: Translations = {
   bot: {
-    started: 'Pappaliiga Bot käynnistetty!',
+    started: 'Team Manager Bot käynnistetty!',
   },
   errors: {
     notAdmin: 'Sinulla ei ole oikeuksia tähän komentoon.',
