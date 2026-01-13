@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
-import type { BotContext } from '../bot/context';
-import { db } from '../db';
-import { deleteExpiredMenus, getExpiredMenus } from '../services/menu';
+import type { BotContext } from '@/bot/context';
+import { db } from '@/db';
+import { deleteExpiredMenus, getExpiredMenus } from '@/services/menu';
 
 export const cleanupExpiredMenus = async (
   bot: Bot<BotContext>,

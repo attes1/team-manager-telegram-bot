@@ -1,13 +1,13 @@
 import type { Bot } from 'grammy';
-import type { BotContext } from '../bot/context';
-import { db } from '../db';
-import { getTranslations } from '../i18n';
-import { formatDateRange, formatPlayerName } from '../lib/format';
-import { getSchedulingWeek, getWeekDateRange } from '../lib/week';
-import { hasRespondedForWeek } from '../services/availability';
-import { getConfig } from '../services/config';
-import { getRoster } from '../services/roster';
-import { getActiveSeason } from '../services/season';
+import type { BotContext } from '@/bot/context';
+import { db } from '@/db';
+import { getTranslations } from '@/i18n';
+import { formatDateRange, formatPlayerName } from '@/lib/format';
+import { getSchedulingWeek, getWeekDateRange } from '@/lib/week';
+import { hasRespondedForWeek } from '@/services/availability';
+import { getConfig } from '@/services/config';
+import { getRoster } from '@/services/roster';
+import { getActiveSeason } from '@/services/season';
 
 export const sendReminder = async (bot: Bot<BotContext>, chatId: number): Promise<void> => {
   const season = await getActiveSeason(db);

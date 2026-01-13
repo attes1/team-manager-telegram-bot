@@ -1,15 +1,15 @@
 import type { Bot } from 'grammy';
 import cron, { type ScheduledTask as CronTask } from 'node-cron';
+import { db } from '@/db';
+import { env } from '@/env';
+import { sendMatchDayReminder } from '@/scheduler/match-day';
+import { cleanupExpiredMenus } from '@/scheduler/menu-cleanup';
+import { sendReminder } from '@/scheduler/reminder';
+import { buildCronExpression, buildDailyCronExpression } from '@/scheduler/utils';
+import { sendWeeklyPoll } from '@/scheduler/weekly-poll';
+import { getConfig } from '@/services/config';
+import { getActiveSeason } from '@/services/season';
 import type { BotContext } from '../bot/context';
-import { db } from '../db';
-import { env } from '../env';
-import { getConfig } from '../services/config';
-import { getActiveSeason } from '../services/season';
-import { sendMatchDayReminder } from './match-day';
-import { cleanupExpiredMenus } from './menu-cleanup';
-import { sendReminder } from './reminder';
-import { buildCronExpression, buildDailyCronExpression } from './utils';
-import { sendWeeklyPoll } from './weekly-poll';
 
 export interface ScheduledTask {
   name: string;

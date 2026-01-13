@@ -1,5 +1,5 @@
-import type { Day } from '../lib/schemas';
-import { daySchema } from '../lib/schemas';
+import type { Day } from '@/lib/schemas';
+import { daySchema } from '@/lib/schemas';
 
 const DAY_TO_WEEKDAY: Record<Day, number> = {
   sun: 0,
