@@ -3,7 +3,7 @@ import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
 import type { Translations } from '@/i18n';
 import { formatDateRange, formatPlayerName } from '@/lib/format';
-import type { AvailabilityStatus, Day } from '@/lib/schemas';
+import { type AvailabilityStatus, availFilterSchema, type Day } from '@/lib/schemas';
 import { getSchedulingWeek, getTodayDay, getWeekDateRange, parseDayOrWeekInput } from '@/lib/week';
 import type { PlayerWeekAvailability } from '@/services/availability';
 import { getWeekAvailability } from '@/services/availability';
@@ -21,28 +21,16 @@ type AvailFilter = 'all' | 'practice' | 'match';
 const PRACTICE_STATUSES: AvailabilityStatus[] = ['available', 'practice_only', 'if_needed'];
 const MATCH_STATUSES: AvailabilityStatus[] = ['available', 'match_only', 'if_needed'];
 
-const parseFilter = (arg: string): AvailFilter | null => {
-  const lower = arg.toLowerCase();
-  if (lower === 'practice') {
-    return 'practice';
-  }
-  if (lower === 'match') {
-    return 'match';
-  }
-  return null;
-};
-
 const matchesFilter = (status: AvailabilityStatus, filter: AvailFilter): boolean => {
   if (filter === 'all') {
     return status !== 'unavailable';
-  }
-  if (filter === 'practice') {
+  } else if (filter === 'practice') {
     return PRACTICE_STATUSES.includes(status);
-  }
-  if (filter === 'match') {
+  } else if (filter === 'match') {
     return MATCH_STATUSES.includes(status);
+  } else {
+    return true;
   }
-  return true;
 };
 
 const formatPlayerLine = (
@@ -75,10 +63,10 @@ const getTitle = (
 ): string => {
   if (filter === 'practice') {
     return i18n.avail.practiceTitle(week, dateRange);
-  }
-  if (filter === 'match') {
+  } else if (filter === 'match') {
     return i18n.avail.matchTitle(week, dateRange);
   }
+
   return i18n.avail.title(week, dateRange);
 };
 
@@ -183,34 +171,28 @@ const parseAvailArgs = (
   let year: number | null = null;
 
   for (const part of parts) {
-    const parsedFilter = parseFilter(part);
-    if (parsedFilter) {
-      filter = parsedFilter;
-      continue;
-    }
+    const filterResult = availFilterSchema.safeParse(part.toLowerCase());
 
-    if (part.toLowerCase() === 'today') {
+    if (filterResult.success) {
+      filter = filterResult.data;
+    } else if (part.toLowerCase() === 'today') {
       day = 'today';
-      continue;
-    }
+    } else {
+      const parsed = parseDayOrWeekInput(part, {
+        defaultWeek: schedulingWeek,
+        allowPast: false,
+        schedulingWeek,
+      });
 
-    const parsed = parseDayOrWeekInput(part, {
-      defaultWeek: schedulingWeek,
-      allowPast: false,
-      schedulingWeek,
-    });
-
-    if (parsed.success) {
-      week = parsed.week;
-      year = parsed.year;
-      if (parsed.type === 'day') {
-        day = parsed.day;
+      if (parsed.success) {
+        week = parsed.week;
+        year = parsed.year;
+        if (parsed.type === 'day') {
+          day = parsed.day;
+        }
+      } else if (parsed.error === 'past') {
+        return { type: 'error', error: 'past' };
       }
-      continue;
-    }
-
-    if (parsed.error === 'past') {
-      return { type: 'error', error: 'past' };
     }
   }
 
@@ -218,10 +200,14 @@ const parseAvailArgs = (
   const finalYear = year ?? schedulingWeek.year;
 
   if (day === 'today') {
-    return { type: 'day', filter, day: getTodayDay(), week: finalWeek, year: finalYear };
-  }
-
-  if (day) {
+    return {
+      type: 'day',
+      filter,
+      day: getTodayDay(),
+      week: finalWeek,
+      year: finalYear,
+    };
+  } else if (day) {
     return { type: 'day', filter, day, week: finalWeek, year: finalYear };
   }
 

@@ -23,6 +23,8 @@ export const availabilityStatusSchema = z.enum([
 
 export const weekTypeSchema = z.enum(['match', 'practice']);
 
+export const availFilterSchema = z.enum(['practice', 'match']);
+
 export const remindersModeSchema = z.enum(['ping', 'quiet', 'off']);
 
 export const onOffSchema = z.enum(['on', 'off']);
