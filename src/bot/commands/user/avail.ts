@@ -4,8 +4,14 @@ import { rosterCommand } from '@/bot/middleware';
 import type { Translations } from '@/i18n';
 import { formatDateRange, formatPlayerName } from '@/lib/format';
 import type { AvailabilityStatus, Day } from '@/lib/schemas';
-import { dayWeekInputSchema, weekInputSchema } from '@/lib/schemas';
-import { getSchedulingWeek, getTodayDay, getWeekDateRange } from '@/lib/week';
+import {
+  getSchedulingWeek,
+  getTodayDay,
+  getWeekDateRange,
+  parseDayWeekInput,
+  parseWeekInput,
+} from '@/lib/week';
+import type { PlayerWeekAvailability } from '@/services/availability';
 import { getWeekAvailability } from '@/services/availability';
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
@@ -21,6 +27,17 @@ type AvailFilter = 'all' | 'practice' | 'match';
 const PRACTICE_STATUSES: AvailabilityStatus[] = ['available', 'practice_only', 'if_needed'];
 const MATCH_STATUSES: AvailabilityStatus[] = ['available', 'match_only', 'if_needed'];
 
+const parseFilter = (arg: string): AvailFilter | null => {
+  const lower = arg.toLowerCase();
+  if (lower === 'practice') {
+    return 'practice';
+  }
+  if (lower === 'match') {
+    return 'match';
+  }
+  return null;
+};
+
 const matchesFilter = (status: AvailabilityStatus, filter: AvailFilter): boolean => {
   if (filter === 'all') {
     return status !== 'unavailable';
@@ -34,15 +51,51 @@ const matchesFilter = (status: AvailabilityStatus, filter: AvailFilter): boolean
   return true;
 };
 
+const formatPlayerLine = (
+  player: PlayerWeekAvailability,
+  day: Day,
+  indent: string = '',
+): string | null => {
+  const response = player.responses[day];
+  if (!response) {
+    return null;
+  }
+  const timesStr = response.timeSlots.length > 0 ? response.timeSlots.join(', ') : '-';
+  const statusIcon = STATUS_ICONS[response.status];
+  return `${indent}• ${formatPlayerName(player)}: ${timesStr} ${statusIcon}`;
+};
+
+const formatDayDate = (year: number, week: number, day: Day): string => {
+  const { start } = getWeekDateRange(year, week);
+  const dayIndex = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].indexOf(day);
+  const dayDate = new Date(start);
+  dayDate.setDate(dayDate.getDate() + dayIndex);
+  return `${dayDate.getDate()}.${dayDate.getMonth() + 1}.`;
+};
+
+const getTitle = (
+  i18n: Translations,
+  week: number,
+  dateRange: string,
+  filter: AvailFilter,
+): string => {
+  if (filter === 'practice') {
+    return i18n.avail.practiceTitle(week, dateRange);
+  }
+  if (filter === 'match') {
+    return i18n.avail.matchTitle(week, dateRange);
+  }
+  return i18n.avail.title(week, dateRange);
+};
+
 const showDayAvailability = async (
   ctx: RosterContext,
   day: Day,
-  i18n: Translations,
   week: number,
   year: number,
   filter: AvailFilter,
 ): Promise<void> => {
-  const { db, season } = ctx;
+  const { db, season, i18n } = ctx;
   const availability = await getWeekAvailability(db, {
     seasonId: season.id,
     weekNumber: week,
@@ -59,34 +112,75 @@ const showDayAvailability = async (
     return;
   }
 
-  const { start } = getWeekDateRange(year, week);
-  const dayIndex = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].indexOf(day);
-  const dayDate = new Date(start);
-  dayDate.setDate(dayDate.getDate() + dayIndex);
-  const dateStr = `${dayDate.getDate()}.${dayDate.getMonth() + 1}.`;
-
+  const dateStr = formatDayDate(year, week, day);
   const lines: string[] = [i18n.avail.dayTitle(i18n.poll.days[day], dateStr, week), ''];
 
   for (const player of playersForDay) {
-    const response = player.responses[day];
-    if (response) {
-      const timesStr = response.timeSlots.length > 0 ? response.timeSlots.join(', ') : '-';
-      const statusIcon = STATUS_ICONS[response.status];
-      lines.push(`• ${formatPlayerName(player)}: ${timesStr} ${statusIcon}`);
+    const line = formatPlayerLine(player, day);
+    if (line) {
+      lines.push(line);
     }
   }
 
   await ctx.reply(lines.join('\n'));
 };
 
-type ParsedArgs = {
-  filter: AvailFilter;
-  day: Day | 'today' | null;
-  week: number | null;
-  year: number | null;
+const showWeekAvailability = async (
+  ctx: RosterContext,
+  week: number,
+  year: number,
+  filter: AvailFilter,
+): Promise<void> => {
+  const { db, season, config, i18n } = ctx;
+
+  const availability = await getWeekAvailability(db, {
+    seasonId: season.id,
+    weekNumber: week,
+    year,
+  });
+
+  if (availability.length === 0) {
+    await ctx.reply(i18n.avail.noResponses);
+    return;
+  }
+
+  const { start, end } = getWeekDateRange(year, week);
+  const dateRange = formatDateRange(start, end);
+  const title = getTitle(i18n, week, dateRange, filter);
+  const lines: string[] = [title, ''];
+
+  for (const dayKey of config.pollDays) {
+    const playersForDay = availability.filter((p) => {
+      const response = p.responses[dayKey];
+      return response && matchesFilter(response.status, filter);
+    });
+
+    if (playersForDay.length === 0) {
+      continue;
+    }
+
+    lines.push(`${i18n.poll.days[dayKey]}:`);
+    for (const player of playersForDay) {
+      const line = formatPlayerLine(player, dayKey, '  ');
+      if (line) {
+        lines.push(line);
+      }
+    }
+    lines.push('');
+  }
+
+  await ctx.reply(lines.join('\n'));
 };
 
-const parseArgs = (args: string): ParsedArgs => {
+type ParsedArgs =
+  | { type: 'week'; filter: AvailFilter; week: number; year: number }
+  | { type: 'day'; filter: AvailFilter; day: Day; week: number; year: number }
+  | { type: 'error'; error: 'invalid' | 'past' };
+
+const parseAvailArgs = (
+  args: string,
+  schedulingWeek: { week: number; year: number },
+): ParsedArgs => {
   const parts = args.split(/\s+/).filter(Boolean);
 
   let filter: AvailFilter = 'all';
@@ -95,114 +189,73 @@ const parseArgs = (args: string): ParsedArgs => {
   let year: number | null = null;
 
   for (const part of parts) {
-    const lower = part.toLowerCase();
+    const parsedFilter = parseFilter(part);
+    if (parsedFilter) {
+      filter = parsedFilter;
+      continue;
+    }
 
-    // Check for filter keywords
-    if (lower === 'practice') {
-      filter = 'practice';
-      continue;
-    }
-    if (lower === 'match') {
-      filter = 'match';
-      continue;
-    }
-    if (lower === 'today') {
+    if (part.toLowerCase() === 'today') {
       day = 'today';
       continue;
     }
 
-    // Try parsing as day/week format (tue, tue/5, tue/5/2026)
-    const dayWeekResult = dayWeekInputSchema.safeParse(lower);
+    const dayWeekResult = parseDayWeekInput(part.toLowerCase(), schedulingWeek);
     if (dayWeekResult.success) {
-      day = dayWeekResult.data.day;
-      if (dayWeekResult.data.week !== null) {
-        week = dayWeekResult.data.week;
-        year = dayWeekResult.data.year ?? new Date().getFullYear();
-      }
+      day = dayWeekResult.day;
+      week = dayWeekResult.week;
+      year = dayWeekResult.year;
       continue;
     }
 
-    // Try parsing as week format (5, 5/2026)
-    const weekResult = weekInputSchema.safeParse(part);
+    const weekResult = parseWeekInput(part, { allowPast: false, schedulingWeek });
     if (weekResult.success) {
-      week = weekResult.data.week;
-      year = weekResult.data.year;
+      week = weekResult.week;
+      year = weekResult.year;
+      continue;
+    }
+
+    if (weekResult.error === 'past') {
+      return { type: 'error', error: 'past' };
     }
   }
 
-  return { filter, day, week, year };
+  const finalWeek = week ?? schedulingWeek.week;
+  const finalYear = year ?? schedulingWeek.year;
+
+  if (day === 'today') {
+    return { type: 'day', filter, day: getTodayDay(), week: finalWeek, year: finalYear };
+  }
+
+  if (day) {
+    return { type: 'day', filter, day, week: finalWeek, year: finalYear };
+  }
+
+  return { type: 'week', filter, week: finalWeek, year: finalYear };
 };
 
 export const registerAvailCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'avail',
     rosterCommand(async (ctx: RosterContext) => {
-      const { db, season, config, i18n } = ctx;
+      const { config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
-
-      // Default to scheduling week
       const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
-      const { filter, day, week: parsedWeek, year: parsedYear } = parseArgs(args);
+      const parsed = parseAvailArgs(args, schedulingWeek);
 
-      // Use parsed week/year or fall back to scheduling week
-      const week = parsedWeek ?? schedulingWeek.week;
-      const year = parsedYear ?? schedulingWeek.year;
-
-      const { start, end } = getWeekDateRange(year, week);
-      const dateRange = formatDateRange(start, end);
-
-      if (day === 'today') {
-        return showDayAvailability(ctx, getTodayDay(), i18n, week, year, filter);
-      }
-
-      if (day) {
-        return showDayAvailability(ctx, day, i18n, week, year, filter);
-      }
-
-      const availability = await getWeekAvailability(db, {
-        seasonId: season.id,
-        weekNumber: week,
-        year,
-      });
-
-      if (availability.length === 0) {
-        return ctx.reply(i18n.avail.noResponses);
-      }
-
-      const title =
-        filter === 'practice'
-          ? i18n.avail.practiceTitle(week, dateRange)
-          : filter === 'match'
-            ? i18n.avail.matchTitle(week, dateRange)
-            : i18n.avail.title(week, dateRange);
-
-      const lines: string[] = [title, ''];
-
-      for (const dayKey of config.pollDays) {
-        const dayHeader = i18n.poll.days[dayKey];
-        const playersForDay = availability.filter((p) => {
-          const response = p.responses[dayKey];
-          return response && matchesFilter(response.status, filter);
-        });
-
-        if (playersForDay.length === 0) {
-          continue;
+      if (parsed.type === 'error') {
+        if (parsed.error === 'past') {
+          return ctx.reply(i18n.avail.weekInPast(schedulingWeek.week));
         }
-
-        lines.push(`${dayHeader}:`);
-        for (const player of playersForDay) {
-          const response = player.responses[dayKey];
-          if (response) {
-            const timesStr = response.timeSlots.length > 0 ? response.timeSlots.join(', ') : '-';
-            const statusIcon = STATUS_ICONS[response.status];
-            lines.push(`  • ${formatPlayerName(player)}: ${timesStr} ${statusIcon}`);
-          }
-        }
-        lines.push('');
+        return ctx.reply(i18n.avail.invalidWeek);
       }
 
-      return ctx.reply(lines.join('\n'));
+      if (parsed.type === 'day') {
+        return showDayAvailability(ctx, parsed.day, parsed.week, parsed.year, parsed.filter);
+      }
+
+      return showWeekAvailability(ctx, parsed.week, parsed.year, parsed.filter);
     }),
   );
 };

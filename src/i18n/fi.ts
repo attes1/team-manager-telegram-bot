@@ -127,6 +127,8 @@ export interface Translations {
     noResponses: string;
     noResponsesForDay: (day: string) => string;
     usage: string;
+    invalidWeek: string;
+    weekInPast: (schedulingWeek: number) => string;
   };
   match: {
     scheduled: (day: string, time: string, week: number, dateRange: string) => string;
@@ -360,6 +362,8 @@ export const fi: Translations = {
     noResponses: 'Ei vastauksia.',
     noResponsesForDay: (day) => `Ei vastauksia päivälle ${day}.`,
     usage: 'Käyttö: /avail [practice|match] [today|day[/week[/year]]] [week[/year]]',
+    invalidWeek: 'Virheellinen viikko. Käytä: 5 tai 5/2026',
+    weekInPast: (schedulingWeek) => `Viikon pitää olla ${schedulingWeek} tai myöhempi.`,
   },
   match: {
     scheduled: (day, time, week, dateRange) =>

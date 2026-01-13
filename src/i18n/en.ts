@@ -132,6 +132,8 @@ export const en: Translations = {
     noResponses: 'No responses yet.',
     noResponsesForDay: (day) => `No availability for ${day}.`,
     usage: 'Usage: /avail [practice|match] [today|day[/week[/year]]] [week[/year]]',
+    invalidWeek: 'Invalid week. Use: 5 or 5/2026',
+    weekInPast: (schedulingWeek) => `Week must be ${schedulingWeek} or later.`,
   },
   match: {
     scheduled: (day, time, week, dateRange) =>
