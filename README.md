@@ -138,9 +138,9 @@ Available to roster members, captains, and admins:
 ### Captain Commands
 Available to captains and admins:
 - `/setweek [week[/year]] practice|match` - Set week type (e.g., `/setweek 5 practice` or `/setweek 5/2026 match`)
-- `/setmatch <day> <time>` - Schedule a match
+- `/setmatch <day[/week[/year]]> <time>` - Schedule a match (e.g., `/setmatch sun 20:00` or `/setmatch sun/5 20:00`)
 - `/setlineup @users... [week[/year]]` - Set match lineup (e.g., `/setlineup @user1 @user2 5` or `/setlineup @user1 5/2026`)
-- `/setopponent <name> [url]` - Set opponent name and optional team profile link
+- `/setopponent <name> [url] [week[/year]]` - Set opponent name and optional team profile link (e.g., `/setopponent Team Name 5`)
 - `/remind` - Send reminder to non-responders
 
 ### Admin Commands
