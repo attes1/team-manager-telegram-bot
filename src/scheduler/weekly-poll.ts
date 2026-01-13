@@ -20,7 +20,7 @@ export const sendWeeklyPoll = async (bot: Bot<BotContext>, chatId: number): Prom
   }
 
   // Use target week based on cutoff logic
-  const targetWeek = getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
+  const targetWeek = getTargetWeek(config.weekChangeDay, config.weekChangeTime);
   const message = await getPollMessage(season.id, targetWeek);
 
   await bot.api.sendMessage(chatId, message, {

@@ -14,7 +14,7 @@ export const registerWeekCommand = (bot: Bot<BotContext>) => {
       const args = ctx.match?.toString().trim() ?? '';
       const parts = args.split(/\s+/).filter(Boolean);
 
-      const targetWeek = getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
+      const targetWeek = getTargetWeek(config.weekChangeDay, config.weekChangeTime);
 
       let weekNumber: number;
       let year: number;

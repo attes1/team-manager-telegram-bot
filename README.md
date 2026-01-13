@@ -169,8 +169,8 @@ Use `/config` to view all settings. Available options:
 | `poll_time` | Time to send poll | `10:00` |
 | `poll_days` | Days shown in poll | `mon,tue,wed,thu,fri,sat,sun` |
 | `poll_times` | Time slots in poll | `19,20,21` |
-| `poll_cutoff_day` | Day for week cutoff | `thu` |
-| `poll_cutoff_time` | Time for week cutoff | `10:00` |
+| `week_change_day` | Day for week change | `thu` |
+| `week_change_time` | Time for week change | `10:00` |
 | `reminder_day` | Day for reminders | `wed` |
 | `reminder_time` | Time for reminders | `18:00` |
 | `reminders_mode` | ping/quiet/off | `quiet` |
@@ -181,7 +181,7 @@ Use `/config` to view all settings. Available options:
 | `match_day_reminder_time` | Time for match day reminder | `18:00` |
 | `public_announcements` | Auto-announce to public group (on/off) | `on` |
 
-**Poll Cutoff Logic**: After the cutoff (default: Thursday 10:00), polls and reminders automatically target the next week. This ensures that when you send the Sunday poll, it asks about next week's availability (for the upcoming match), not the current week.
+**Week Change Logic**: After the week change (default: Thursday 10:00), polls and scheduling automatically target the next week. This ensures that when you send the Sunday poll, it asks about next week's availability (for the upcoming match), not the current week.
 
 ## Project Structure
 

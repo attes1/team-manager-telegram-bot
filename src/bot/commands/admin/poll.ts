@@ -13,7 +13,7 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
       const { season, config, i18n } = ctx;
 
       // Get target week using cutoff logic
-      const targetWeek = getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
+      const targetWeek = getTargetWeek(config.weekChangeDay, config.weekChangeTime);
 
       // Parse optional week parameter
       const args = ctx.message?.text?.split(' ').slice(1) ?? [];

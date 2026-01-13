@@ -12,7 +12,7 @@ export const registerRemindCommand = (bot: Bot<BotContext>) => {
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, config, i18n } = ctx;
       // Use target week based on cutoff logic
-      const { week, year } = getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
+      const { week, year } = getTargetWeek(config.weekChangeDay, config.weekChangeTime);
       const { start, end } = getWeekDateRange(year, week);
       const dateRange = formatDateRange(start, end);
 

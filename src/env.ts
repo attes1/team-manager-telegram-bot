@@ -37,8 +37,8 @@ const envSchema = z.object({
   DEFAULT_POLL_TIME: z.string().default('10:00'),
   DEFAULT_POLL_DAYS: commaSeparatedStrings('mon,tue,wed,thu,fri,sat,sun'),
   DEFAULT_POLL_TIMES: commaSeparatedNumbers('19,20,21'),
-  DEFAULT_POLL_CUTOFF_DAY: z.string().default('thu'),
-  DEFAULT_POLL_CUTOFF_TIME: z.string().default('10:00'),
+  DEFAULT_WEEK_CHANGE_DAY: z.string().default('thu'),
+  DEFAULT_WEEK_CHANGE_TIME: z.string().default('10:00'),
 
   DEFAULT_POLL_REMINDER_DAY: z.string().default('wed'),
   DEFAULT_POLL_REMINDER_TIME: z.string().default('18:00'),

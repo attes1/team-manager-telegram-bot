@@ -23,8 +23,8 @@ export interface ConfigTable {
   pollTime: Generated<string>;
   pollDays: Generated<string>;
   pollTimes: Generated<string>;
-  pollCutoffDay: Generated<string>;
-  pollCutoffTime: Generated<string>;
+  weekChangeDay: Generated<string>;
+  weekChangeTime: Generated<string>;
   reminderDay: Generated<string>;
   reminderTime: Generated<string>;
   remindersMode: Generated<RemindersMode>;

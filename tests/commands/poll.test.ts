@@ -250,8 +250,8 @@ describe('/poll command', () => {
       .values({
         seasonId: season.id,
         language: 'en',
-        pollCutoffDay: 'mon',
-        pollCutoffTime: '10:00',
+        weekChangeDay: 'mon',
+        weekChangeTime: '10:00',
       })
       .execute();
 
@@ -291,8 +291,8 @@ describe('/poll command', () => {
       .values({
         seasonId: season.id,
         language: 'en',
-        pollCutoffDay: 'thu',
-        pollCutoffTime: '08:00',
+        weekChangeDay: 'thu',
+        weekChangeTime: '08:00',
       })
       .execute();
 

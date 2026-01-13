@@ -59,8 +59,8 @@ export interface Translations {
       poll_time: string;
       poll_days: string;
       poll_times: string;
-      poll_cutoff_day: string;
-      poll_cutoff_time: string;
+      week_change_day: string;
+      week_change_time: string;
       reminder_day: string;
       reminder_time: string;
       reminders_mode: string;
@@ -77,8 +77,8 @@ export interface Translations {
       poll_time: string;
       poll_days: string;
       poll_times: string;
-      poll_cutoff_day: string;
-      poll_cutoff_time: string;
+      week_change_day: string;
+      week_change_time: string;
       reminder_day: string;
       reminder_time: string;
       reminders_mode: string;
@@ -278,8 +278,8 @@ export const fi: Translations = {
       poll_time: 'Kyselyn aika',
       poll_days: 'Kyselyn päivät',
       poll_times: 'Kyselyn kellonajat',
-      poll_cutoff_day: 'Kyselyn raja-aika (päivä)',
-      poll_cutoff_time: 'Kyselyn raja-aika (kello)',
+      week_change_day: 'Viikon vaihto (päivä)',
+      week_change_time: 'Viikon vaihto (kello)',
       reminder_day: 'Muistutuksen päivä',
       reminder_time: 'Muistutuksen aika',
       reminders_mode: 'Muistutustila',
@@ -296,8 +296,8 @@ export const fi: Translations = {
       poll_time: 'HH:MM (esim. 10:00)',
       poll_days: 'mon,tue,wed,thu,fri,sat,sun (pilkulla erotettuna)',
       poll_times: '0-23 (pilkulla erotettuna, max 5)',
-      poll_cutoff_day: 'mon, tue, wed, thu, fri, sat, sun',
-      poll_cutoff_time: 'HH:MM (esim. 10:00)',
+      week_change_day: 'mon, tue, wed, thu, fri, sat, sun',
+      week_change_time: 'HH:MM (esim. 10:00)',
       reminder_day: 'mon, tue, wed, thu, fri, sat, sun',
       reminder_time: 'HH:MM (esim. 18:00)',
       reminders_mode: 'ping, quiet, off',

@@ -92,7 +92,7 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
   // Parse week from message, fall back to target week
   const messageText = ctx.callbackQuery?.message?.text;
   const parsedWeek = parseWeekFromMessage(messageText);
-  const { week, year } = parsedWeek ?? getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
+  const { week, year } = parsedWeek ?? getTargetWeek(config.weekChangeDay, config.weekChangeTime);
   const days = config.pollDays;
   const times = config.pollTimes.split(',');
 

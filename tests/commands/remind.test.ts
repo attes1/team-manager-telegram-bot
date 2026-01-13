@@ -201,8 +201,8 @@ describe('/remind command', () => {
       .values({
         seasonId: season.id,
         language: 'en',
-        pollCutoffDay: 'mon',
-        pollCutoffTime: '10:00',
+        weekChangeDay: 'mon',
+        weekChangeTime: '10:00',
       })
       .execute();
 
