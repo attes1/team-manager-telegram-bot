@@ -44,15 +44,15 @@ describe('roster service', () => {
       const player = await db
         .selectFrom('players')
         .selectAll()
-        .where('telegram_id', '=', 123456)
+        .where('telegramId', '=', 123456)
         .executeTakeFirst();
       expect(player).toBeDefined();
 
       const rosterEntry = await db
-        .selectFrom('season_roster')
+        .selectFrom('seasonRoster')
         .selectAll()
-        .where('season_id', '=', seasonId)
-        .where('player_id', '=', 123456)
+        .where('seasonId', '=', seasonId)
+        .where('playerId', '=', 123456)
         .executeTakeFirst();
       expect(rosterEntry).toBeDefined();
     });
@@ -60,7 +60,7 @@ describe('roster service', () => {
     test('adds existing player to roster without creating duplicate', async () => {
       await db
         .insertInto('players')
-        .values({ telegram_id: 123456, display_name: 'Existing', username: 'existing' })
+        .values({ telegramId: 123456, displayName: 'Existing', username: 'existing' })
         .execute();
 
       const result = await addPlayerToRoster(db, {
@@ -76,7 +76,7 @@ describe('roster service', () => {
 
       const players = await db.selectFrom('players').selectAll().execute();
       expect(players).toHaveLength(1);
-      expect(players[0].display_name).toBe('Updated Name');
+      expect(players[0].displayName).toBe('Updated Name');
     });
 
     test('allows null username', async () => {
@@ -105,10 +105,10 @@ describe('roster service', () => {
       expect(result.telegramId).toBe(123456);
 
       const rosterEntries = await db
-        .selectFrom('season_roster')
+        .selectFrom('seasonRoster')
         .selectAll()
-        .where('season_id', '=', seasonId)
-        .where('player_id', '=', 123456)
+        .where('seasonId', '=', seasonId)
+        .where('playerId', '=', 123456)
         .execute();
       expect(rosterEntries).toHaveLength(1);
     });
@@ -126,10 +126,10 @@ describe('roster service', () => {
       expect(removed).toBe(true);
 
       const rosterEntry = await db
-        .selectFrom('season_roster')
+        .selectFrom('seasonRoster')
         .selectAll()
-        .where('season_id', '=', seasonId)
-        .where('player_id', '=', 123456)
+        .where('seasonId', '=', seasonId)
+        .where('playerId', '=', 123456)
         .executeTakeFirst();
       expect(rosterEntry).toBeUndefined();
     });
@@ -146,7 +146,7 @@ describe('roster service', () => {
       const player = await db
         .selectFrom('players')
         .selectAll()
-        .where('telegram_id', '=', 123456)
+        .where('telegramId', '=', 123456)
         .executeTakeFirst();
       expect(player).toBeDefined();
     });
@@ -269,7 +269,7 @@ describe('roster service', () => {
     test('returns player if exists', async () => {
       await db
         .insertInto('players')
-        .values({ telegram_id: 123456, display_name: 'Test', username: 'test' })
+        .values({ telegramId: 123456, displayName: 'Test', username: 'test' })
         .execute();
 
       const player = await getPlayerByTelegramId(db, 123456);

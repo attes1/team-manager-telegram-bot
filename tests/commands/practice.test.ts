@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import { getISOWeek } from 'date-fns';
 import type { Kysely } from 'kysely';
-import { Kysely as KyselyClass, SqliteDialect } from 'kysely';
+import { CamelCasePlugin, Kysely as KyselyClass, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { up } from '@/db/migrations/001_initial';
 import type { DB } from '@/types/db';
@@ -26,6 +26,7 @@ describe('/practice command', () => {
       dialect: new SqliteDialect({
         database: new Database(':memory:'),
       }),
+      plugins: [new CamelCasePlugin()],
     });
     await up(db);
     mockDb.db = db;
@@ -71,24 +72,24 @@ describe('/practice command', () => {
       .returningAll()
       .executeTakeFirstOrThrow();
 
-    await mockDb.db.insertInto('config').values({ season_id: season.id }).execute();
+    await mockDb.db.insertInto('config').values({ seasonId: season.id }).execute();
 
     await mockDb.db
       .insertInto('players')
-      .values({ telegram_id: 111, display_name: 'Player One', username: 'playerone' })
+      .values({ telegramId: 111, displayName: 'Player One', username: 'playerone' })
       .execute();
 
     await mockDb.db
-      .insertInto('season_roster')
-      .values({ season_id: season.id, player_id: 111 })
+      .insertInto('seasonRoster')
+      .values({ seasonId: season.id, playerId: 111 })
       .execute();
 
     const dayResponse = await mockDb.db
-      .insertInto('day_responses')
+      .insertInto('dayResponses')
       .values({
-        season_id: season.id,
-        player_id: 111,
-        week_number: getISOWeek(new Date()),
+        seasonId: season.id,
+        playerId: 111,
+        weekNumber: getISOWeek(new Date()),
         year: new Date().getFullYear(),
         day: 'mon',
         status: 'available',
@@ -97,10 +98,10 @@ describe('/practice command', () => {
       .executeTakeFirstOrThrow();
 
     await mockDb.db
-      .insertInto('time_slots')
+      .insertInto('timeSlots')
       .values([
-        { day_response_id: dayResponse.id, time_slot: '19' },
-        { day_response_id: dayResponse.id, time_slot: '20' },
+        { dayResponseId: dayResponse.id, timeSlot: '19' },
+        { dayResponseId: dayResponse.id, timeSlot: '20' },
       ])
       .execute();
 
@@ -122,7 +123,7 @@ describe('/practice command', () => {
       .returningAll()
       .executeTakeFirstOrThrow();
 
-    await mockDb.db.insertInto('config').values({ season_id: season.id }).execute();
+    await mockDb.db.insertInto('config').values({ seasonId: season.id }).execute();
 
     const update = createCommandUpdate('/practice mon', ADMIN_ID, CHAT_ID);
     await bot.handleUpdate(update);

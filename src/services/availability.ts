@@ -52,11 +52,11 @@ export const setDayAvailability = async (
   const { seasonId, playerId, weekNumber, year, day, status, timeSlots } = params;
 
   const existingResponse = await db
-    .selectFrom('day_responses')
+    .selectFrom('dayResponses')
     .select('id')
-    .where('season_id', '=', seasonId)
-    .where('player_id', '=', playerId)
-    .where('week_number', '=', weekNumber)
+    .where('seasonId', '=', seasonId)
+    .where('playerId', '=', playerId)
+    .where('weekNumber', '=', weekNumber)
     .where('year', '=', year)
     .where('day', '=', day)
     .executeTakeFirst();
@@ -65,24 +65,17 @@ export const setDayAvailability = async (
 
   if (existingResponse) {
     await db
-      .updateTable('day_responses')
+      .updateTable('dayResponses')
       .set({ status })
       .where('id', '=', existingResponse.id)
       .execute();
     responseId = existingResponse.id;
 
-    await db.deleteFrom('time_slots').where('day_response_id', '=', responseId).execute();
+    await db.deleteFrom('timeSlots').where('dayResponseId', '=', responseId).execute();
   } else {
     const inserted = await db
-      .insertInto('day_responses')
-      .values({
-        season_id: seasonId,
-        player_id: playerId,
-        week_number: weekNumber,
-        year,
-        day,
-        status,
-      })
+      .insertInto('dayResponses')
+      .values({ seasonId, playerId, weekNumber, year, day, status })
       .returning('id')
       .executeTakeFirstOrThrow();
     responseId = inserted.id;
@@ -90,8 +83,8 @@ export const setDayAvailability = async (
 
   if (timeSlots.length > 0) {
     await db
-      .insertInto('time_slots')
-      .values(timeSlots.map((slot) => ({ day_response_id: responseId, time_slot: slot })))
+      .insertInto('timeSlots')
+      .values(timeSlots.map((slot) => ({ dayResponseId: responseId, timeSlot: slot })))
       .execute();
   }
 
@@ -105,11 +98,11 @@ export const getDayAvailability = async (
   const { seasonId, playerId, weekNumber, year, day } = params;
 
   const response = await db
-    .selectFrom('day_responses')
+    .selectFrom('dayResponses')
     .select(['id', 'day', 'status'])
-    .where('season_id', '=', seasonId)
-    .where('player_id', '=', playerId)
-    .where('week_number', '=', weekNumber)
+    .where('seasonId', '=', seasonId)
+    .where('playerId', '=', playerId)
+    .where('weekNumber', '=', weekNumber)
     .where('year', '=', year)
     .where('day', '=', day)
     .executeTakeFirst();
@@ -119,15 +112,15 @@ export const getDayAvailability = async (
   }
 
   const slots = await db
-    .selectFrom('time_slots')
-    .select('time_slot')
-    .where('day_response_id', '=', response.id)
+    .selectFrom('timeSlots')
+    .select('timeSlot')
+    .where('dayResponseId', '=', response.id)
     .execute();
 
   return {
     day: response.day,
     status: response.status,
-    timeSlots: slots.map((s) => s.time_slot),
+    timeSlots: slots.map((s) => s.timeSlot),
   };
 };
 
@@ -138,11 +131,11 @@ export const getPlayerWeekAvailability = async (
   const { seasonId, playerId, weekNumber, year } = params;
 
   const responses = await db
-    .selectFrom('day_responses')
+    .selectFrom('dayResponses')
     .select(['id', 'day', 'status'])
-    .where('season_id', '=', seasonId)
-    .where('player_id', '=', playerId)
-    .where('week_number', '=', weekNumber)
+    .where('seasonId', '=', seasonId)
+    .where('playerId', '=', playerId)
+    .where('weekNumber', '=', weekNumber)
     .where('year', '=', year)
     .execute();
 
@@ -152,16 +145,16 @@ export const getPlayerWeekAvailability = async (
 
   const responseIds = responses.map((r) => r.id);
   const slots = await db
-    .selectFrom('time_slots')
-    .select(['day_response_id', 'time_slot'])
-    .where('day_response_id', 'in', responseIds)
+    .selectFrom('timeSlots')
+    .select(['dayResponseId', 'timeSlot'])
+    .where('dayResponseId', 'in', responseIds)
     .execute();
 
   const slotsByResponseId = new Map<number, string[]>();
   for (const slot of slots) {
-    const existing = slotsByResponseId.get(slot.day_response_id) ?? [];
-    existing.push(slot.time_slot);
-    slotsByResponseId.set(slot.day_response_id, existing);
+    const existing = slotsByResponseId.get(slot.dayResponseId) ?? [];
+    existing.push(slot.timeSlot);
+    slotsByResponseId.set(slot.dayResponseId, existing);
   }
 
   const result: Partial<Record<Day, DayAvailability>> = {};
@@ -183,18 +176,18 @@ export const getWeekAvailability = async (
   const { seasonId, weekNumber, year } = params;
 
   const responses = await db
-    .selectFrom('day_responses')
-    .innerJoin('players', 'players.telegram_id', 'day_responses.player_id')
+    .selectFrom('dayResponses')
+    .innerJoin('players', 'players.telegramId', 'dayResponses.playerId')
     .select([
-      'day_responses.id',
-      'day_responses.player_id',
-      'day_responses.day',
-      'day_responses.status',
-      'players.display_name',
+      'dayResponses.id',
+      'dayResponses.playerId',
+      'dayResponses.day',
+      'dayResponses.status',
+      'players.displayName',
     ])
-    .where('day_responses.season_id', '=', seasonId)
-    .where('day_responses.week_number', '=', weekNumber)
-    .where('day_responses.year', '=', year)
+    .where('dayResponses.seasonId', '=', seasonId)
+    .where('dayResponses.weekNumber', '=', weekNumber)
+    .where('dayResponses.year', '=', year)
     .execute();
 
   if (responses.length === 0) {
@@ -203,28 +196,28 @@ export const getWeekAvailability = async (
 
   const responseIds = responses.map((r) => r.id);
   const slots = await db
-    .selectFrom('time_slots')
-    .select(['day_response_id', 'time_slot'])
-    .where('day_response_id', 'in', responseIds)
+    .selectFrom('timeSlots')
+    .select(['dayResponseId', 'timeSlot'])
+    .where('dayResponseId', 'in', responseIds)
     .execute();
 
   const slotsByResponseId = new Map<number, string[]>();
   for (const slot of slots) {
-    const existing = slotsByResponseId.get(slot.day_response_id) ?? [];
-    existing.push(slot.time_slot);
-    slotsByResponseId.set(slot.day_response_id, existing);
+    const existing = slotsByResponseId.get(slot.dayResponseId) ?? [];
+    existing.push(slot.timeSlot);
+    slotsByResponseId.set(slot.dayResponseId, existing);
   }
 
   const playerMap = new Map<number, PlayerWeekAvailability>();
   for (const response of responses) {
-    let player = playerMap.get(response.player_id);
+    let player = playerMap.get(response.playerId);
     if (!player) {
       player = {
-        playerId: response.player_id,
-        displayName: response.display_name,
+        playerId: response.playerId,
+        displayName: response.displayName,
         responses: {},
       };
-      playerMap.set(response.player_id, player);
+      playerMap.set(response.playerId, player);
     }
     player.responses[response.day] = {
       day: response.day,
@@ -243,11 +236,11 @@ export const hasRespondedForWeek = async (
   const { seasonId, playerId, weekNumber, year } = params;
 
   const count = await db
-    .selectFrom('day_responses')
+    .selectFrom('dayResponses')
     .select(db.fn.count('id').as('count'))
-    .where('season_id', '=', seasonId)
-    .where('player_id', '=', playerId)
-    .where('week_number', '=', weekNumber)
+    .where('seasonId', '=', seasonId)
+    .where('playerId', '=', playerId)
+    .where('weekNumber', '=', weekNumber)
     .where('year', '=', year)
     .executeTakeFirst();
 
@@ -261,10 +254,10 @@ export const clearDayAvailability = async (
   const { seasonId, playerId, weekNumber, year, day } = params;
 
   const result = await db
-    .deleteFrom('day_responses')
-    .where('season_id', '=', seasonId)
-    .where('player_id', '=', playerId)
-    .where('week_number', '=', weekNumber)
+    .deleteFrom('dayResponses')
+    .where('seasonId', '=', seasonId)
+    .where('playerId', '=', playerId)
+    .where('weekNumber', '=', weekNumber)
     .where('year', '=', year)
     .where('day', '=', day)
     .executeTakeFirst();

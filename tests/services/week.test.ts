@@ -44,8 +44,8 @@ describe('week service', () => {
       const weeks = await db
         .selectFrom('weeks')
         .selectAll()
-        .where('season_id', '=', seasonId)
-        .where('week_number', '=', 5)
+        .where('seasonId', '=', seasonId)
+        .where('weekNumber', '=', 5)
         .where('year', '=', 2025)
         .execute();
 

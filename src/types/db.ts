@@ -1,82 +1,87 @@
-import type { Generated } from 'kysely';
+import type { Generated, Selectable } from 'kysely';
 import type { AvailabilityStatus, Day, RemindersMode, SeasonStatus, WeekType } from '../validation';
 
 export interface SeasonsTable {
   id: Generated<number>;
   name: string;
   status: Generated<SeasonStatus>;
-  created_at: Generated<string>;
-  ended_at: string | null;
+  createdAt: Generated<string>;
+  endedAt: string | null;
 }
 
 export interface ConfigTable {
-  season_id: number;
+  seasonId: number;
   language: Generated<string>;
-  poll_day: Generated<string>;
-  poll_time: Generated<string>;
-  poll_days: Generated<string>;
-  poll_times: Generated<string>;
-  reminder_day: Generated<string>;
-  reminder_time: Generated<string>;
-  reminders_mode: Generated<RemindersMode>;
-  match_day: Generated<string>;
-  match_time: Generated<string>;
-  lineup_size: Generated<number>;
+  pollDay: Generated<string>;
+  pollTime: Generated<string>;
+  pollDays: Generated<string>;
+  pollTimes: Generated<string>;
+  reminderDay: Generated<string>;
+  reminderTime: Generated<string>;
+  remindersMode: Generated<RemindersMode>;
+  matchDay: Generated<string>;
+  matchTime: Generated<string>;
+  lineupSize: Generated<number>;
 }
 
 export interface PlayersTable {
-  telegram_id: number;
+  telegramId: number;
   username: string | null;
-  display_name: string;
-  created_at: Generated<string>;
+  displayName: string;
+  createdAt: Generated<string>;
 }
 
 export interface SeasonRosterTable {
-  season_id: number;
-  player_id: number;
-  added_at: Generated<string>;
+  seasonId: number;
+  playerId: number;
+  addedAt: Generated<string>;
 }
 
 export interface DayResponsesTable {
   id: Generated<number>;
-  season_id: number;
-  player_id: number;
-  week_number: number;
+  seasonId: number;
+  playerId: number;
+  weekNumber: number;
   year: number;
   day: Day;
   status: AvailabilityStatus;
-  updated_at: Generated<string>;
+  updatedAt: Generated<string>;
 }
 
 export interface TimeSlotsTable {
   id: Generated<number>;
-  day_response_id: number;
-  time_slot: string;
+  dayResponseId: number;
+  timeSlot: string;
 }
 
 export interface WeeksTable {
-  season_id: number;
-  week_number: number;
+  seasonId: number;
+  weekNumber: number;
   year: number;
   type: Generated<WeekType>;
-  match_day: Day | null;
-  match_time: string | null;
+  matchDay: Day | null;
+  matchTime: string | null;
 }
 
 export interface LineupsTable {
-  season_id: number;
-  week_number: number;
+  seasonId: number;
+  weekNumber: number;
   year: number;
-  player_id: number;
+  playerId: number;
 }
 
 export interface DB {
   seasons: SeasonsTable;
   config: ConfigTable;
   players: PlayersTable;
-  season_roster: SeasonRosterTable;
-  day_responses: DayResponsesTable;
-  time_slots: TimeSlotsTable;
+  seasonRoster: SeasonRosterTable;
+  dayResponses: DayResponsesTable;
+  timeSlots: TimeSlotsTable;
   weeks: WeeksTable;
   lineups: LineupsTable;
 }
+
+export type Season = Selectable<SeasonsTable>;
+export type Config = Selectable<ConfigTable>;
+export type Player = Selectable<PlayersTable>;
+export type Week = Selectable<WeeksTable>;

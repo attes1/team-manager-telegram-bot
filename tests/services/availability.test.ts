@@ -82,9 +82,9 @@ describe('availability service', () => {
       expect(result.timeSlots).toEqual(['20', '21']);
 
       const responses = await db
-        .selectFrom('day_responses')
+        .selectFrom('dayResponses')
         .selectAll()
-        .where('player_id', '=', playerId)
+        .where('playerId', '=', playerId)
         .where('day', '=', 'mon')
         .execute();
       expect(responses).toHaveLength(1);
@@ -127,15 +127,15 @@ describe('availability service', () => {
       });
 
       const slots = await db
-        .selectFrom('time_slots')
-        .innerJoin('day_responses', 'day_responses.id', 'time_slots.day_response_id')
-        .select('time_slots.time_slot')
-        .where('day_responses.player_id', '=', playerId)
-        .where('day_responses.day', '=', 'wed')
+        .selectFrom('timeSlots')
+        .innerJoin('dayResponses', 'dayResponses.id', 'timeSlots.dayResponseId')
+        .select('timeSlots.timeSlot')
+        .where('dayResponses.playerId', '=', playerId)
+        .where('dayResponses.day', '=', 'wed')
         .execute();
 
       expect(slots).toHaveLength(1);
-      expect(slots[0].time_slot).toBe('20');
+      expect(slots[0].timeSlot).toBe('20');
     });
   });
 

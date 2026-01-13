@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { Kysely, SqliteDialect } from 'kysely';
+import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { up } from '@/db/migrations/001_initial';
 import type { DB } from '@/types/db';
@@ -29,6 +29,7 @@ describe('/config command', () => {
       dialect: new SqliteDialect({
         database: new Database(':memory:'),
       }),
+      plugins: [new CamelCasePlugin()],
     });
     await up(db);
     mockDb.db = db;
@@ -95,45 +96,45 @@ describe('/config command', () => {
       expect(calls[0].payload.text).toContain('en');
     });
 
-    test('admin can update poll_day', async () => {
+    test('admin can update pollDay', async () => {
       await startSeason(mockDb.db, 'Test Season');
 
       const { bot, calls } = createTestBot();
       registerConfigCommand(bot);
 
-      const update = createCommandUpdate('/config poll_day mon', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/config pollDay mon', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('poll_day');
+      expect(calls[0].payload.text).toContain('pollDay');
       expect(calls[0].payload.text).toContain('mon');
     });
 
-    test('admin can update poll_time', async () => {
+    test('admin can update pollTime', async () => {
       await startSeason(mockDb.db, 'Test Season');
 
       const { bot, calls } = createTestBot();
       registerConfigCommand(bot);
 
-      const update = createCommandUpdate('/config poll_time 09:00', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/config pollTime 09:00', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('poll_time');
+      expect(calls[0].payload.text).toContain('pollTime');
       expect(calls[0].payload.text).toContain('09:00');
     });
 
-    test('admin can update lineup_size', async () => {
+    test('admin can update lineupSize', async () => {
       await startSeason(mockDb.db, 'Test Season');
 
       const { bot, calls } = createTestBot();
       registerConfigCommand(bot);
 
-      const update = createCommandUpdate('/config lineup_size 7', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/config lineupSize 7', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);
-      expect(calls[0].payload.text).toContain('lineup_size');
+      expect(calls[0].payload.text).toContain('lineupSize');
       expect(calls[0].payload.text).toContain('7');
     });
 
@@ -156,7 +157,7 @@ describe('/config command', () => {
       const { bot, calls } = createTestBot();
       registerConfigCommand(bot);
 
-      const update = createCommandUpdate('/config poll_time invalid', TEST_ADMIN_ID, TEST_CHAT_ID);
+      const update = createCommandUpdate('/config pollTime invalid', TEST_ADMIN_ID, TEST_CHAT_ID);
       await bot.handleUpdate(update);
 
       expect(calls).toHaveLength(1);

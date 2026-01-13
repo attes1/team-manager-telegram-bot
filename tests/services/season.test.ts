@@ -30,11 +30,11 @@ describe('season service', () => {
       const config = await db
         .selectFrom('config')
         .selectAll()
-        .where('season_id', '=', season.id)
+        .where('seasonId', '=', season.id)
         .executeTakeFirst();
 
       expect(config).toBeDefined();
-      expect(config?.season_id).toBe(season.id);
+      expect(config?.seasonId).toBe(season.id);
     });
 
     test('ends any existing active season', async () => {

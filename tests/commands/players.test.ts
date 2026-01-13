@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { Kysely, SqliteDialect } from 'kysely';
+import { CamelCasePlugin, Kysely, SqliteDialect } from 'kysely';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { up } from '@/db/migrations/001_initial';
 import type { DB } from '@/types/db';
@@ -30,6 +30,7 @@ describe('/addplayer command', () => {
       dialect: new SqliteDialect({
         database: new Database(':memory:'),
       }),
+      plugins: [new CamelCasePlugin()],
     });
     await up(db);
     mockDb.db = db;
@@ -129,6 +130,7 @@ describe('/removeplayer command', () => {
       dialect: new SqliteDialect({
         database: new Database(':memory:'),
       }),
+      plugins: [new CamelCasePlugin()],
     });
     await up(db);
     mockDb.db = db;
@@ -203,6 +205,7 @@ describe('/roster command', () => {
       dialect: new SqliteDialect({
         database: new Database(':memory:'),
       }),
+      plugins: [new CamelCasePlugin()],
     });
     await up(db);
     mockDb.db = db;

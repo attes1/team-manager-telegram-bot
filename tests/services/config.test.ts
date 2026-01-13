@@ -65,80 +65,80 @@ describe('config service', () => {
       expect(config?.language).toBe('en');
     });
 
-    test('updates poll_day', async () => {
-      const updated = await updateConfig(db, seasonId, 'poll_day', 'mon');
+    test('updates pollDay', async () => {
+      const updated = await updateConfig(db, seasonId, 'pollDay', 'mon');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.pollDay).toBe('mon');
     });
 
-    test('updates poll_time', async () => {
-      const updated = await updateConfig(db, seasonId, 'poll_time', '09:00');
+    test('updates pollTime', async () => {
+      const updated = await updateConfig(db, seasonId, 'pollTime', '09:00');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.pollTime).toBe('09:00');
     });
 
-    test('updates poll_days', async () => {
-      const updated = await updateConfig(db, seasonId, 'poll_days', 'mon,wed,fri');
+    test('updates pollDays', async () => {
+      const updated = await updateConfig(db, seasonId, 'pollDays', 'mon,wed,fri');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.pollDays).toBe('mon,wed,fri');
     });
 
-    test('updates poll_times', async () => {
-      const updated = await updateConfig(db, seasonId, 'poll_times', '18,19,20,21');
+    test('updates pollTimes', async () => {
+      const updated = await updateConfig(db, seasonId, 'pollTimes', '18,19,20,21');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.pollTimes).toBe('18,19,20,21');
     });
 
-    test('updates reminder_day', async () => {
-      const updated = await updateConfig(db, seasonId, 'reminder_day', 'thu');
+    test('updates reminderDay', async () => {
+      const updated = await updateConfig(db, seasonId, 'reminderDay', 'thu');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.reminderDay).toBe('thu');
     });
 
-    test('updates reminder_time', async () => {
-      const updated = await updateConfig(db, seasonId, 'reminder_time', '17:00');
+    test('updates reminderTime', async () => {
+      const updated = await updateConfig(db, seasonId, 'reminderTime', '17:00');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.reminderTime).toBe('17:00');
     });
 
-    test('updates reminders_mode', async () => {
-      const updated = await updateConfig(db, seasonId, 'reminders_mode', 'ping');
+    test('updates remindersMode', async () => {
+      const updated = await updateConfig(db, seasonId, 'remindersMode', 'ping');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.remindersMode).toBe('ping');
     });
 
-    test('updates match_day', async () => {
-      const updated = await updateConfig(db, seasonId, 'match_day', 'sat');
+    test('updates matchDay', async () => {
+      const updated = await updateConfig(db, seasonId, 'matchDay', 'sat');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.matchDay).toBe('sat');
     });
 
-    test('updates match_time', async () => {
-      const updated = await updateConfig(db, seasonId, 'match_time', '19:00');
+    test('updates matchTime', async () => {
+      const updated = await updateConfig(db, seasonId, 'matchTime', '19:00');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);
       expect(config?.matchTime).toBe('19:00');
     });
 
-    test('updates lineup_size', async () => {
-      const updated = await updateConfig(db, seasonId, 'lineup_size', '7');
+    test('updates lineupSize', async () => {
+      const updated = await updateConfig(db, seasonId, 'lineupSize', '7');
       expect(updated).toBe(true);
 
       const config = await getConfig(db, seasonId);

@@ -23,7 +23,7 @@ describe('seasons', () => {
 
     expect(result.status).toBe('active');
     expect(result.name).toBe('Spring 2025');
-    expect(result.created_at).toBeDefined();
+    expect(result.createdAt).toBeDefined();
   });
 
   test('rejects invalid status', async () => {
@@ -49,24 +49,24 @@ describe('config', () => {
   });
 
   test('creates config with defaults', async () => {
-    await db.insertInto('config').values({ season_id: 1 }).execute();
+    await db.insertInto('config').values({ seasonId: 1 }).execute();
 
     const config = await db
       .selectFrom('config')
       .selectAll()
-      .where('season_id', '=', 1)
+      .where('seasonId', '=', 1)
       .executeTakeFirstOrThrow();
 
     expect(config.language).toBe('fi');
-    expect(config.poll_day).toBe('sun');
-    expect(config.poll_time).toBe('10:00');
-    expect(config.reminders_mode).toBe('quiet');
-    expect(config.lineup_size).toBe(5);
+    expect(config.pollDay).toBe('sun');
+    expect(config.pollTime).toBe('10:00');
+    expect(config.remindersMode).toBe('quiet');
+    expect(config.lineupSize).toBe(5);
   });
 
   test('rejects invalid time format', async () => {
     await expect(
-      db.insertInto('config').values({ season_id: 1, poll_time: 'invalid' }).execute(),
+      db.insertInto('config').values({ seasonId: 1, pollTime: 'invalid' }).execute(),
     ).rejects.toThrow();
   });
 
@@ -74,7 +74,7 @@ describe('config', () => {
     await expect(
       db
         .insertInto('config')
-        .values({ season_id: 1, reminders_mode: 'invalid' as 'ping' })
+        .values({ seasonId: 1, remindersMode: 'invalid' as 'ping' })
         .execute(),
     ).rejects.toThrow();
   });
@@ -94,19 +94,19 @@ describe('players', () => {
   test('creates player', async () => {
     const result = await db
       .insertInto('players')
-      .values({ telegram_id: 123456, display_name: 'Test Player', username: 'testuser' })
+      .values({ telegramId: 123456, displayName: 'Test Player', username: 'testuser' })
       .returningAll()
       .executeTakeFirstOrThrow();
 
-    expect(result.telegram_id).toBe(123456);
-    expect(result.display_name).toBe('Test Player');
+    expect(result.telegramId).toBe(123456);
+    expect(result.displayName).toBe('Test Player');
     expect(result.username).toBe('testuser');
   });
 
   test('allows null username', async () => {
     const result = await db
       .insertInto('players')
-      .values({ telegram_id: 123456, display_name: 'Test Player' })
+      .values({ telegramId: 123456, displayName: 'Test Player' })
       .returningAll()
       .executeTakeFirstOrThrow();
 
@@ -114,13 +114,13 @@ describe('players', () => {
   });
 });
 
-describe('day_responses', () => {
+describe('dayResponses', () => {
   let db: Kysely<DB>;
 
   beforeEach(async () => {
     db = await createTestDb();
     await db.insertInto('seasons').values({ name: 'Test Season' }).execute();
-    await db.insertInto('players').values({ telegram_id: 123, display_name: 'Player 1' }).execute();
+    await db.insertInto('players').values({ telegramId: 123, displayName: 'Player 1' }).execute();
   });
 
   afterEach(async () => {
@@ -129,11 +129,11 @@ describe('day_responses', () => {
 
   test('creates day response', async () => {
     const result = await db
-      .insertInto('day_responses')
+      .insertInto('dayResponses')
       .values({
-        season_id: 1,
-        player_id: 123,
-        week_number: 5,
+        seasonId: 1,
+        playerId: 123,
+        weekNumber: 5,
         year: 2025,
         day: 'mon',
         status: 'available',
@@ -148,11 +148,11 @@ describe('day_responses', () => {
   test('rejects invalid day', async () => {
     await expect(
       db
-        .insertInto('day_responses')
+        .insertInto('dayResponses')
         .values({
-          season_id: 1,
-          player_id: 123,
-          week_number: 5,
+          seasonId: 1,
+          playerId: 123,
+          weekNumber: 5,
           year: 2025,
           day: 'invalid' as 'mon',
           status: 'available',
@@ -164,11 +164,11 @@ describe('day_responses', () => {
   test('rejects invalid status', async () => {
     await expect(
       db
-        .insertInto('day_responses')
+        .insertInto('dayResponses')
         .values({
-          season_id: 1,
-          player_id: 123,
-          week_number: 5,
+          seasonId: 1,
+          playerId: 123,
+          weekNumber: 5,
           year: 2025,
           day: 'mon',
           status: 'invalid' as 'available',
@@ -179,11 +179,11 @@ describe('day_responses', () => {
 
   test('enforces unique constraint per player/week/day', async () => {
     await db
-      .insertInto('day_responses')
+      .insertInto('dayResponses')
       .values({
-        season_id: 1,
-        player_id: 123,
-        week_number: 5,
+        seasonId: 1,
+        playerId: 123,
+        weekNumber: 5,
         year: 2025,
         day: 'mon',
         status: 'available',
@@ -192,11 +192,11 @@ describe('day_responses', () => {
 
     await expect(
       db
-        .insertInto('day_responses')
+        .insertInto('dayResponses')
         .values({
-          season_id: 1,
-          player_id: 123,
-          week_number: 5,
+          seasonId: 1,
+          playerId: 123,
+          weekNumber: 5,
           year: 2025,
           day: 'mon',
           status: 'unavailable',
@@ -219,7 +219,7 @@ describe('cascade deletes', () => {
 
   test('deleting season cascades to config', async () => {
     await db.insertInto('seasons').values({ name: 'Test' }).execute();
-    await db.insertInto('config').values({ season_id: 1 }).execute();
+    await db.insertInto('config').values({ seasonId: 1 }).execute();
 
     await db.deleteFrom('seasons').where('id', '=', 1).execute();
 
@@ -227,24 +227,24 @@ describe('cascade deletes', () => {
     expect(configs).toHaveLength(0);
   });
 
-  test('deleting player cascades to day_responses', async () => {
+  test('deleting player cascades to dayResponses', async () => {
     await db.insertInto('seasons').values({ name: 'Test' }).execute();
-    await db.insertInto('players').values({ telegram_id: 123, display_name: 'Test' }).execute();
+    await db.insertInto('players').values({ telegramId: 123, displayName: 'Test' }).execute();
     await db
-      .insertInto('day_responses')
+      .insertInto('dayResponses')
       .values({
-        season_id: 1,
-        player_id: 123,
-        week_number: 5,
+        seasonId: 1,
+        playerId: 123,
+        weekNumber: 5,
         year: 2025,
         day: 'mon',
         status: 'available',
       })
       .execute();
 
-    await db.deleteFrom('players').where('telegram_id', '=', 123).execute();
+    await db.deleteFrom('players').where('telegramId', '=', 123).execute();
 
-    const responses = await db.selectFrom('day_responses').selectAll().execute();
+    const responses = await db.selectFrom('dayResponses').selectAll().execute();
     expect(responses).toHaveLength(0);
   });
 });

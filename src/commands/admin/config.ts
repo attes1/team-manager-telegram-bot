@@ -7,16 +7,16 @@ import { getActiveSeason } from '../../services/season';
 
 const CONFIG_KEYS = [
   'language',
-  'poll_day',
-  'poll_time',
-  'poll_days',
-  'poll_times',
-  'reminder_day',
-  'reminder_time',
-  'reminders_mode',
-  'match_day',
-  'match_time',
-  'lineup_size',
+  'pollDay',
+  'pollTime',
+  'pollDays',
+  'pollTimes',
+  'reminderDay',
+  'reminderTime',
+  'remindersMode',
+  'matchDay',
+  'matchTime',
+  'lineupSize',
 ] as const;
 
 type ConfigKey = (typeof CONFIG_KEYS)[number];
