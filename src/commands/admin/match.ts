@@ -5,6 +5,7 @@ import { isAdmin } from '../../lib/admin';
 import { formatDateRange } from '../../lib/format';
 import { daySchema, timeSchema } from '../../lib/schemas';
 import { getWeekDateRange, getWeekNumber, getWeekYear } from '../../lib/week';
+import { getLineupMenuMessage, lineupMenu } from '../../menus/lineup';
 import { clearLineup, setLineup, setMatchTime } from '../../services/match';
 import { isPlayerInRoster } from '../../services/roster';
 import { getActiveSeason } from '../../services/season';
@@ -31,6 +32,8 @@ const getAllMentionedUsers = (ctx: Context): MentionedUser[] => {
 };
 
 export const registerMatchCommands = (bot: Bot) => {
+  bot.use(lineupMenu);
+
   bot.command('setmatch', async (ctx) => {
     const userId = ctx.from?.id;
     if (!userId || !isAdmin(userId)) {
@@ -102,7 +105,8 @@ export const registerMatchCommands = (bot: Bot) => {
     const mentionedUsers = getAllMentionedUsers(ctx);
 
     if (mentionedUsers.length === 0) {
-      return ctx.reply(t().lineup.usage);
+      const message = await getLineupMenuMessage(season.id);
+      return ctx.reply(message, { reply_markup: lineupMenu });
     }
 
     for (const user of mentionedUsers) {

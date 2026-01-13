@@ -90,6 +90,11 @@ export interface Translations {
     usage: string;
     noMentions: string;
     playerNotInRoster: (name: string) => string;
+    menuTitle: (week: number, dateRange: string) => string;
+    selectPlayers: string;
+    done: string;
+    needExact: (count: number) => string;
+    saved: (count: number) => string;
   };
 }
 
@@ -189,5 +194,10 @@ export const fi: Translations = {
     usage: 'Käyttö: /setlineup @pelaaja1 @pelaaja2 ...\nTai /setlineup clear tyhjentääksesi',
     noMentions: 'Mainitse pelaajat komennossa (esim. /setlineup @pelaaja1 @pelaaja2)',
     playerNotInRoster: (name) => `${name} ei ole rosterissa.`,
+    menuTitle: (week, dateRange) => `Vko ${week} (${dateRange}) kokoonpano`,
+    selectPlayers: 'Valitse pelaajat klikkaamalla:',
+    done: 'Valmis',
+    needExact: (count) => `Valitse ${count} pelaajaa.`,
+    saved: (count) => `Kokoonpano tallennettu (${count} pelaajaa).`,
   },
 };

@@ -95,5 +95,10 @@ export const en: Translations = {
     usage: 'Usage: /setlineup @player1 @player2 ...\nOr /setlineup clear to clear',
     noMentions: 'Mention players in the command (e.g. /setlineup @player1 @player2)',
     playerNotInRoster: (name) => `${name} is not in the roster.`,
+    menuTitle: (week, dateRange) => `Week ${week} (${dateRange}) lineup`,
+    selectPlayers: 'Select players by clicking:',
+    done: 'Done',
+    needExact: (count) => `Select exactly ${count} players.`,
+    saved: (count) => `Lineup saved (${count} players).`,
   },
 };

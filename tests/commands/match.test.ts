@@ -238,7 +238,7 @@ describe('/setlineup command', () => {
     expect(calls[0].payload.text).toContain('No active season');
   });
 
-  test('shows usage when no mentions', async () => {
+  test('shows interactive menu when no mentions', async () => {
     const { bot, calls } = createTestBot();
     registerMatchCommands(bot);
 
@@ -246,7 +246,7 @@ describe('/setlineup command', () => {
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('Usage');
+    expect(calls[0].payload.reply_markup).toBeDefined();
   });
 
   test('admin can clear lineup', async () => {
