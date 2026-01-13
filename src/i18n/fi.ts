@@ -318,7 +318,7 @@ export const fi: Translations = {
   week: {
     setPractice: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty treeniviikoksi.`,
     setMatch: (week, dateRange) => `Vko ${week} (${dateRange}) merkitty matsiviikoksi.`,
-    usage: 'Käyttö: /setweek [viikko] <practice|match>',
+    usage: 'Käyttö: /setweek [week] <practice|match>',
     invalidWeek: 'Virheellinen viikkonumero.',
     invalidType: 'Virheellinen tyyppi. Käytä "practice" tai "match".',
   },
@@ -349,12 +349,12 @@ export const fi: Translations = {
     dayTitle: (day, date, week) => `Vko ${week}: ${day} ${date} aikataulut:`,
     noResponses: 'Ei vastauksia.',
     noResponsesForDay: (day) => `Ei vastauksia päivälle ${day}.`,
-    usage: 'Käyttö: /avail [practice|match] [today|<päivä>] [viikko]',
+    usage: 'Käyttö: /avail [practice|match] [today|<day>] [week]',
   },
   match: {
     scheduled: (day, time, week, dateRange) =>
       `Matsi sovittu: ${day} klo ${time} (vko ${week}, ${dateRange})`,
-    usage: 'Käyttö: /setmatch <päivä> <aika>\nEsim: /setmatch sun 20:00',
+    usage: 'Käyttö: /setmatch <day> <time>\nEsim: /setmatch sun 20:00',
     invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Virheellinen aika. Käytä muotoa HH:MM (esim. 20:00)',
   },
@@ -362,7 +362,7 @@ export const fi: Translations = {
     set: (count, players) => `Linari asetettu (${count} pelaajaa):\n${players}`,
     cleared: 'Linari tyhjennetty.',
     usage:
-      'Käyttö: /setlineup @pelaaja1 @pelaaja2 ... [viikko]\nTai /setlineup clear [viikko] tyhjentääksesi',
+      'Käyttö: /setlineup @pelaaja1 @pelaaja2 ... [week]\nTai /setlineup clear [week] tyhjentääksesi',
     noMentions: 'Mainitse pelaajat komennossa (esim. /setlineup @pelaaja1 @pelaaja2)',
     playerNotInRoster: (name) => `${name} ei ole rosterissa.`,
     menuTitle: (week, dateRange) => `Vko ${week} (${dateRange}) linari`,
@@ -409,7 +409,7 @@ export const fi: Translations = {
       help: 'Näytä komennot',
       roster: 'Näytä joukkueen rosteri',
       nextmatch: 'Näytä seuraavan matsin tiedot',
-      avail: 'Näytä aikataulut [practice|match] [today|day]',
+      avail: 'Näytä aikataulut [practice|match] [today|day] [week]',
       poll: 'Näytä aikataulukysely [week]',
       status: 'Näytä tilannekatsaus',
       setweek: 'Aseta viikon tyyppi &lt;week&gt; &lt;practice|match&gt;',
