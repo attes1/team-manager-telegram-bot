@@ -135,6 +135,8 @@ export interface Translations {
     usage: string;
     invalidDay: string;
     invalidTime: string;
+    invalidWeek: string;
+    weekInPast: (schedulingWeek: number) => string;
   };
   lineup: {
     set: (count: number, players: string) => string;
@@ -228,6 +230,7 @@ export interface Translations {
     cleared: string;
     usage: string;
     noOpponentSet: string;
+    invalidWeek: string;
   };
   group: {
     notInGroup: string;
@@ -377,9 +380,12 @@ export const fi: Translations = {
   match: {
     scheduled: (day, time, week, dateRange) =>
       `Matsi sovittu: ${day} klo ${time} (vko ${week}, ${dateRange})`,
-    usage: 'Käyttö: /setmatch <day> <time>\nEsim: /setmatch sun 20:00',
+    usage:
+      'Käyttö: /setmatch <day[/week[/year]]> <time>\nEsim: /setmatch sun 20:00 tai /setmatch sun/5 20:00',
     invalidDay: 'Virheellinen päivä. Käytä: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Virheellinen aika. Käytä muotoa HH:MM (esim. 20:00)',
+    invalidWeek: 'Virheellinen viikko. Käytä: 5 tai 5/2026',
+    weekInPast: (schedulingWeek) => `Viikon pitää olla ${schedulingWeek} tai myöhempi.`,
   },
   lineup: {
     set: (count, players) => `Linari asetettu (${count} pelaajaa):\n${players}`,
@@ -480,8 +486,9 @@ export const fi: Translations = {
     setWithUrl: (name, url) => `Vihu asetettu: ${name} (${url})`,
     cleared: 'Vihu poistettu.',
     usage:
-      'Käyttö: /setopponent <nimi> [url]\nEsim: /setopponent EC Myyrylit https://example.com/team',
+      'Käyttö: /setopponent <nimi> [url] [week[/year]]\nEsim: /setopponent EC Myyrylit https://example.com/team 5',
     noOpponentSet: 'Vihua ei ole asetettu.',
+    invalidWeek: 'Virheellinen viikko. Käytä: 5 tai 5/2026',
   },
   group: {
     notInGroup: 'Tätä komentoa voi käyttää vain ryhmässä.',

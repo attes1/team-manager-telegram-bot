@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext, CaptainSeasonContext } from '@/bot/context';
 import { captainSeasonCommand } from '@/bot/middleware';
 import { formatDateRange, formatDay } from '@/lib/format';
-import { daySchema, timeSchema } from '@/lib/schemas';
+import { dayWeekInputSchema, timeSchema } from '@/lib/schemas';
 import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/temporal';
 import { getLineupMenuMessage, lineupMenu } from '@/menus/lineup';
 import { getPublicGroupIds } from '@/services/group';
@@ -54,14 +54,15 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
-      const [dayStr, timeStr] = args.split(/\s+/);
+      const [dayWeekStr, timeStr] = args.split(/\s+/);
 
-      if (!dayStr || !timeStr) {
+      if (!dayWeekStr || !timeStr) {
         return ctx.reply(i18n.match.usage);
       }
 
-      const dayResult = daySchema.safeParse(dayStr.toLowerCase());
-      if (!dayResult.success) {
+      // Parse day[/week[/year]] format
+      const dayWeekResult = dayWeekInputSchema.safeParse(dayWeekStr.toLowerCase());
+      if (!dayWeekResult.success) {
         return ctx.reply(i18n.match.invalidDay);
       }
 
@@ -70,23 +71,42 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.match.invalidTime);
       }
 
-      const { week: weekNumber, year } = getSchedulingWeek(
-        config.weekChangeDay,
-        config.weekChangeTime,
-      );
+      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+      const { day, week: parsedWeek, year: parsedYear } = dayWeekResult.data;
+
+      // Use parsed week/year or fall back to scheduling week
+      let weekNumber = parsedWeek ?? schedulingWeek.week;
+      let year =
+        parsedYear ?? (parsedWeek !== null ? new Date().getFullYear() : schedulingWeek.year);
+
+      // Validate week is not in the past if explicitly provided
+      if (parsedWeek !== null) {
+        const result = parseWeekInput(`${weekNumber}/${year}`, {
+          allowPast: false,
+          schedulingWeek,
+        });
+        if (!result.success) {
+          if (result.error === 'past') {
+            return ctx.reply(i18n.match.weekInPast(schedulingWeek.week));
+          }
+          return ctx.reply(i18n.match.invalidWeek);
+        }
+        weekNumber = result.week;
+        year = result.year;
+      }
 
       await setMatchTime(db, {
         seasonId: season.id,
         weekNumber,
         year,
-        matchDay: dayResult.data,
+        matchDay: day,
         matchTime: timeResult.data,
       });
 
       const { start, end } = getWeekDateRange(year, weekNumber);
       const dateRange = formatDateRange(start, end);
-      const dayName = i18n.poll.days[dayResult.data];
-      const dayFormatted = formatDay(dayResult.data, config.language);
+      const dayName = i18n.poll.days[day];
+      const dayFormatted = formatDay(day, config.language);
 
       if (config.publicAnnouncements === 'on') {
         const publicGroupIds = await getPublicGroupIds(db);
@@ -291,13 +311,27 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, config, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
+      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
-      if (args.toLowerCase() === 'clear') {
-        const { week: weekNumber, year } = getSchedulingWeek(
-          config.weekChangeDay,
-          config.weekChangeTime,
-        );
-        await clearOpponent(db, { seasonId: season.id, weekNumber, year });
+      // Check for clear command (with optional week or week/year)
+      const clearMatch = args.toLowerCase().match(/^clear(?:\s+(\d+(?:\/\d+)?))?$/);
+      if (clearMatch) {
+        let week: number;
+        let year: number;
+
+        if (clearMatch[1]) {
+          const result = parseWeekInput(clearMatch[1], { allowPast: false, schedulingWeek });
+          if (!result.success) {
+            return ctx.reply(i18n.opponent.invalidWeek);
+          }
+          week = result.week;
+          year = result.year;
+        } else {
+          week = schedulingWeek.week;
+          year = schedulingWeek.year;
+        }
+
+        await clearOpponent(db, { seasonId: season.id, weekNumber: week, year });
         return ctx.reply(i18n.opponent.cleared);
       }
 
@@ -305,25 +339,36 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.opponent.usage);
       }
 
-      const urlMatch = args.match(/\s+(https?:\/\/\S+)$/i);
+      // Check for week/year at the end of args (e.g., "5" or "5/2026")
+      const weekMatch = args.match(/\s+(\d+(?:\/\d+)?)$/);
+      let argsWithoutWeek = args;
+      let weekNumber = schedulingWeek.week;
+      let year = schedulingWeek.year;
+
+      if (weekMatch) {
+        const result = parseWeekInput(weekMatch[1], { allowPast: false, schedulingWeek });
+        if (result.success) {
+          weekNumber = result.week;
+          year = result.year;
+          argsWithoutWeek = args.slice(0, weekMatch.index).trim();
+        }
+        // If parsing fails, treat it as part of the name (e.g., "Team 123")
+      }
+
+      const urlMatch = argsWithoutWeek.match(/\s+(https?:\/\/\S+)$/i);
       let opponentName: string;
       let opponentUrl: string | undefined;
 
       if (urlMatch) {
         opponentUrl = urlMatch[1];
-        opponentName = args.slice(0, urlMatch.index).trim();
+        opponentName = argsWithoutWeek.slice(0, urlMatch.index).trim();
       } else {
-        opponentName = args;
+        opponentName = argsWithoutWeek;
       }
 
       if (!opponentName) {
         return ctx.reply(i18n.opponent.usage);
       }
-
-      const { week: weekNumber, year } = getSchedulingWeek(
-        config.weekChangeDay,
-        config.weekChangeTime,
-      );
 
       await setOpponent(db, {
         seasonId: season.id,

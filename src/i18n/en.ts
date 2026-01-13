@@ -138,9 +138,12 @@ export const en: Translations = {
   match: {
     scheduled: (day, time, week, dateRange) =>
       `Match scheduled: ${day} at ${time} (week ${week}, ${dateRange})`,
-    usage: 'Usage: /setmatch <day> <time>\nExample: /setmatch sun 20:00',
+    usage:
+      'Usage: /setmatch <day[/week[/year]]> <time>\nExample: /setmatch sun 20:00 or /setmatch sun/5 20:00',
     invalidDay: 'Invalid day. Use: mon, tue, wed, thu, fri, sat, sun',
     invalidTime: 'Invalid time format. Use HH:MM (e.g. 20:00)',
+    invalidWeek: 'Invalid week. Use: 5 or 5/2026',
+    weekInPast: (schedulingWeek) => `Week must be ${schedulingWeek} or later.`,
   },
   lineup: {
     set: (count, players) => `Lineup set (${count} players):\n${players}`,
@@ -241,8 +244,9 @@ export const en: Translations = {
     setWithUrl: (name, url) => `Opponent set: ${name} (${url})`,
     cleared: 'Opponent cleared.',
     usage:
-      'Usage: /setopponent <name> [url]\nExample: /setopponent EC Myyrylit https://example.com/team',
+      'Usage: /setopponent <name> [url] [week[/year]]\nExample: /setopponent EC Myyrylit https://example.com/team 5',
     noOpponentSet: 'Opponent not set.',
+    invalidWeek: 'Invalid week. Use: 5 or 5/2026',
   },
   group: {
     notInGroup: 'This command can only be used in a group.',
