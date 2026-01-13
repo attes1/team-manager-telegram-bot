@@ -1,10 +1,11 @@
 import { Bot } from 'grammy';
 import { env } from './env';
+import { t } from './i18n';
 
 export const createBot = () => {
   const bot = new Bot(env.BOT_TOKEN);
 
-  bot.command('start', (ctx) => ctx.reply('Pappaliiga Bot käynnistetty!'));
+  bot.command('start', (ctx) => ctx.reply(t().bot.started));
 
   bot.catch((err) => {
     console.error('Bot error:', err);
