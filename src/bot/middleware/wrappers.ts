@@ -47,6 +47,10 @@ export const rosterCommand = (
   handler: CommandHandler<RosterContext>,
 ): CommandMiddleware<BotContext> => {
   return async (ctx) => {
+    if (ctx.isInPublicGroup && !ctx.isAdmin) {
+      await ctx.reply(ctx.i18n.errors.notAvailableInPublicGroup);
+      return;
+    }
     if (!isSeasonContext(ctx)) {
       await ctx.reply(ctx.i18n.errors.noActiveSeason);
       return;
@@ -79,6 +83,10 @@ export const captainCommand = (
   handler: CommandHandler<CaptainContext>,
 ): CommandMiddleware<BotContext> => {
   return async (ctx) => {
+    if (ctx.isInPublicGroup && !ctx.isAdmin) {
+      await ctx.reply(ctx.i18n.errors.notAvailableInPublicGroup);
+      return;
+    }
     if (!isCaptainContext(ctx)) {
       await ctx.reply(ctx.i18n.errors.notCaptain);
       return;
@@ -91,6 +99,10 @@ export const captainSeasonCommand = (
   handler: CommandHandler<CaptainSeasonContext>,
 ): CommandMiddleware<BotContext> => {
   return async (ctx) => {
+    if (ctx.isInPublicGroup && !ctx.isAdmin) {
+      await ctx.reply(ctx.i18n.errors.notAvailableInPublicGroup);
+      return;
+    }
     if (!isCaptainContext(ctx)) {
       await ctx.reply(ctx.i18n.errors.notCaptain);
       return;

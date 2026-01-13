@@ -71,11 +71,11 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
 
       await ctx.answerCallbackQuery(ctx.i18n.lineup.saved(lineup.length));
 
-      if (env.PUBLIC_CHANNEL_ID) {
+      if (env.PUBLIC_GROUP_ID) {
         const { start, end } = getWeekDateRange(year, week);
         const dateRange = formatDateRange(start, end);
         const announcement = buildLineupAnnouncement(ctx.i18n, week, dateRange, lineup);
-        await ctx.api.sendMessage(env.PUBLIC_CHANNEL_ID, announcement);
+        await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
       }
 
       const playerList = lineup.map((p) => `• ${formatPlayerName(p)}`).join('\n');

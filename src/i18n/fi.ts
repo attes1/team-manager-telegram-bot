@@ -13,6 +13,7 @@ export interface Translations {
     invalidConfigKey: string;
     invalidConfigValue: (key: string) => string;
     notInRoster: string;
+    notAvailableInPublicGroup: string;
   };
   roster: {
     added: (name: string) => string;
@@ -194,6 +195,7 @@ export const fi: Translations = {
     invalidConfigKey: 'Tuntematon asetus. Käytä /config nähdäksesi vaihtoehdot.',
     invalidConfigValue: (key) => `Virheellinen arvo asetukselle "${key}".`,
     notInRoster: 'Et ole rosterissa. Pyydä adminia lisäämään sinut.',
+    notAvailableInPublicGroup: 'Komento ei käytettävissä yleisessä ryhmässä.',
   },
   roster: {
     added: (name) => `${name} lisätty rosteriin.`,

@@ -15,6 +15,7 @@ export const en: Translations = {
     invalidConfigKey: 'Unknown setting. Use /config to see options.',
     invalidConfigValue: (key) => `Invalid value for "${key}".`,
     notInRoster: 'You are not in the roster. Ask an admin to add you.',
+    notAvailableInPublicGroup: 'Command not available in public group.',
   },
   roster: {
     added: (name) => `${name} added to roster.`,

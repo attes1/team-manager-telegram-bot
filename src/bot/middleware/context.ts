@@ -1,5 +1,6 @@
 import type { NextFunction } from 'grammy';
 import { db } from '../../db';
+import { env } from '../../env';
 import { t } from '../../i18n';
 import { isAdmin } from '../../lib/admin';
 import { getConfig } from '../../services/config';
@@ -13,6 +14,7 @@ export const contextMiddleware = async (ctx: BotContext, next: NextFunction) => 
   ctx.isAdmin = ctx.userId !== 0 && isAdmin(ctx.userId);
   ctx.isCaptain = ctx.isAdmin;
   ctx.isInRoster = false;
+  ctx.isInPublicGroup = env.PUBLIC_GROUP_ID !== undefined && ctx.chat?.id === env.PUBLIC_GROUP_ID;
 
   const season = await getActiveSeason(db);
   if (season) {

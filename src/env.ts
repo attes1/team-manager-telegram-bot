@@ -16,7 +16,7 @@ const envSchema = z.object({
   BOT_TOKEN: z.string().min(1),
 
   TEAM_GROUP_ID: z.coerce.number(),
-  PUBLIC_CHANNEL_ID: z
+  PUBLIC_GROUP_ID: z
     .string()
     .optional()
     .transform((val) => {

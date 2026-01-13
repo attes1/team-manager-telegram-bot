@@ -148,6 +148,8 @@ export type MockDb = {
 export type MockEnv = {
   env: {
     ADMIN_IDS: number[];
+    TEAM_GROUP_ID: number;
+    PUBLIC_GROUP_ID?: number;
     DEFAULT_LANGUAGE: 'en' | 'fi';
     DEFAULT_POLL_DAY: string;
     DEFAULT_POLL_TIME: string;
@@ -164,9 +166,14 @@ export type MockEnv = {
   };
 };
 
-export const createMockEnv = (adminIds: number[]): MockEnv => ({
+export const createMockEnv = (
+  adminIds: number[],
+  options?: { teamGroupId?: number; publicGroupId?: number },
+): MockEnv => ({
   env: {
     ADMIN_IDS: adminIds,
+    TEAM_GROUP_ID: options?.teamGroupId ?? -100123,
+    PUBLIC_GROUP_ID: options?.publicGroupId,
     DEFAULT_LANGUAGE: 'en',
     DEFAULT_POLL_DAY: 'sun',
     DEFAULT_POLL_TIME: '10:00',

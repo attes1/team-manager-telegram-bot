@@ -10,6 +10,7 @@ export interface BotContext extends Context {
   isAdmin: boolean;
   isCaptain: boolean;
   isInRoster: boolean;
+  isInPublicGroup: boolean;
   season?: Season;
   config?: ParsedConfig;
   i18n: Translations;

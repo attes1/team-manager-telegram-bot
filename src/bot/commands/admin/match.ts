@@ -75,9 +75,9 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
       const dayName = i18n.poll.days[dayResult.data];
       const dayFormatted = formatDay(dayResult.data, config.language);
 
-      if (env.PUBLIC_CHANNEL_ID) {
+      if (env.PUBLIC_GROUP_ID) {
         const announcement = buildMatchScheduledAnnouncement(i18n, dayFormatted, timeResult.data);
-        await ctx.api.sendMessage(env.PUBLIC_CHANNEL_ID, announcement);
+        await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
       }
 
       return ctx.reply(i18n.match.scheduled(dayName, timeResult.data, weekNumber, dateRange));
@@ -121,12 +121,12 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         playerIds: mentionedUsers.map((u) => u.id),
       });
 
-      if (env.PUBLIC_CHANNEL_ID) {
+      if (env.PUBLIC_GROUP_ID) {
         const { start, end } = getWeekDateRange(year, week);
         const dateRange = formatDateRange(start, end);
         const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
         const announcement = buildLineupAnnouncement(i18n, week, dateRange, lineup);
-        await ctx.api.sendMessage(env.PUBLIC_CHANNEL_ID, announcement);
+        await ctx.api.sendMessage(env.PUBLIC_GROUP_ID, announcement);
       }
 
       const playerList = mentionedUsers.map((u) => `• ${u.name}`).join('\n');
