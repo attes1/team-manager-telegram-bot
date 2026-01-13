@@ -57,6 +57,8 @@ export interface Translations {
       poll_time: string;
       poll_days: string;
       poll_times: string;
+      poll_cutoff_day: string;
+      poll_cutoff_time: string;
       reminder_day: string;
       reminder_time: string;
       reminders_mode: string;
@@ -79,6 +81,8 @@ export interface Translations {
     matchWeekTitle: (week: number, dateRange: string) => string;
     legend: string;
     notInRoster: string;
+    invalidWeek: string;
+    weekInPast: (targetWeek: number) => string;
     days: {
       mon: string;
       tue: string;
@@ -240,6 +244,8 @@ export const fi: Translations = {
       poll_time: 'Kyselyn aika',
       poll_days: 'Kyselyn päivät',
       poll_times: 'Kyselyn kellonajat',
+      poll_cutoff_day: 'Kyselyn raja-aika (päivä)',
+      poll_cutoff_time: 'Kyselyn raja-aika (kello)',
       reminder_day: 'Muistutuksen päivä',
       reminder_time: 'Muistutuksen aika',
       reminders_mode: 'Muistutustila',
@@ -264,6 +270,8 @@ export const fi: Translations = {
       `Vko ${week} (${dateRange}) - MATSI!\nOletusaika su 20:00. Merkkaa milloin pääset.`,
     legend: '✅ Vapaa | 🏋️ Vain treeni | 🏆 Vain matsi | ⚠️ Jos tarve | ❌ Ei pääse',
     notInRoster: 'Valikko on vain rosterissa oleville pelaajille.',
+    invalidWeek: 'Virheellinen viikkonumero (1-53).',
+    weekInPast: (targetWeek) => `Viikon pitää olla ${targetWeek} tai myöhempi.`,
     days: {
       mon: 'Ma',
       tue: 'Ti',

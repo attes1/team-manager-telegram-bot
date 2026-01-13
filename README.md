@@ -116,7 +116,8 @@ Available to roster members, captains, and admins:
 - `/avail today` - View today's availability
 - `/avail <day>` - View specific day (mon, tue, wed, etc.)
 - `/avail practice mon` - Combine filters
-- `/poll` - View/respond to availability poll
+- `/poll` - View/respond to availability poll for target week
+- `/poll <week>` - Poll for specific future week (e.g., `/poll 5`)
 - `/status` - View status overview
 
 ### Captain Commands
@@ -165,6 +166,8 @@ Use `/config` to view all settings. Available options:
 | `poll_time` | Time to send poll | `10:00` |
 | `poll_days` | Days shown in poll | `mon,tue,wed,thu,fri,sat,sun` |
 | `poll_times` | Time slots in poll | `19,20,21` |
+| `poll_cutoff_day` | Day for week cutoff | `thu` |
+| `poll_cutoff_time` | Time for week cutoff | `10:00` |
 | `reminder_day` | Day for reminders | `wed` |
 | `reminder_time` | Time for reminders | `18:00` |
 | `reminders_mode` | ping/quiet/off | `quiet` |
@@ -173,6 +176,8 @@ Use `/config` to view all settings. Available options:
 | `lineup_size` | Players in lineup | `5` |
 | `match_day_reminder_mode` | Match day reminder (ping/quiet/off) | `quiet` |
 | `match_day_reminder_time` | Time for match day reminder | `18:00` |
+
+**Poll Cutoff Logic**: After the cutoff (default: Thursday 10:00), polls and reminders automatically target the next week. This ensures that when you send the Sunday poll, it asks about next week's availability (for the upcoming match), not the current week.
 
 ## Project Structure
 

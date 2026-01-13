@@ -1,7 +1,9 @@
 import type { Bot } from 'grammy';
 import type { BotContext } from '../bot/context';
 import { db } from '../db';
+import { getTargetWeek } from '../lib/week';
 import { getPollMessage, pollMenu } from '../menus/poll';
+import { getConfig } from '../services/config';
 import { getActiveSeason } from '../services/season';
 
 export const sendWeeklyPoll = async (bot: Bot<BotContext>, chatId: number): Promise<void> => {
@@ -11,12 +13,20 @@ export const sendWeeklyPoll = async (bot: Bot<BotContext>, chatId: number): Prom
     return;
   }
 
-  const message = await getPollMessage(season.id);
+  const config = await getConfig(db, season.id);
+  if (!config) {
+    console.log('Weekly poll: No config found, skipping');
+    return;
+  }
+
+  // Use target week based on cutoff logic
+  const targetWeek = getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
+  const message = await getPollMessage(season.id, targetWeek);
 
   await bot.api.sendMessage(chatId, message, {
     reply_markup: pollMenu,
     parse_mode: 'HTML',
   });
 
-  console.log(`Weekly poll sent to chat ${chatId}`);
+  console.log(`Weekly poll sent to chat ${chatId} for week ${targetWeek.week}/${targetWeek.year}`);
 };

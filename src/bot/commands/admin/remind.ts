@@ -1,6 +1,6 @@
 import type { Bot } from 'grammy';
 import { formatDateRange, formatPlayerName } from '../../../lib/format';
-import { getCurrentWeek, getWeekDateRange } from '../../../lib/week';
+import { getTargetWeek, getWeekDateRange } from '../../../lib/week';
 import { hasRespondedForWeek } from '../../../services/availability';
 import { getRoster } from '../../../services/roster';
 import type { BotContext, CaptainSeasonContext } from '../../context';
@@ -11,7 +11,8 @@ export const registerRemindCommand = (bot: Bot<BotContext>) => {
     'remind',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, config, i18n } = ctx;
-      const { week, year } = getCurrentWeek();
+      // Use target week based on cutoff logic
+      const { week, year } = getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
       const { start, end } = getWeekDateRange(year, week);
       const dateRange = formatDateRange(start, end);
 

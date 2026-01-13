@@ -60,6 +60,8 @@ export const en: Translations = {
       poll_time: 'Poll time',
       poll_days: 'Poll days',
       poll_times: 'Poll times',
+      poll_cutoff_day: 'Poll cutoff day',
+      poll_cutoff_time: 'Poll cutoff time',
       reminder_day: 'Reminder day',
       reminder_time: 'Reminder time',
       reminders_mode: 'Reminders mode',
@@ -84,6 +86,8 @@ export const en: Translations = {
       `Week ${week} (${dateRange}) - MATCH WEEK!\nDefault: Sun 20:00. Mark your availability.`,
     legend: '✅ Available | 🏋️ Practice only | 🏆 Match only | ⚠️ If needed | ❌ Unavailable',
     notInRoster: 'Menu is only available for roster players.',
+    invalidWeek: 'Invalid week number (1-53).',
+    weekInPast: (targetWeek) => `Week must be ${targetWeek} or later.`,
     days: {
       mon: 'Mon',
       tue: 'Tue',

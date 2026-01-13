@@ -4,10 +4,26 @@ import { db } from '../db';
 import { getTranslations } from '../i18n';
 import { formatDateRange } from '../lib/format';
 import type { AvailabilityStatus } from '../lib/schemas';
-import { getCurrentWeek, getWeekDateRange } from '../lib/week';
+import { getCurrentWeek, getTargetWeek, getWeekDateRange } from '../lib/week';
 import { getPlayerWeekAvailability, setDayAvailability } from '../services/availability';
 import { isPlayerInRoster } from '../services/roster';
 import { getWeek } from '../services/week';
+
+// Week marker format: [w:5/2025] - appended to poll message for parsing
+const WEEK_MARKER_REGEX = /\[w:(\d+)\/(\d+)\]$/;
+
+const parseWeekFromMessage = (text: string | undefined): { week: number; year: number } | null => {
+  if (!text) {
+    return null;
+  }
+  const match = text.match(WEEK_MARKER_REGEX);
+  if (match) {
+    return { week: Number(match[1]), year: Number(match[2]) };
+  }
+  return null;
+};
+
+const createWeekMarker = (week: number, year: number): string => `[w:${week}/${year}]`;
 
 const STATUS_ICONS: Record<AvailabilityStatus, string> = {
   available: '✅',
@@ -46,7 +62,10 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
     return;
   }
 
-  const { week, year } = getCurrentWeek();
+  // Parse week from message, fall back to target week
+  const messageText = ctx.callbackQuery?.message?.text;
+  const parsedWeek = parseWeekFromMessage(messageText);
+  const { week, year } = parsedWeek ?? getTargetWeek(config.pollCutoffDay, config.pollCutoffTime);
   const days = config.pollDays;
   const times = config.pollTimes.split(',');
 
@@ -137,10 +156,13 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
   }
 });
 
-export const getPollMessage = async (seasonId: number): Promise<string> => {
+export const getPollMessage = async (
+  seasonId: number,
+  targetWeek?: { week: number; year: number },
+): Promise<string> => {
   const i18n = await getTranslations(db, seasonId);
 
-  const { week, year } = getCurrentWeek();
+  const { week, year } = targetWeek ?? getCurrentWeek();
   const { start, end } = getWeekDateRange(year, week);
   const dateRange = formatDateRange(start, end);
 
@@ -151,5 +173,8 @@ export const getPollMessage = async (seasonId: number): Promise<string> => {
     ? i18n.poll.matchWeekTitle(week, dateRange)
     : i18n.poll.title(week, dateRange);
 
-  return `${title}\n\n${i18n.poll.legend}`;
+  // Append week marker for menu to parse
+  const weekMarker = createWeekMarker(week, year);
+
+  return `${title}\n\n${i18n.poll.legend}\n${weekMarker}`;
 };
