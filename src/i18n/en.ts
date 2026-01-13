@@ -11,6 +11,8 @@ export const en: Translations = {
     playerNotFound: 'Player not found.',
     playerNotInRoster: 'Player is not in the roster.',
     missingSeasonName: 'Provide a season name (e.g. /season start Spring 2025)',
+    invalidConfigKey: 'Unknown setting. Use /config to see options.',
+    invalidConfigValue: (key) => `Invalid value for "${key}".`,
   },
   roster: {
     added: (name) => `${name} added to roster.`,
@@ -27,5 +29,24 @@ export const en: Translations = {
     info: (name, status, createdAt) => `Season: ${name}\nStatus: ${status}\nStarted: ${createdAt}`,
     statusActive: 'Active',
     statusEnded: 'Ended',
+  },
+  config: {
+    title: 'Settings:',
+    updated: (key, value) => `${key} = ${value}`,
+    line: (key, value) => `${key}: ${value}`,
+    usage: 'Usage: /config <setting> <value>',
+    keys: {
+      language: 'Language',
+      poll_day: 'Poll day',
+      poll_time: 'Poll time',
+      poll_days: 'Poll days',
+      poll_times: 'Poll times',
+      reminder_day: 'Reminder day',
+      reminder_time: 'Reminder time',
+      reminders_mode: 'Reminders mode',
+      match_day: 'Default match day',
+      match_time: 'Default match time',
+      lineup_size: 'Lineup size',
+    },
   },
 };

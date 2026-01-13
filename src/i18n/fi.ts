@@ -9,6 +9,8 @@ export interface Translations {
     playerNotFound: string;
     playerNotInRoster: string;
     missingSeasonName: string;
+    invalidConfigKey: string;
+    invalidConfigValue: (key: string) => string;
   };
   roster: {
     added: (name: string) => string;
@@ -26,6 +28,25 @@ export interface Translations {
     statusActive: string;
     statusEnded: string;
   };
+  config: {
+    title: string;
+    updated: (key: string, value: string) => string;
+    line: (key: string, value: string) => string;
+    usage: string;
+    keys: {
+      language: string;
+      poll_day: string;
+      poll_time: string;
+      poll_days: string;
+      poll_times: string;
+      reminder_day: string;
+      reminder_time: string;
+      reminders_mode: string;
+      match_day: string;
+      match_time: string;
+      lineup_size: string;
+    };
+  };
 }
 
 export const fi: Translations = {
@@ -39,6 +60,8 @@ export const fi: Translations = {
     playerNotFound: 'Pelaajaa ei löytynyt.',
     playerNotInRoster: 'Pelaaja ei ole rosterissa.',
     missingSeasonName: 'Anna kauden nimi (esim. /season start Kevät 2025)',
+    invalidConfigKey: 'Tuntematon asetus. Käytä /config nähdäksesi vaihtoehdot.',
+    invalidConfigValue: (key) => `Virheellinen arvo asetukselle "${key}".`,
   },
   roster: {
     added: (name) => `${name} lisätty rosteriin.`,
@@ -55,5 +78,24 @@ export const fi: Translations = {
     info: (name, status, createdAt) => `Kausi: ${name}\nTila: ${status}\nAloitettu: ${createdAt}`,
     statusActive: 'Aktiivinen',
     statusEnded: 'Päättynyt',
+  },
+  config: {
+    title: 'Asetukset:',
+    updated: (key, value) => `${key} = ${value}`,
+    line: (key, value) => `${key}: ${value}`,
+    usage: 'Käyttö: /config <asetus> <arvo>',
+    keys: {
+      language: 'Kieli',
+      poll_day: 'Kyselyn päivä',
+      poll_time: 'Kyselyn aika',
+      poll_days: 'Kyselyn päivät',
+      poll_times: 'Kyselyn kellonajat',
+      reminder_day: 'Muistutuksen päivä',
+      reminder_time: 'Muistutuksen aika',
+      reminders_mode: 'Muistutustila',
+      match_day: 'Oletusmatsin päivä',
+      match_time: 'Oletusmatsin aika',
+      lineup_size: 'Kokoonpanon koko',
+    },
   },
 };
