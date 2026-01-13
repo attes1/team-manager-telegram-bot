@@ -35,6 +35,7 @@ export interface ConfigTable {
   matchDayReminderMode: Generated<RemindersMode>;
   matchDayReminderTime: Generated<string>;
   publicAnnouncements: Generated<string>;
+  publicCommandsMode: Generated<string>;
   menuExpirationHours: Generated<number>;
   menuCleanupTime: Generated<string>;
 }

@@ -8,6 +8,7 @@ import {
   onOffSchema,
   type ParsedConfig,
   pollTimesSchema,
+  publicCommandsModeSchema,
   remindersModeSchema,
   timeSchema,
 } from '../lib/schemas';
@@ -30,6 +31,7 @@ const configValidators: Record<string, z.ZodTypeAny> = {
   matchDayReminderMode: remindersModeSchema,
   matchDayReminderTime: timeSchema,
   publicAnnouncements: onOffSchema,
+  publicCommandsMode: publicCommandsModeSchema,
 };
 
 export type { ParsedConfig as Config };
@@ -51,6 +53,7 @@ const VALID_CONFIG_KEYS = [
   'matchDayReminderMode',
   'matchDayReminderTime',
   'publicAnnouncements',
+  'publicCommandsMode',
 ] as const;
 
 type ConfigKey = (typeof VALID_CONFIG_KEYS)[number];

@@ -201,6 +201,7 @@ Use `/config` to view all settings. Available options:
 | `match_day_reminder_mode` | Match day reminder (ping/quiet/off) | `quiet` |
 | `match_day_reminder_time` | Time for match day reminder | `18:00` |
 | `public_announcements` | Auto-announce to public group (on/off) | `on` |
+| `public_commands_mode` | Who can use commands in public groups (all/admins) | `all` |
 | `menu_expiration_hours` | Hours before menus are cleaned up (1-168) | `24` |
 | `menu_cleanup_time` | Time to run daily menu cleanup | `04:00` |
 

@@ -12,6 +12,7 @@ export {
   requireCaptainAndSeason,
   requireSeason,
 } from './guards';
+export { publicCommandsRestriction } from './public-commands';
 export {
   adminCommand,
   adminSeasonCommand,

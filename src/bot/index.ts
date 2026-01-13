@@ -11,12 +11,13 @@ import { commandDefinitions } from './commands/definitions';
 import type { BotContext } from './context';
 import { registerChatMemberHandlers } from './handlers/chat-member';
 import { registerReactionHandlers } from './handlers/reactions';
-import { contextMiddleware } from './middleware';
+import { contextMiddleware, publicCommandsRestriction } from './middleware';
 
 export const createBot = () => {
   const bot = new Bot<BotContext>(env.BOT_TOKEN);
 
   bot.use(contextMiddleware);
+  bot.use(publicCommandsRestriction);
   bot.use(pollMenu);
   bot.use(lineupMenu);
 

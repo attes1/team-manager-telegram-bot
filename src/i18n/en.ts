@@ -16,6 +16,7 @@ export const en: Translations = {
     invalidConfigValue: (key) => `Invalid value for "${key}".`,
     notInRoster: 'You are not in the roster. Ask an admin to add you.',
     notAvailableInPublicGroup: 'Command not available in public group.',
+    commandsRestrictedToAdmins: 'Commands are restricted to admins in this group.',
   },
   roster: {
     added: (name) => `${name} added to roster.`,
@@ -72,6 +73,7 @@ export const en: Translations = {
       match_day_reminder_mode: 'Match day reminder mode',
       match_day_reminder_time: 'Match day reminder time',
       public_announcements: 'Public announcements',
+      public_commands_mode: 'Commands in public groups',
       menu_expiration_hours: 'Menu expiration (hours)',
       menu_cleanup_time: 'Menu cleanup time',
     },
@@ -92,6 +94,7 @@ export const en: Translations = {
       match_day_reminder_mode: 'ping, quiet, off',
       match_day_reminder_time: 'HH:MM (e.g. 18:00)',
       public_announcements: 'on, off',
+      public_commands_mode: 'all, admins',
       menu_expiration_hours: '1-168',
       menu_cleanup_time: 'HH:MM (e.g. 04:00)',
     },

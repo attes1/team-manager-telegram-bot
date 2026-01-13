@@ -29,6 +29,8 @@ export const remindersModeSchema = z.enum(['ping', 'quiet', 'off']);
 
 export const onOffSchema = z.enum(['on', 'off']);
 
+export const publicCommandsModeSchema = z.enum(['all', 'admins']);
+
 export const seasonStatusSchema = z.enum(['active', 'ended']);
 
 export const rosterRoleSchema = z.enum(['player', 'captain']);
@@ -154,6 +156,7 @@ export type AvailabilityStatus = z.infer<typeof availabilityStatusSchema>;
 export type WeekType = z.infer<typeof weekTypeSchema>;
 export type RemindersMode = z.infer<typeof remindersModeSchema>;
 export type OnOff = z.infer<typeof onOffSchema>;
+export type PublicCommandsMode = z.infer<typeof publicCommandsModeSchema>;
 export type SeasonStatus = z.infer<typeof seasonStatusSchema>;
 export type RosterRole = z.infer<typeof rosterRoleSchema>;
 export type GroupType = z.infer<typeof groupTypeSchema>;
@@ -177,6 +180,7 @@ export const configSchema = z.object({
   matchDayReminderMode: remindersModeSchema.catch('quiet'),
   matchDayReminderTime: timeSchema.catch('18:00'),
   publicAnnouncements: onOffSchema.catch('on'),
+  publicCommandsMode: publicCommandsModeSchema.catch('all'),
   menuExpirationHours: z.number().int().min(1).max(168).catch(24),
   menuCleanupTime: timeSchema.catch('04:00'),
 });

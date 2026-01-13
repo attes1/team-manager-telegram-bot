@@ -14,6 +14,7 @@ export interface Translations {
     invalidConfigValue: (key: string) => string;
     notInRoster: string;
     notAvailableInPublicGroup: string;
+    commandsRestrictedToAdmins: string;
   };
   roster: {
     added: (name: string) => string;
@@ -70,6 +71,7 @@ export interface Translations {
       match_day_reminder_mode: string;
       match_day_reminder_time: string;
       public_announcements: string;
+      public_commands_mode: string;
       menu_expiration_hours: string;
       menu_cleanup_time: string;
     };
@@ -90,6 +92,7 @@ export interface Translations {
       match_day_reminder_mode: string;
       match_day_reminder_time: string;
       public_announcements: string;
+      public_commands_mode: string;
       menu_expiration_hours: string;
       menu_cleanup_time: string;
     };
@@ -285,6 +288,7 @@ export const fi: Translations = {
     invalidConfigValue: (key) => `Virheellinen arvo asetukselle "${key}".`,
     notInRoster: 'Et ole rosterissa. Pyydä adminia lisäämään sinut.',
     notAvailableInPublicGroup: 'Komento ei käytettävissä yleisessä ryhmässä.',
+    commandsRestrictedToAdmins: 'Komennot on rajoitettu ylläpitäjille tässä ryhmässä.',
   },
   roster: {
     added: (name) => `${name} lisätty rosteriin.`,
@@ -341,6 +345,7 @@ export const fi: Translations = {
       match_day_reminder_mode: 'Matsipäivän muistutustila',
       match_day_reminder_time: 'Matsipäivän muistutusaika',
       public_announcements: 'Julkiset ilmoitukset',
+      public_commands_mode: 'Komennot julkisissa ryhmissä',
       menu_expiration_hours: 'Valikon vanheneminen (tuntia)',
       menu_cleanup_time: 'Valikon siivousaika',
     },
@@ -361,6 +366,7 @@ export const fi: Translations = {
       match_day_reminder_mode: 'ping, quiet, off',
       match_day_reminder_time: 'HH:MM (esim. 18:00)',
       public_announcements: 'on, off',
+      public_commands_mode: 'all, admins',
       menu_expiration_hours: '1-168',
       menu_cleanup_time: 'HH:MM (esim. 04:00)',
     },

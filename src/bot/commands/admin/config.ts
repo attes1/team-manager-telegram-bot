@@ -25,6 +25,7 @@ const USER_TO_DB_KEY: Record<string, string> = {
   match_day_reminder_mode: 'matchDayReminderMode',
   match_day_reminder_time: 'matchDayReminderTime',
   public_announcements: 'publicAnnouncements',
+  public_commands_mode: 'publicCommandsMode',
 };
 
 const SCHEDULER_KEYS = [
@@ -86,6 +87,11 @@ const formatConfigDisplay = (i18n: Translations, config: ParsedConfig): string =
       labels.public_announcements,
       'public_announcements',
       config.publicAnnouncements,
+    ),
+    formatConfigLine(
+      labels.public_commands_mode,
+      'public_commands_mode',
+      config.publicCommandsMode,
     ),
   ];
   return `${i18n.config.title}\n${lines.join('\n')}\n\n${i18n.config.usage}`;
