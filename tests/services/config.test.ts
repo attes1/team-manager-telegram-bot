@@ -99,6 +99,10 @@ describe('config service', () => {
       expect(config?.pollTimes).toBe('18,19,20,21');
     });
 
+    test('rejects pollTimes with more than 5 values', async () => {
+      await expect(updateConfig(db, seasonId, 'pollTimes', '17,18,19,20,21,22')).rejects.toThrow();
+    });
+
     test('updates reminderDay', async () => {
       const updated = await updateConfig(db, seasonId, 'reminderDay', 'thu');
       expect(updated).toBe(true);

@@ -1,6 +1,32 @@
 import type { Kysely } from 'kysely';
-import { configSchema, type ParsedConfig } from '../lib/schemas';
+import { z } from 'zod';
+import {
+  configSchema,
+  daySchema,
+  daysListSchema,
+  languageSchema,
+  type ParsedConfig,
+  pollTimesSchema,
+  remindersModeSchema,
+  timeSchema,
+} from '../lib/schemas';
 import type { DB } from '../types/db';
+
+const configValidators: Record<string, z.ZodTypeAny> = {
+  language: languageSchema,
+  pollDay: daySchema,
+  pollTime: timeSchema,
+  pollDays: daysListSchema,
+  pollTimes: pollTimesSchema,
+  reminderDay: daySchema,
+  reminderTime: timeSchema,
+  remindersMode: remindersModeSchema,
+  matchDay: daySchema,
+  matchTime: timeSchema,
+  lineupSize: z.coerce.number().int().min(1).max(20),
+  matchDayReminderEnabled: z.enum(['true', 'false', '1', '0', 'on', 'off']),
+  matchDayReminderTime: timeSchema,
+};
 
 export type { ParsedConfig as Config };
 
@@ -50,6 +76,11 @@ export const updateConfig = async (
 ): Promise<boolean> => {
   if (!isValidConfigKey(key)) {
     throw new Error(`Invalid config key: ${key}`);
+  }
+
+  const validator = configValidators[key];
+  if (validator) {
+    validator.parse(value);
   }
 
   let updateValue: string | number = value;
