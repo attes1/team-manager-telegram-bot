@@ -52,11 +52,11 @@ export const updateConfig = async (
     throw new Error(`Invalid config key: ${key}`);
   }
 
-  let updateValue: string | number | boolean = value;
+  let updateValue: string | number = value;
   if (key === 'lineupSize') {
     updateValue = Number(value);
   } else if (key === 'matchDayReminderEnabled') {
-    updateValue = value === 'true' || value === '1' || value === 'on';
+    updateValue = value === 'true' || value === '1' || value === 'on' ? 1 : 0;
   }
 
   const result = await db
