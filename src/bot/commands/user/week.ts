@@ -3,18 +3,16 @@ import type { BotContext, CaptainSeasonContext } from '@/bot/context';
 import { captainSeasonCommand } from '@/bot/middleware';
 import { formatDateRange } from '@/lib/format';
 import { weekTypeSchema } from '@/lib/schemas';
-import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/temporal';
+import { getWeekDateRange, parseWeekInput } from '@/lib/temporal';
 import { setWeekType } from '@/services/week';
 
 export const registerWeekCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'setweek',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
-      const { db, season, config, i18n } = ctx;
+      const { db, season, schedulingWeek, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
       const parts = args.split(/\s+/).filter(Boolean);
-
-      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       let weekNumber: number;
       let year: number;

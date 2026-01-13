@@ -3,6 +3,7 @@ import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
 import { t } from '@/i18n';
 import { isAdmin } from '@/lib/admin';
+import { getSchedulingWeek } from '@/lib/temporal';
 import { getConfig } from '@/services/config';
 import { getGroup } from '@/services/group';
 import { isCaptain, isPlayerInRoster } from '@/services/roster';
@@ -31,6 +32,7 @@ export const contextMiddleware = async (ctx: BotContext, next: NextFunction) => 
     const config = await getConfig(db, season.id);
     if (config) {
       ctx.config = config;
+      ctx.schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
       ctx.i18n = t(config.language);
     } else {
       ctx.i18n = t();

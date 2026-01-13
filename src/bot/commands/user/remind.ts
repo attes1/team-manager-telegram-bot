@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext, CaptainSeasonContext } from '@/bot/context';
 import { captainSeasonCommand } from '@/bot/middleware';
 import { formatDateRange, formatPlayerName, formatUserMention } from '@/lib/format';
-import { getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
+import { getWeekDateRange } from '@/lib/temporal';
 import { hasRespondedForWeek } from '@/services/availability';
 import { getRoster } from '@/services/roster';
 
@@ -10,8 +10,7 @@ export const registerRemindCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'remind',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
-      const { db, season, config, i18n } = ctx;
-      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+      const { db, season, config, schedulingWeek, i18n } = ctx;
       const { week, year } = schedulingWeek;
       const { start, end } = getWeekDateRange(year, week);
       const dateRange = formatDateRange(start, end);

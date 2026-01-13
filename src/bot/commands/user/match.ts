@@ -3,7 +3,7 @@ import type { BotContext, CaptainSeasonContext } from '@/bot/context';
 import { captainSeasonCommand } from '@/bot/middleware';
 import { formatDateRange, formatDay } from '@/lib/format';
 import { dayWeekInputSchema, timeSchema } from '@/lib/schemas';
-import { getSchedulingWeek, getWeekDateRange, parseWeekInput } from '@/lib/temporal';
+import { getWeekDateRange, parseWeekInput } from '@/lib/temporal';
 import { getLineupMenuMessage, lineupMenu } from '@/menus/lineup';
 import { getPublicGroupIds } from '@/services/group';
 import {
@@ -52,7 +52,7 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
   bot.command(
     'setmatch',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
-      const { db, season, config, i18n } = ctx;
+      const { db, season, config, schedulingWeek, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
       const [dayWeekStr, timeStr] = args.split(/\s+/);
 
@@ -71,7 +71,6 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.match.invalidTime);
       }
 
-      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
       const { day, week: parsedWeek, year: parsedYear } = dayWeekResult.data;
 
       // Use parsed week/year or fall back to scheduling week
@@ -129,9 +128,8 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
   bot.command(
     'setlineup',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
-      const { db, season, config, i18n } = ctx;
+      const { db, season, config, schedulingWeek, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
-      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       // Parse optional week number from args (last word if it matches week or week/year format)
       const parseWeekFromArgs = (
@@ -309,9 +307,8 @@ export const registerMatchCommands = (bot: Bot<BotContext>) => {
   bot.command(
     'setopponent',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
-      const { db, season, config, i18n } = ctx;
+      const { db, season, schedulingWeek, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
-      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       // Check for clear command (with optional week or week/year)
       const clearMatch = args.toLowerCase().match(/^clear(?:\s+(\d+(?:\/\d+)?))?$/);

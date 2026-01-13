@@ -4,7 +4,7 @@ import { db } from '@/db';
 import { getTranslations } from '@/i18n';
 import { formatDateRange } from '@/lib/format';
 import type { AvailabilityStatus } from '@/lib/schemas';
-import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
+import { getCurrentWeek, getWeekDateRange } from '@/lib/temporal';
 import { getPlayerWeekAvailability, setDayAvailability } from '@/services/availability';
 import { isPlayerInRoster } from '@/services/roster';
 import { getWeek } from '@/services/week';
@@ -72,10 +72,10 @@ export const getDisplayStatus = (
 };
 
 export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) => {
-  const { db, season, config, i18n } = ctx;
+  const { db, season, config, schedulingWeek, i18n } = ctx;
   const userId = ctx.from?.id;
 
-  if (!userId || !season || !config) {
+  if (!userId || !season || !config || !schedulingWeek) {
     return;
   }
 
@@ -87,10 +87,7 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
 
   // Get week from: 1) payload (button click), 2) context (initial render from command), 3) scheduling week
   const payloadWeek = decodeWeekPayload(ctx.match);
-  const { week, year } =
-    payloadWeek ??
-    ctx.pollTargetWeek ??
-    getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+  const { week, year } = payloadWeek ?? ctx.pollTargetWeek ?? schedulingWeek;
   const weekPayload = encodeWeekPayload(week, year);
   const days = config.pollDays;
   const times = config.pollTimes.split(',');

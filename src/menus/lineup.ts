@@ -1,7 +1,7 @@
 import { Menu } from '@grammyjs/menu';
 import type { BotContext } from '@/bot/context';
 import { formatDateRange, formatPlayerName } from '@/lib/format';
-import { getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
+import { getWeekDateRange } from '@/lib/temporal';
 import { getPublicGroupIds } from '@/services/group';
 import { buildLineupMessage, getLineup, setLineup } from '@/services/match';
 import { getRoster } from '@/services/roster';
@@ -21,9 +21,9 @@ const decodeWeekPayload = (
 };
 
 export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, range) => {
-  const { db, season, config, i18n } = ctx;
+  const { db, season, config, schedulingWeek, i18n } = ctx;
 
-  if (!season || !config) {
+  if (!season || !config || !schedulingWeek) {
     return;
   }
 
@@ -36,10 +36,7 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
 
   // Get week from: 1) payload (button click), 2) context (initial render from command), 3) scheduling week
   const payloadWeek = decodeWeekPayload(ctx.match);
-  const { week, year } =
-    payloadWeek ??
-    ctx.lineupTargetWeek ??
-    getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+  const { week, year } = payloadWeek ?? ctx.lineupTargetWeek ?? schedulingWeek;
   const weekPayload = encodeWeekPayload(week, year);
 
   const roster = await getRoster(db, season.id);

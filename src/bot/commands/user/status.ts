@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
 import { formatDateRange } from '@/lib/format';
-import { getCurrentWeek, getSchedulingWeek, getWeekDateRange } from '@/lib/temporal';
+import { getCurrentWeek, getWeekDateRange } from '@/lib/temporal';
 import { getWeekAvailability } from '@/services/availability';
 import { getLineup, getMatchInfo } from '@/services/match';
 import { getRoster } from '@/services/roster';
@@ -12,11 +12,10 @@ export const registerStatusCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'status',
     rosterCommand(async (ctx: RosterContext) => {
-      const { db, season, config, i18n } = ctx;
+      const { db, season, config, schedulingWeek, i18n } = ctx;
 
       // Use scheduling week for all status info
       const currentWeek = getCurrentWeek();
-      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
       const { week, year } = schedulingWeek;
       const { start, end } = getWeekDateRange(year, week);
       const dateRange = formatDateRange(start, end);

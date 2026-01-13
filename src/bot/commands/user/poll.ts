@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
 import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
-import { getSchedulingWeek, parseWeekInput } from '@/lib/temporal';
+import { parseWeekInput } from '@/lib/temporal';
 import { getPollMessage, pollMenu } from '@/menus/poll';
 import { deleteActiveMenu, getActiveMenu, saveActiveMenu } from '@/services/menu';
 
@@ -11,11 +11,9 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'poll',
     rosterCommand(async (ctx: RosterContext) => {
-      const { db, season, config, i18n } = ctx;
+      const { db, season, schedulingWeek, i18n } = ctx;
       const chatId = ctx.chat?.id;
       const userId = ctx.from?.id;
-
-      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       // Parse optional week parameter
       const args = ctx.message?.text?.split(' ').slice(1) ?? [];

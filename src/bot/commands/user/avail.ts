@@ -4,12 +4,7 @@ import { rosterCommand } from '@/bot/middleware';
 import type { Translations } from '@/i18n';
 import { formatDateRange, formatDayDate, formatPlayerName } from '@/lib/format';
 import { type AvailabilityStatus, availFilterSchema, type Day } from '@/lib/schemas';
-import {
-  getSchedulingWeek,
-  getTodayDay,
-  getWeekDateRange,
-  parseDayOrWeekInput,
-} from '@/lib/temporal';
+import { getTodayDay, getWeekDateRange, parseDayOrWeekInput } from '@/lib/temporal';
 import type { PlayerWeekAvailability } from '@/services/availability';
 import { getWeekAvailability } from '@/services/availability';
 
@@ -215,9 +210,8 @@ export const registerAvailCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'avail',
     rosterCommand(async (ctx: RosterContext) => {
-      const { config, i18n } = ctx;
+      const { schedulingWeek, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
-      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       const parsed = parseAvailArgs(args, schedulingWeek);
 

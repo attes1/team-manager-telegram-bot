@@ -4,6 +4,11 @@ import type { Translations } from '../i18n';
 import type { ParsedConfig } from '../lib/schemas';
 import type { DB, Season } from '../types/db';
 
+export interface SchedulingWeek {
+  week: number;
+  year: number;
+}
+
 export interface BotContext extends Context {
   db: Kysely<DB>;
   userId: number;
@@ -13,6 +18,7 @@ export interface BotContext extends Context {
   isInPublicGroup: boolean;
   season?: Season;
   config?: ParsedConfig;
+  schedulingWeek?: SchedulingWeek;
   i18n: Translations;
   // Used by /poll command to pass target week to menu on initial render
   pollTargetWeek?: { week: number; year: number };
@@ -23,6 +29,7 @@ export interface BotContext extends Context {
 export type SeasonContext = BotContext & {
   season: Season;
   config: ParsedConfig;
+  schedulingWeek: SchedulingWeek;
 };
 
 export type RosterContext = SeasonContext & {
