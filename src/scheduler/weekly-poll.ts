@@ -19,14 +19,15 @@ export const sendWeeklyPoll = async (bot: Bot<BotContext>, chatId: number): Prom
     return;
   }
 
-  // Use target week based on cutoff logic
-  const targetWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
-  const message = await getPollMessage(season.id, targetWeek);
+  const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+  const message = await getPollMessage(season.id, schedulingWeek);
 
   await bot.api.sendMessage(chatId, message, {
     reply_markup: pollMenu,
     parse_mode: 'HTML',
   });
 
-  console.log(`Weekly poll sent to chat ${chatId} for week ${targetWeek.week}/${targetWeek.year}`);
+  console.log(
+    `Weekly poll sent to chat ${chatId} for week ${schedulingWeek.week}/${schedulingWeek.year}`,
+  );
 };

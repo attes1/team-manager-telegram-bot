@@ -108,7 +108,7 @@ export const en: Translations = {
     practiceLegend: '🏋️ Available for practice | ❌ Unavailable',
     notInRoster: 'Menu is only available for roster players.',
     invalidWeek: 'Invalid week number (1-53).',
-    weekInPast: (targetWeek) => `Week must be ${targetWeek} or later.`,
+    weekInPast: (schedulingWeek) => `Week must be ${schedulingWeek} or later.`,
     days: {
       mon: 'Mon',
       tue: 'Tue',

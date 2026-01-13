@@ -194,11 +194,11 @@ export const pollMenu = new Menu<BotContext>('poll').dynamic(async (ctx, range) 
 
 export const getPollMessage = async (
   seasonId: number,
-  targetWeek?: { week: number; year: number },
+  schedulingWeek?: { week: number; year: number },
 ): Promise<string> => {
   const i18n = await getTranslations(db, seasonId);
 
-  const { week, year } = targetWeek ?? getCurrentWeek();
+  const { week, year } = schedulingWeek ?? getCurrentWeek();
   const { start, end } = getWeekDateRange(year, week);
   const dateRange = formatDateRange(start, end);
 

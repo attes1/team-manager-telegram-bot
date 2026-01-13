@@ -77,13 +77,13 @@ export const getSchedulingWeek = (
 
 export const inferWeekYear = (
   requestedWeek: number,
-  targetWeek: { week: number; year: number },
+  schedulingWeek: { week: number; year: number },
 ): { week: number; year: number } => {
   // If requested week is less than target week, assume next year
-  if (requestedWeek < targetWeek.week) {
-    return { week: requestedWeek, year: targetWeek.year + 1 };
+  if (requestedWeek < schedulingWeek.week) {
+    return { week: requestedWeek, year: schedulingWeek.year + 1 };
   }
-  return { week: requestedWeek, year: targetWeek.year };
+  return { week: requestedWeek, year: schedulingWeek.year };
 };
 
 export type ParseWeekResult =
@@ -92,7 +92,7 @@ export type ParseWeekResult =
 
 export const parseWeekInput = (
   input: string,
-  targetWeek: { week: number; year: number },
+  schedulingWeek: { week: number; year: number },
   options: { allowPast?: boolean } = {},
 ): ParseWeekResult => {
   const { allowPast = true } = options;
@@ -103,12 +103,12 @@ export const parseWeekInput = (
   }
 
   const weekNum = parsed.data;
-  const result = inferWeekYear(weekNum, targetWeek);
+  const result = inferWeekYear(weekNum, schedulingWeek);
 
   if (!allowPast) {
     const isInPast =
-      result.year < targetWeek.year ||
-      (result.year === targetWeek.year && result.week < targetWeek.week);
+      result.year < schedulingWeek.year ||
+      (result.year === schedulingWeek.year && result.week < schedulingWeek.week);
 
     if (isInPast) {
       return { success: false, error: 'past' };

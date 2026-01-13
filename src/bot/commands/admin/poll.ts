@@ -12,19 +12,18 @@ export const registerPollCommand = (bot: Bot<BotContext>) => {
     rosterCommand(async (ctx: RosterContext) => {
       const { season, config, i18n } = ctx;
 
-      // Get target week using cutoff logic
-      const targetWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       // Parse optional week parameter
       const args = ctx.message?.text?.split(' ').slice(1) ?? [];
-      let pollWeek = targetWeek;
+      let pollWeek = schedulingWeek;
 
       if (args.length > 0) {
-        const weekResult = parseWeekInput(args[0], targetWeek, { allowPast: false });
+        const weekResult = parseWeekInput(args[0], schedulingWeek, { allowPast: false });
 
         if (!weekResult.success) {
           if (weekResult.error === 'past') {
-            return ctx.reply(i18n.poll.weekInPast(targetWeek.week));
+            return ctx.reply(i18n.poll.weekInPast(schedulingWeek.week));
           }
           return ctx.reply(i18n.poll.invalidWeek);
         }

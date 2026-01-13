@@ -14,7 +14,7 @@ export const registerWeekCommand = (bot: Bot<BotContext>) => {
       const args = ctx.match?.toString().trim() ?? '';
       const parts = args.split(/\s+/).filter(Boolean);
 
-      const targetWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
+      const schedulingWeek = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
 
       let weekNumber: number;
       let year: number;
@@ -33,12 +33,11 @@ export const registerWeekCommand = (bot: Bot<BotContext>) => {
       const type = parsedType.data;
 
       if (parts.length === 1) {
-        // Single argument is type - use target week with cutoff logic
-        weekNumber = targetWeek.week;
-        year = targetWeek.year;
+        weekNumber = schedulingWeek.week;
+        year = schedulingWeek.year;
       } else if (parts.length === 2) {
         // Two arguments: week number + type
-        const weekResult = parseWeekInput(parts[0], targetWeek);
+        const weekResult = parseWeekInput(parts[0], schedulingWeek);
 
         if (!weekResult.success) {
           return ctx.reply(i18n.week.invalidWeek);

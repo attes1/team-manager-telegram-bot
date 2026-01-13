@@ -104,7 +104,7 @@ export interface Translations {
     practiceLegend: string;
     notInRoster: string;
     invalidWeek: string;
-    weekInPast: (targetWeek: number) => string;
+    weekInPast: (schedulingWeek: number) => string;
     days: {
       mon: string;
       tue: string;
@@ -329,7 +329,7 @@ export const fi: Translations = {
     practiceLegend: '🏋️ Pääsee treeneihin | ❌ Ei pääse',
     notInRoster: 'Valikko on vain rosterissa oleville pelaajille.',
     invalidWeek: 'Virheellinen viikkonumero (1-53).',
-    weekInPast: (targetWeek) => `Viikon pitää olla ${targetWeek} tai myöhempi.`,
+    weekInPast: (schedulingWeek) => `Viikon pitää olla ${schedulingWeek} tai myöhempi.`,
     days: {
       mon: 'Ma',
       tue: 'Ti',
