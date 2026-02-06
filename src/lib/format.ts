@@ -90,3 +90,11 @@ export const escapeHtml = (text: string): string => {
 export const formatUserMention = (telegramId: number, displayName: string): string => {
   return `<a href="tg://user?id=${telegramId}">${escapeHtml(displayName)}</a>`;
 };
+
+export const formatPlayerList = (
+  players: ReadonlyArray<{ telegramId: number; name: string }>,
+  ping: boolean,
+): string =>
+  players
+    .map((p) => (ping ? `• ${formatUserMention(p.telegramId, p.name)}` : `• ${p.name}`))
+    .join('\n');

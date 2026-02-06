@@ -2,32 +2,9 @@ import { type Bot, InlineKeyboard } from 'grammy';
 import type { AdminSeasonContext, BotContext } from '@/bot/context';
 import { adminSeasonCommand } from '@/bot/middleware';
 import { formatUserMention } from '@/lib/format';
+import { getTextMention, getUsernameFromArgs } from '@/lib/mentions';
 import { addInvitation } from '@/services/pending-invitations';
-import { removePlayerFromRoster } from '@/services/roster';
-
-// Extract user info from text_mention entity (user without username)
-const getTextMention = (
-  ctx: AdminSeasonContext,
-): { userId: number; displayName: string; username?: string } | null => {
-  const textMentions = ctx.entities('text_mention');
-  if (textMentions.length > 0 && textMentions[0].user) {
-    const user = textMentions[0].user;
-    const displayName = user.first_name + (user.last_name ? ` ${user.last_name}` : '');
-    return { userId: user.id, displayName, username: user.username };
-  }
-  return null;
-};
-
-// Extract username from command arguments
-const getUsernameFromArgs = (ctx: AdminSeasonContext): string | null => {
-  const text = ctx.message?.text || '';
-  const parts = text.split(/\s+/);
-  if (parts.length < 2) {
-    return null;
-  }
-  // Remove @ if present
-  return parts[1].replace(/^@/, '');
-};
+import { getPlayerByUsername, removePlayerFromRoster } from '@/services/roster';
 
 export const registerPlayerCommands = (bot: Bot<BotContext>) => {
   bot.command(
@@ -118,24 +95,16 @@ export const registerPlayerCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.roster.removed(textMention.displayName));
       }
 
-      // Check for username in args - need to look up in database
       const username = getUsernameFromArgs(ctx);
       if (username) {
-        // Look up player by username in roster
-        const roster = await db
-          .selectFrom('seasonRoster')
-          .innerJoin('players', 'players.telegramId', 'seasonRoster.playerId')
-          .selectAll('players')
-          .where('seasonRoster.seasonId', '=', season.id)
-          .where('players.username', '=', username)
-          .executeTakeFirst();
+        const player = await getPlayerByUsername(db, season.id, username);
 
-        if (!roster) {
+        if (!player) {
           return ctx.reply(i18n.errors.playerNotInRoster);
         }
 
-        await removePlayerFromRoster(db, season.id, roster.telegramId);
-        return ctx.reply(i18n.roster.removed(roster.displayName));
+        await removePlayerFromRoster(db, season.id, player.telegramId);
+        return ctx.reply(i18n.roster.removed(player.displayName));
       }
 
       return ctx.reply(i18n.roster.addplayerUsage);

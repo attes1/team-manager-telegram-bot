@@ -2,7 +2,7 @@ import type { Bot } from 'grammy';
 import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
 import { getTranslations } from '@/i18n';
-import { formatPlayerName, formatUserMention } from '@/lib/format';
+import { formatPlayerList, formatPlayerName } from '@/lib/format';
 import { getCurrentWeek } from '@/lib/temporal';
 import { getConfig } from '@/services/config';
 import { getLineup, getMatchInfo } from '@/services/match';
@@ -43,14 +43,10 @@ export const sendMatchDayReminder = async (bot: Bot<BotContext>, chatId: number)
   let message = i18n.reminder.matchDayTitle(dayName, matchTime);
 
   if (lineup.length > 0) {
-    const isPingMode = config.matchDayReminderMode === 'ping';
-    const players = lineup
-      .map((p) =>
-        isPingMode
-          ? `• ${formatUserMention(p.telegramId, formatPlayerName(p))}`
-          : `• ${formatPlayerName(p)}`,
-      )
-      .join('\n');
+    const players = formatPlayerList(
+      lineup.map((p) => ({ telegramId: p.telegramId, name: formatPlayerName(p) })),
+      config.matchDayReminderMode === 'ping',
+    );
     message += `\n\n${i18n.reminder.matchDayLineup(players)}`;
   } else {
     message += `\n\n⚠️ ${i18n.reminder.matchDayNoLineup}`;

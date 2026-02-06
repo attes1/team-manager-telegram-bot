@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
 import type { BotContext, CaptainSeasonContext } from '@/bot/context';
 import { captainSeasonCommand } from '@/bot/middleware';
-import { formatDateRange, formatPlayerName, formatUserMention } from '@/lib/format';
+import { formatDateRange, formatPlayerList, formatPlayerName } from '@/lib/format';
 import { getWeekDateRange } from '@/lib/temporal';
 import { hasRespondedForWeek } from '@/services/availability';
 import { getRoster } from '@/services/roster';
@@ -47,10 +47,7 @@ export const registerRemindCommand = (bot: Bot<BotContext>) => {
         );
       }
 
-      const isPingMode = config.remindersMode === 'ping';
-      const names = playersWithoutResponse
-        .map((p) => (isPingMode ? `• ${formatUserMention(p.telegramId, p.name)}` : `• ${p.name}`))
-        .join('\n');
+      const names = formatPlayerList(playersWithoutResponse, config.remindersMode === 'ping');
 
       const message = `${i18n.reminder.title(week, dateRange)}\n\n${i18n.reminder.missingResponses(names)}`;
 

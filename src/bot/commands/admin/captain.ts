@@ -1,30 +1,8 @@
 import type { Bot } from 'grammy';
 import type { AdminSeasonContext, BotContext } from '@/bot/context';
 import { adminSeasonCommand } from '@/bot/middleware';
-import { getPlayerRole, setPlayerRole } from '@/services/roster';
-
-// Extract user info from text_mention entity (user without username)
-const getTextMention = (
-  ctx: AdminSeasonContext,
-): { userId: number; displayName: string; username?: string } | null => {
-  const textMentions = ctx.entities('text_mention');
-  if (textMentions.length > 0 && textMentions[0].user) {
-    const user = textMentions[0].user;
-    const displayName = user.first_name + (user.last_name ? ` ${user.last_name}` : '');
-    return { userId: user.id, displayName, username: user.username };
-  }
-  return null;
-};
-
-// Extract username from command arguments
-const getUsernameFromArgs = (ctx: AdminSeasonContext): string | null => {
-  const text = ctx.message?.text || '';
-  const parts = text.split(/\s+/);
-  if (parts.length < 2) {
-    return null;
-  }
-  return parts[1].replace(/^@/, '');
-};
+import { getTextMention, getUsernameFromArgs } from '@/lib/mentions';
+import { getPlayerByUsername, getPlayerRole, setPlayerRole } from '@/services/roster';
 
 export const registerCaptainCommands = (bot: Bot<BotContext>) => {
   bot.command(
@@ -32,7 +10,6 @@ export const registerCaptainCommands = (bot: Bot<BotContext>) => {
     adminSeasonCommand(async (ctx: AdminSeasonContext) => {
       const { db, season, i18n } = ctx;
 
-      // Check for text_mention first
       const textMention = getTextMention(ctx);
       if (textMention) {
         const role = await getPlayerRole(db, season.id, textMention.userId);
@@ -46,21 +23,14 @@ export const registerCaptainCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.captain.promoted(textMention.displayName));
       }
 
-      // Check for username in args
       const username = getUsernameFromArgs(ctx);
       if (username) {
-        const player = await db
-          .selectFrom('seasonRoster')
-          .innerJoin('players', 'players.telegramId', 'seasonRoster.playerId')
-          .select(['players.telegramId', 'players.displayName', 'seasonRoster.role'])
-          .where('seasonRoster.seasonId', '=', season.id)
-          .where('players.username', '=', username)
-          .executeTakeFirst();
-
+        const player = await getPlayerByUsername(db, season.id, username);
         if (!player) {
           return ctx.reply(i18n.errors.playerNotInRoster);
         }
-        if (player.role === 'captain') {
+        const role = await getPlayerRole(db, season.id, player.telegramId);
+        if (role === 'captain') {
           return ctx.reply(i18n.captain.alreadyCaptain(player.displayName));
         }
         await setPlayerRole(db, season.id, player.telegramId, 'captain');
@@ -76,7 +46,6 @@ export const registerCaptainCommands = (bot: Bot<BotContext>) => {
     adminSeasonCommand(async (ctx: AdminSeasonContext) => {
       const { db, season, i18n } = ctx;
 
-      // Check for text_mention first
       const textMention = getTextMention(ctx);
       if (textMention) {
         const role = await getPlayerRole(db, season.id, textMention.userId);
@@ -90,21 +59,14 @@ export const registerCaptainCommands = (bot: Bot<BotContext>) => {
         return ctx.reply(i18n.captain.demoted(textMention.displayName));
       }
 
-      // Check for username in args
       const username = getUsernameFromArgs(ctx);
       if (username) {
-        const player = await db
-          .selectFrom('seasonRoster')
-          .innerJoin('players', 'players.telegramId', 'seasonRoster.playerId')
-          .select(['players.telegramId', 'players.displayName', 'seasonRoster.role'])
-          .where('seasonRoster.seasonId', '=', season.id)
-          .where('players.username', '=', username)
-          .executeTakeFirst();
-
+        const player = await getPlayerByUsername(db, season.id, username);
         if (!player) {
           return ctx.reply(i18n.errors.playerNotInRoster);
         }
-        if (player.role !== 'captain') {
+        const role = await getPlayerRole(db, season.id, player.telegramId);
+        if (role !== 'captain') {
           return ctx.reply(i18n.captain.notACaptain(player.displayName));
         }
         await setPlayerRole(db, season.id, player.telegramId, 'player');

@@ -1,54 +1,12 @@
-import { createTestDb } from '@tests/helpers';
+import { createMockBot, createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
-import { Bot } from 'grammy';
-import type { UserFromGetMe } from 'grammy/types';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import type { BotContext } from '@/bot/context';
 import { sendMatchDayReminder } from '@/scheduler/match-day';
 import { setLineup } from '@/services/match';
 import { addPlayerToRoster } from '@/services/roster';
 import { setWeekType } from '@/services/week';
 
 const CHAT_ID = -100123456789;
-
-interface ApiCall {
-  method: string;
-  payload: Record<string, unknown>;
-}
-
-const createMockBot = () => {
-  const calls: ApiCall[] = [];
-
-  const bot = new Bot<BotContext>('test-token', {
-    botInfo: {
-      id: 1,
-      is_bot: true,
-      first_name: 'TestBot',
-      username: 'test_bot',
-      can_join_groups: true,
-      can_read_all_group_messages: true,
-      supports_inline_queries: false,
-      can_connect_to_business: false,
-      has_main_web_app: false,
-    } satisfies UserFromGetMe,
-  });
-
-  bot.api.config.use((_prev, method, payload) => {
-    calls.push({ method, payload: payload as Record<string, unknown> });
-    return {
-      ok: true,
-      result: {
-        message_id: 1,
-        date: Math.floor(Date.now() / 1000),
-        chat: { id: CHAT_ID, type: 'group', title: 'Test Group' },
-        from: { id: 1, is_bot: true, first_name: 'TestBot' },
-        text: '',
-      },
-    } as ReturnType<typeof _prev>;
-  });
-
-  return { bot, calls };
-};
 
 describe('sendMatchDayReminder', () => {
   beforeEach(async () => {
