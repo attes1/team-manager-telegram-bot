@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import type { Day } from './schemas';
+import type { AvailabilityStatus, Day } from './schemas';
 import { DAYS, getWeekDateRange } from './temporal';
 
 const DAY_NAMES_FI: Record<Day, string> = {
@@ -98,3 +98,11 @@ export const formatPlayerList = (
   players
     .map((p) => (ping ? `• ${formatUserMention(p.telegramId, p.name)}` : `• ${p.name}`))
     .join('\n');
+
+export const STATUS_ICONS: Record<AvailabilityStatus, string> = {
+  available: '✅',
+  practice_only: '🏋️',
+  match_only: '🏆',
+  if_needed: '⚠️',
+  unavailable: '❌',
+};

@@ -10,9 +10,11 @@ import { registerHelpCommand } from './public/help';
 import { registerNextMatchCommand } from './public/nextmatch';
 import { registerRosterCommand } from './public/roster';
 import { registerAvailCommand } from './user/avail';
-import { registerMatchCommands } from './user/match';
 import { registerPollCommand } from './user/poll';
 import { registerRemindCommand } from './user/remind';
+import { registerSetlineupCommand } from './user/setlineup';
+import { registerSetmatchCommand } from './user/setmatch';
+import { registerSetopponentCommand } from './user/setopponent';
 import { registerStatusCommand } from './user/status';
 import { registerWeekCommand } from './user/week';
 
@@ -27,7 +29,9 @@ export const registerCommands = (bot: Bot<BotContext>) => {
   registerPollCommand(bot);
   registerStatusCommand(bot);
   registerWeekCommand(bot);
-  registerMatchCommands(bot);
+  registerSetmatchCommand(bot);
+  registerSetlineupCommand(bot);
+  registerSetopponentCommand(bot);
   registerRemindCommand(bot);
 
   // Admin commands

@@ -2,19 +2,11 @@ import type { Bot } from 'grammy';
 import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
 import type { Translations } from '@/i18n';
-import { formatDateRange, formatDayDate, formatPlayerName } from '@/lib/format';
+import { formatDateRange, formatDayDate, formatPlayerName, STATUS_ICONS } from '@/lib/format';
 import { type AvailabilityStatus, availFilterSchema, type Day } from '@/lib/schemas';
 import { getTodayDay, getWeekDateRange, parseDayOrWeekInput } from '@/lib/temporal';
 import type { PlayerWeekAvailability } from '@/services/availability';
 import { getWeekAvailability } from '@/services/availability';
-
-const STATUS_ICONS: Record<AvailabilityStatus, string> = {
-  available: '✅',
-  practice_only: '🏋️',
-  match_only: '🏆',
-  if_needed: '⚠️',
-  unavailable: '❌',
-};
 
 type AvailFilter = 'all' | 'practice' | 'match';
 

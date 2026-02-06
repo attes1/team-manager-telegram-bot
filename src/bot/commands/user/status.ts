@@ -3,6 +3,7 @@ import type { BotContext, RosterContext } from '@/bot/context';
 import { rosterCommand } from '@/bot/middleware';
 import { env } from '@/env';
 import { formatDateRange } from '@/lib/format';
+import { buildStatusMessage } from '@/lib/status';
 import { getCurrentWeek, getWeekDateRange } from '@/lib/temporal';
 import { getWeekAvailability } from '@/services/availability';
 import { getLineup, getMatchInfo } from '@/services/match';
@@ -15,7 +16,6 @@ export const registerStatusCommand = (bot: Bot<BotContext>) => {
     rosterCommand(async (ctx: RosterContext) => {
       const { db, season, config, schedulingWeek, i18n } = ctx;
 
-      // Use scheduling week for all status info
       const currentWeek = getCurrentWeek();
       const { week, year } = schedulingWeek;
       const { start, end } = getWeekDateRange(year, week);
@@ -30,78 +30,41 @@ export const registerStatusCommand = (bot: Bot<BotContext>) => {
         year,
       });
 
-      const respondedCount = availability.length;
-      const responseRate =
-        roster.length > 0 ? Math.round((respondedCount / roster.length) * 100) : 0;
-
       const matchInfo = await getMatchInfo(db, { seasonId: season.id, weekNumber: week, year });
       const lineup = await getLineup(db, { seasonId: season.id, weekNumber: week, year });
 
       const matchDay = matchInfo?.matchDay ?? config.matchDay;
       const matchTime = matchInfo?.matchTime ?? config.matchTime;
-      const dayName = i18n.poll.days[matchDay as keyof typeof i18n.poll.days] ?? matchDay;
 
-      const devBadge = env.DEV_MODE ? ` ${i18n.status.devBadge}` : '';
+      const message = buildStatusMessage({
+        seasonName: season.name,
+        week,
+        year,
+        dateRange,
+        schedulingWeek,
+        currentWeek,
+        weekType,
+        rosterCount: roster.length,
+        respondedCount: availability.length,
+        matchDay,
+        matchTime,
+        lineupCount: lineup.length,
+        lineupSize: config.lineupSize,
+        config: {
+          pollDay: config.pollDay,
+          pollTime: config.pollTime,
+          reminderDay: config.reminderDay,
+          reminderTime: config.reminderTime,
+          remindersMode: config.remindersMode,
+          matchDayReminderMode: config.matchDayReminderMode,
+          matchDayReminderTime: config.matchDayReminderTime,
+          menuCleanupTime: config.menuCleanupTime,
+        },
+        devMode: env.DEV_MODE,
+        i18n,
+      });
 
-      const lines: string[] = [
-        `📊 <b>${i18n.status.title}</b>${devBadge}`,
-        '',
-        `<b>${i18n.status.season}:</b> ${season.name}`,
-      ];
-
-      // Show scheduling week indicator when different from current week
-      if (currentWeek.week !== schedulingWeek.week || currentWeek.year !== schedulingWeek.year) {
-        lines.push(`<b>${i18n.status.schedulingFor}:</b> ${i18n.status.weekLabel(week)}`);
-      }
-
-      lines.push(
-        `<b>${i18n.status.week}:</b> ${week} (${dateRange})`,
-        `<b>${i18n.status.weekType}:</b> ${weekType === 'match' ? '🏆 ' : '🏋️ '}${i18n.status.weekTypes[weekType]}`,
-        '',
-        `<b>${i18n.status.roster}:</b> ${roster.length} ${i18n.status.players}`,
-        `<b>${i18n.status.responses}:</b> ${respondedCount}/${roster.length} (${responseRate}%)`,
-      );
-
-      if (weekType === 'match') {
-        lines.push('');
-        lines.push(`<b>${i18n.status.matchTime}:</b> ${dayName} ${matchTime}`);
-        const lineupIcon = lineup.length < config.lineupSize ? '⚠️' : '👥';
-        lines.push(
-          `${lineupIcon} <b>${i18n.status.lineup}:</b> ${lineup.length}/${config.lineupSize} ${i18n.status.players}`,
-        );
-      }
-
-      // Add schedule information
-      const getDayLabel = (day: string) =>
-        i18n.poll.days[day as keyof typeof i18n.poll.days] ?? day;
-
-      lines.push('');
-      lines.push(`<b>${i18n.status.schedulesTitle}:</b>`);
-      lines.push(
-        `• ${i18n.status.pollSchedule}: ${getDayLabel(config.pollDay)} ${config.pollTime}`,
-      );
-
-      if (config.remindersMode !== 'off') {
-        lines.push(
-          `• ${i18n.status.reminderSchedule}: ${getDayLabel(config.reminderDay)} ${config.reminderTime}`,
-        );
-      } else {
-        lines.push(`• ${i18n.status.reminderSchedule}: ${i18n.status.scheduleOff}`);
-      }
-
-      if (config.matchDayReminderMode !== 'off') {
-        lines.push(
-          `• ${i18n.status.matchDayReminderSchedule}: ${getDayLabel(config.matchDay)} ${config.matchDayReminderTime}`,
-        );
-      } else {
-        lines.push(`• ${i18n.status.matchDayReminderSchedule}: ${i18n.status.scheduleOff}`);
-      }
-
-      if (env.DEV_MODE) {
-        lines.push(`• ${i18n.status.menuCleanupSchedule}: ${config.menuCleanupTime}`);
-      }
-
-      return ctx.reply(lines.join('\n'), { parse_mode: 'HTML' });
+      return ctx.reply(message, { parse_mode: 'HTML' });
     }),
   );
 };

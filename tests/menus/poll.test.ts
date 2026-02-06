@@ -1,7 +1,8 @@
 import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { decodeWeekPayload, getDisplayStatus, getNextStatus, getPollMessage } from '@/menus/poll';
+import { getDisplayStatus, getNextStatus, getPollMessage } from '@/menus/poll';
+import { decodeWeekPayload } from '@/menus/shared';
 
 describe('getPollMessage', () => {
   beforeEach(async () => {

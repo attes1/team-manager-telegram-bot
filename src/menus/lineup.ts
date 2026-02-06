@@ -5,20 +5,7 @@ import { getWeekDateRange } from '@/lib/temporal';
 import { getPublicGroupIds } from '@/services/group';
 import { buildLineupMessage, getLineup, setLineup } from '@/services/match';
 import { getRoster } from '@/services/roster';
-
-// Payload format for buttons: "week:year" e.g. "5:2025"
-const encodeWeekPayload = (week: number, year: number): string => `${week}:${year}`;
-
-const decodeWeekPayload = (
-  payload: string | RegExpMatchArray | undefined,
-): { week: number; year: number } | null => {
-  if (!payload || typeof payload !== 'string') return null;
-  const [weekStr, yearStr] = payload.split(':');
-  const week = parseInt(weekStr, 10);
-  const year = parseInt(yearStr, 10);
-  if (Number.isNaN(week) || Number.isNaN(year)) return null;
-  return { week, year };
-};
+import { decodeWeekPayload, encodeWeekPayload } from './shared';
 
 export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, range) => {
   const { db, season, config, schedulingWeek, i18n } = ctx;

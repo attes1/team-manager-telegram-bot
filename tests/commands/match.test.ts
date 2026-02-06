@@ -1,7 +1,9 @@
 import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { registerMatchCommands } from '@/bot/commands/user/match';
+import { registerSetlineupCommand } from '@/bot/commands/user/setlineup';
+import { registerSetmatchCommand } from '@/bot/commands/user/setmatch';
+import { registerSetopponentCommand } from '@/bot/commands/user/setopponent';
 import { getSchedulingWeek } from '@/lib/temporal';
 import { registerGroup, setGroupType } from '@/services/group';
 import { addPlayerToRoster } from '@/services/roster';
@@ -13,6 +15,12 @@ import {
   createTestBot,
   createUsernameMentionUpdate,
 } from './helpers';
+
+const registerMatchCommands = (bot: ReturnType<typeof createTestBot>['bot']) => {
+  registerSetmatchCommand(bot);
+  registerSetlineupCommand(bot);
+  registerSetopponentCommand(bot);
+};
 
 const TEST_ADMIN_ID = 123456;
 const TEST_USER_ID = 999999;

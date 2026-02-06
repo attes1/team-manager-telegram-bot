@@ -2,35 +2,13 @@ import { Menu } from '@grammyjs/menu';
 import type { BotContext } from '@/bot/context';
 import { db } from '@/db';
 import { getTranslations } from '@/i18n';
-import { formatDateRange } from '@/lib/format';
+import { formatDateRange, STATUS_ICONS } from '@/lib/format';
 import type { AvailabilityStatus } from '@/lib/schemas';
 import { getCurrentWeek, getWeekDateRange } from '@/lib/temporal';
 import { getPlayerWeekAvailability, setDayAvailability } from '@/services/availability';
 import { isPlayerInRoster } from '@/services/roster';
 import { getWeek } from '@/services/week';
-
-// Payload format for buttons: "week:year" e.g. "5:2025"
-// This is encoded in Telegram callback_data and always reliable
-const encodeWeekPayload = (week: number, year: number): string => `${week}:${year}`;
-
-export const decodeWeekPayload = (
-  payload: string | RegExpMatchArray | undefined,
-): { week: number; year: number } | null => {
-  if (!payload || typeof payload !== 'string') return null;
-  const [weekStr, yearStr] = payload.split(':');
-  const week = parseInt(weekStr, 10);
-  const year = parseInt(yearStr, 10);
-  if (Number.isNaN(week) || Number.isNaN(year)) return null;
-  return { week, year };
-};
-
-const STATUS_ICONS: Record<AvailabilityStatus, string> = {
-  available: '✅',
-  practice_only: '🏋️',
-  match_only: '🏆',
-  if_needed: '⚠️',
-  unavailable: '❌',
-};
+import { decodeWeekPayload, encodeWeekPayload } from './shared';
 
 const NO_RESPONSE_ICON = '·';
 
