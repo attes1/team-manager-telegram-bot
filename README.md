@@ -165,21 +165,21 @@ Available to captains and admins:
 
 ### Adding Players
 
-Due to Telegram API limitations, the bot cannot directly add players by username—Telegram doesn't provide user IDs from @mentions. Instead, `/addplayer` uses an invitation flow:
+Due to Telegram API limitations, the bot cannot directly add players by username—Telegram doesn't provide user IDs from @mentions. Instead, `/addplayer` uses a deep link invitation flow:
 
 **For users with a username:**
 1. Admin types `/addplayer username` (without @, to avoid pinging)
-2. Bot posts an invitation message with 👍/👎 reactions
-3. The mentioned user reacts 👍 to accept or 👎 to decline
-4. Bot verifies the reactor's username matches and adds them to roster
+2. Bot posts an invitation message with an "Accept" button (deep link to bot DM)
+3. The mentioned user clicks the button and is taken to the bot's DM
+4. Bot verifies the user's identity and adds them to the roster
 
 **For users without a username:**
 1. Admin taps on the user's name in any message (creates a text_mention)
 2. Admin types `/addplayer` in the reply
-3. Bot posts an invitation with reaction buttons
-4. User reacts to accept/decline
+3. Bot posts an invitation with an "Accept" deep link button
+4. User clicks the button and is added via the bot's DM
 
-This approach ensures only the actual user can accept roster invitations.
+This approach ensures only the actual user can accept roster invitations. The deep link triggers `/start` in the bot's DM with an invite payload, which the bot uses to match the invitation and complete the roster addition.
 
 ## Configuration Options
 
