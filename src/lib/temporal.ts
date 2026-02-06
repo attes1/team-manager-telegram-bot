@@ -10,15 +10,9 @@ import {
 import type { Day } from './schemas';
 import { dayWeekInputSchema, weekInputSchema } from './schemas';
 
-const DAY_TO_ISO_WEEKDAY: Record<Day, number> = {
-  mon: 1,
-  tue: 2,
-  wed: 3,
-  thu: 4,
-  fri: 5,
-  sat: 6,
-  sun: 7,
-};
+export const DAYS: Day[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+const getDayOffset = (day: Day): number => DAYS.indexOf(day);
 
 export const getWeekNumber = (date: Date): number => getISOWeek(date);
 
@@ -40,8 +34,6 @@ export const getCurrentWeek = (): { week: number; year: number } => {
   };
 };
 
-const ISO_WEEKDAY_TO_DAY: Day[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-
 /**
  * Get today's day of week as a Day type.
  * Uses JavaScript's getDay() (0=Sunday) and converts to ISO weekday format.
@@ -50,7 +42,7 @@ export const getTodayDay = (): Day => {
   const jsDay = new Date().getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
   // Convert: Sun(0)->6, Mon(1)->0, Tue(2)->1, etc.
   const isoIndex = jsDay === 0 ? 6 : jsDay - 1;
-  return ISO_WEEKDAY_TO_DAY[isoIndex];
+  return DAYS[isoIndex];
 };
 
 /**
@@ -65,15 +57,12 @@ export const getSchedulingWeek = (
   const currentWeek = getCurrentWeek();
 
   // Calculate cutoff datetime for current week
-  const cutoffWeekday = DAY_TO_ISO_WEEKDAY[cutoffDay];
   const [cutoffHour, cutoffMinute] = cutoffTime.split(':').map(Number);
 
-  // Get the start of current week (Monday)
   const { start } = getWeekDateRange(currentWeek.year, currentWeek.week);
 
-  // Create cutoff date by adding days from Monday (weekday 1)
   const cutoffDate = new Date(start);
-  cutoffDate.setDate(cutoffDate.getDate() + (cutoffWeekday - 1));
+  cutoffDate.setDate(cutoffDate.getDate() + getDayOffset(cutoffDay));
   cutoffDate.setHours(cutoffHour, cutoffMinute, 0, 0);
 
   // If current time is at or past cutoff, return next week
@@ -87,6 +76,12 @@ export const getSchedulingWeek = (
 
   return currentWeek;
 };
+
+const isWeekInPast = (
+  week: number,
+  year: number,
+  reference: { week: number; year: number },
+): boolean => year < reference.year || (year === reference.year && week < reference.week);
 
 export type ParseWeekResult =
   | { success: true; week: number; year: number }
@@ -110,13 +105,8 @@ export const parseWeekInput = (
 
   const { week, year } = parsed.data;
 
-  if (!allowPast && schedulingWeek) {
-    const isInPast =
-      year < schedulingWeek.year || (year === schedulingWeek.year && week < schedulingWeek.week);
-
-    if (isInPast) {
-      return { success: false, error: 'past' };
-    }
+  if (!allowPast && schedulingWeek && isWeekInPast(week, year, schedulingWeek)) {
+    return { success: false, error: 'past' };
   }
 
   return { success: true, week, year };
@@ -173,13 +163,12 @@ export const parseDayOrWeekInput = (
   // Try day+week format first (tue, tue/5, tue/5/2026)
   const dayWeekResult = parseDayWeekInput(input.toLowerCase(), defaultWeek);
   if (dayWeekResult.success) {
-    if (!allowPast && schedulingWeek) {
-      const isInPast =
-        dayWeekResult.year < schedulingWeek.year ||
-        (dayWeekResult.year === schedulingWeek.year && dayWeekResult.week < schedulingWeek.week);
-      if (isInPast) {
-        return { success: false, error: 'past' };
-      }
+    if (
+      !allowPast &&
+      schedulingWeek &&
+      isWeekInPast(dayWeekResult.week, dayWeekResult.year, schedulingWeek)
+    ) {
+      return { success: false, error: 'past' };
     }
     return {
       success: true,
@@ -204,7 +193,7 @@ export const parseDayOrWeekInput = (
  */
 export const getMatchDateTime = (year: number, week: number, day: Day, time: string): Date => {
   const { start } = getWeekDateRange(year, week);
-  const dayOffset = DAY_TO_ISO_WEEKDAY[day] - 1; // Monday is 0 offset
+  const dayOffset = getDayOffset(day);
   const [hour, minute] = time.split(':').map(Number);
 
   const matchDate = new Date(start);
