@@ -1,4 +1,4 @@
-import type { Bot } from 'grammy';
+import { type Bot, InlineKeyboard } from 'grammy';
 import type { AdminSeasonContext, BotContext } from '@/bot/context';
 import { adminSeasonCommand } from '@/bot/middleware';
 import { formatUserMention } from '@/lib/format';
@@ -41,25 +41,16 @@ export const registerPlayerCommands = (bot: Bot<BotContext>) => {
         return;
       }
 
+      const botUsername = ctx.me.username;
+
       // Flow B: Check for text_mention first (has userId)
       const textMention = getTextMention(ctx);
       if (textMention) {
-        // Create mention link for user without username
         const userLink = formatUserMention(textMention.userId, textMention.displayName);
         const message = `${userLink}, ${i18n.roster.invitationPrompt}`;
 
         const sentMessage = await ctx.reply(message, { parse_mode: 'HTML' });
 
-        // Add 👍 reaction as visual hint (bots can only set one reaction per message)
-        try {
-          await ctx.api.setMessageReaction(chatId, sentMessage.message_id, [
-            { type: 'emoji', emoji: '👍' },
-          ]);
-        } catch {
-          // Reactions may fail if not enabled in chat - continue anyway
-        }
-
-        // Store pending invitation with userId
         addInvitation(sentMessage.message_id, {
           userId: textMention.userId,
           displayName: textMention.displayName,
@@ -67,6 +58,15 @@ export const registerPlayerCommands = (bot: Bot<BotContext>) => {
           messageId: sentMessage.message_id,
           seasonId: season.id,
           adminId,
+        });
+
+        const keyboard = new InlineKeyboard().url(
+          i18n.roster.acceptButton,
+          `https://t.me/${botUsername}?start=invite_${sentMessage.message_id}`,
+        );
+
+        await ctx.api.editMessageReplyMarkup(chatId, sentMessage.message_id, {
+          reply_markup: keyboard,
         });
         return;
       }
@@ -78,23 +78,22 @@ export const registerPlayerCommands = (bot: Bot<BotContext>) => {
 
         const sentMessage = await ctx.reply(message);
 
-        // Add 👍 reaction as visual hint (bots can only set one reaction per message)
-        try {
-          await ctx.api.setMessageReaction(chatId, sentMessage.message_id, [
-            { type: 'emoji', emoji: '👍' },
-          ]);
-        } catch {
-          // Reactions may fail if not enabled in chat - continue anyway
-        }
-
-        // Store pending invitation with username
         addInvitation(sentMessage.message_id, {
           username,
-          displayName: username, // Will be updated when user reacts
+          displayName: username,
           chatId,
           messageId: sentMessage.message_id,
           seasonId: season.id,
           adminId,
+        });
+
+        const keyboard = new InlineKeyboard().url(
+          i18n.roster.acceptButton,
+          `https://t.me/${botUsername}?start=invite_${sentMessage.message_id}`,
+        );
+
+        await ctx.api.editMessageReplyMarkup(chatId, sentMessage.message_id, {
+          reply_markup: keyboard,
         });
         return;
       }

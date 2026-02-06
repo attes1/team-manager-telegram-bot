@@ -37,16 +37,16 @@ describe('/addplayer command', () => {
     });
     await bot.handleUpdate(update);
 
-    // Should have 2 calls: invitation message, setMessageReaction
+    // Should have 2 calls: invitation message, editMessageReplyMarkup (add URL button)
     expect(calls.length).toBe(2);
 
     // First call should be the invitation message
     expect(calls[0].method).toBe('sendMessage');
-    expect(calls[0].payload.text).toContain('join the roster');
+    expect(calls[0].payload.text).toContain('invited to the roster');
     expect(calls[0].payload.text).toContain('John Doe');
 
-    // Second call should be setMessageReaction
-    expect(calls[1].method).toBe('setMessageReaction');
+    // Second call should add the accept button
+    expect(calls[1].method).toBe('editMessageReplyMarkup');
   });
 
   test('admin can send invitation with username arg', async () => {
@@ -58,11 +58,11 @@ describe('/addplayer command', () => {
     const update = createCommandUpdate('/addplayer johndoe', TEST_ADMIN_ID, TEST_CHAT_ID);
     await bot.handleUpdate(update);
 
-    // Should have 2 calls: invitation message, setMessageReaction
+    // Should have 2 calls: invitation message, editMessageReplyMarkup (add URL button)
     expect(calls.length).toBe(2);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('@johndoe');
-    expect(calls[0].payload.text).toContain('join the roster');
+    expect(calls[0].payload.text).toContain('invited to the roster');
   });
 
   test('admin can send invitation with @username arg', async () => {

@@ -24,7 +24,6 @@ export const sendReminder = async (bot: Bot<BotContext>, chatId: number): Promis
   }
 
   const i18n = await getTranslations(db, season.id);
-  // Use target week based on cutoff logic
   const { week, year } = getSchedulingWeek(config.weekChangeDay, config.weekChangeTime);
   const { start, end } = getWeekDateRange(year, week);
   const dateRange = formatDateRange(start, end);

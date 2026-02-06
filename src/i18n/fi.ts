@@ -27,8 +27,10 @@ export interface Translations {
     invitationPrompt: string;
     invitationSent: (name: string) => string;
     invitationAccepted: (name: string) => string;
+    invitationAcceptedDm: string;
     invitationDeclined: (name: string) => string;
     invitationExpired: string;
+    acceptButton: string;
     addplayerUsage: string;
   };
   captain: {
@@ -122,12 +124,8 @@ export interface Translations {
       sun: string;
     };
     openPollButton: string;
-    scheduledPollPrompt: (week: number, dateRange: string) => string;
     dmSent: string;
     dmFailed: (botUsername: string) => string;
-    scheduledSummary: (week: number, dateRange: string) => string;
-    dmSentTo: (players: string) => string;
-    dmFailedTo: (players: string, botUsername: string) => string;
   };
   avail: {
     title: (week: number, dateRange: string) => string;
@@ -304,11 +302,13 @@ export const fi: Translations = {
     title: 'Rosteri:',
     playerLine: (name, username) => (username ? `• ${name} (@${username})` : `• ${name}`),
     captainLine: (name, username) => (username ? `⭐ ${name} (@${username})` : `⭐ ${name}`),
-    invitationPrompt: 'Haluatko liittyä rosteriin? Reagoi 👍 hyväksyäksesi tai 👎 hylätäksesi.',
+    invitationPrompt: 'Sinut on kutsuttu rosteriin!',
     invitationSent: (name) => `Kutsu lähetetty: ${name}`,
     invitationAccepted: (name) => `${name} lisätty rosteriin!`,
+    invitationAcceptedDm: 'Tervetuloa rosteriin! Saat viikkokyselyt tänne.',
     invitationDeclined: (name) => `${name} hylkäsi kutsun.`,
     invitationExpired: 'Kutsu vanhentunut.',
+    acceptButton: 'Hyväksy kutsu',
     addplayerUsage: 'Käyttö: /addplayer <käyttäjänimi>',
   },
   captain: {
@@ -405,15 +405,9 @@ export const fi: Translations = {
       sun: 'Su',
     },
     openPollButton: '📊 Avaa polli',
-    scheduledPollPrompt: (week, dateRange) => `📋 Täytä viikon ${week} (${dateRange}) aikataulut!`,
     dmSent: '📬 Polli lähetetty yksityisviestinä!',
     dmFailed: (botUsername) =>
       `Aloita keskustelu botin kanssa saadaksesi pollin: t.me/${botUsername}`,
-    scheduledSummary: (week, dateRange) =>
-      `📋 Vko ${week} (${dateRange}) aikataulukysely lähetetty!`,
-    dmSentTo: (players) => `✅ Lähetetty: ${players}`,
-    dmFailedTo: (players, botUsername) =>
-      `❌ Ei voitu lähettää: ${players}\n👆 Aloita keskustelu: t.me/${botUsername}`,
   },
   avail: {
     title: (week, dateRange) => `Vko ${week} (${dateRange}) aikataulut:`,

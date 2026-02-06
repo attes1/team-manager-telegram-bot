@@ -26,11 +26,13 @@ export const en: Translations = {
     title: 'Roster:',
     playerLine: (name, username) => (username ? `• ${name} (@${username})` : `• ${name}`),
     captainLine: (name, username) => (username ? `⭐ ${name} (@${username})` : `⭐ ${name}`),
-    invitationPrompt: 'Do you want to join the roster? React 👍 to accept or 👎 to decline.',
+    invitationPrompt: 'You have been invited to the roster!',
     invitationSent: (name) => `Invitation sent: ${name}`,
     invitationAccepted: (name) => `${name} added to roster!`,
+    invitationAcceptedDm: 'Welcome to the roster! You will receive weekly polls here.',
     invitationDeclined: (name) => `${name} declined the invitation.`,
     invitationExpired: 'Invitation expired.',
+    acceptButton: 'Accept invitation',
     addplayerUsage: 'Usage: /addplayer <username>',
   },
   captain: {
@@ -127,15 +129,9 @@ export const en: Translations = {
       sun: 'Sun',
     },
     openPollButton: '📊 Open Poll',
-    scheduledPollPrompt: (week, dateRange) =>
-      `📋 Fill in your availability for week ${week} (${dateRange})!`,
     dmSent: '📬 Poll sent to your DM!',
     dmFailed: (botUsername) =>
       `Start a conversation with the bot to receive polls: t.me/${botUsername}`,
-    scheduledSummary: (week, dateRange) => `📋 Week ${week} (${dateRange}) availability poll sent!`,
-    dmSentTo: (players) => `✅ Sent to: ${players}`,
-    dmFailedTo: (players, botUsername) =>
-      `❌ Couldn't send to: ${players}\n👆 Start conversation: t.me/${botUsername}`,
   },
   avail: {
     title: (week, dateRange) => `Week ${week} (${dateRange}) availability:`,

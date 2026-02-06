@@ -7,8 +7,6 @@ import type { BotContext } from '@/bot/context';
 import { sendWeeklyPoll } from '@/scheduler/weekly-poll';
 
 const CHAT_ID = -100123456789;
-const PLAYER_ID = 111;
-const PLAYER_DM_CHAT_ID = 111;
 
 interface ApiCall {
   method: string;
@@ -62,7 +60,7 @@ describe('sendWeeklyPoll', () => {
     await mockDb.db.destroy();
   });
 
-  const setupSeason = async (options?: { addRosterWithDm?: boolean }) => {
+  const setupSeason = async () => {
     const season = await mockDb.db
       .insertInto('seasons')
       .values({ name: 'Test Season' })
@@ -79,23 +77,6 @@ describe('sendWeeklyPoll', () => {
       })
       .execute();
 
-    if (options?.addRosterWithDm) {
-      await mockDb.db
-        .insertInto('players')
-        .values({ telegramId: PLAYER_ID, displayName: 'Player', username: 'player' })
-        .execute();
-
-      await mockDb.db
-        .insertInto('seasonRoster')
-        .values({ seasonId: season.id, playerId: PLAYER_ID, role: 'player' })
-        .execute();
-
-      await mockDb.db
-        .insertInto('playerDmChats')
-        .values({ playerId: PLAYER_ID, dmChatId: PLAYER_DM_CHAT_ID, canDm: 1 })
-        .execute();
-    }
-
     return season;
   };
 
@@ -107,57 +88,41 @@ describe('sendWeeklyPoll', () => {
     expect(calls).toHaveLength(0);
   });
 
-  test('sends DM to roster players and summary to group', async () => {
-    await setupSeason({ addRosterWithDm: true });
+  test('sends group message with callback button', async () => {
+    await setupSeason();
     const { bot, calls } = createMockBot();
 
     await sendWeeklyPoll(bot, CHAT_ID);
 
-    // getMe + sendMessage to DM + sendMessage summary to group
-    expect(calls).toHaveLength(3);
-    expect(calls[0].method).toBe('getMe');
-
-    // DM to player with poll menu
-    expect(calls[1].method).toBe('sendMessage');
-    expect(calls[1].payload.chat_id).toBe(PLAYER_DM_CHAT_ID);
-
-    // Summary to group
-    expect(calls[2].method).toBe('sendMessage');
-    expect(calls[2].payload.chat_id).toBe(CHAT_ID);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].method).toBe('sendMessage');
+    expect(calls[0].payload.chat_id).toBe(CHAT_ID);
   });
 
-  test('summary shows sent players', async () => {
-    await setupSeason({ addRosterWithDm: true });
+  test('group message contains week info and callback button', async () => {
+    await setupSeason();
     const { bot, calls } = createMockBot();
 
     await sendWeeklyPoll(bot, CHAT_ID);
 
-    const summaryMessage = calls[2].payload.text as string;
-    expect(summaryMessage).toContain('Player'); // The player who received DM
-    expect(summaryMessage).toContain('Week 2');
+    const message = calls[0].payload.text as string;
+    expect(message).toContain('Week 2');
+
+    const replyMarkup = calls[0].payload.reply_markup as {
+      inline_keyboard: Array<Array<{ text: string; callback_data?: string }>>;
+    };
+    const button = replyMarkup.inline_keyboard[0][0];
+    expect(button.callback_data).toBe('open_poll:2:2025');
   });
 
-  test('sends only summary when no roster has DM registered', async () => {
-    await setupSeason(); // No roster
+  test('sends only summary when no config found', async () => {
+    await mockDb.db.insertInto('seasons').values({ name: 'Test Season' }).execute();
+
     const { bot, calls } = createMockBot();
 
     await sendWeeklyPoll(bot, CHAT_ID);
 
-    // getMe + sendMessage summary to group
-    expect(calls).toHaveLength(2);
-    expect(calls[0].method).toBe('getMe');
-    expect(calls[1].method).toBe('sendMessage');
-    expect(calls[1].payload.chat_id).toBe(CHAT_ID);
-  });
-
-  test('summary contains week information', async () => {
-    await setupSeason({ addRosterWithDm: true });
-    const { bot, calls } = createMockBot();
-
-    await sendWeeklyPoll(bot, CHAT_ID);
-
-    // Summary message is the last one
-    const summaryMessage = calls[calls.length - 1].payload.text as string;
-    expect(summaryMessage).toContain('Week 2');
+    // No config → skips entirely
+    expect(calls).toHaveLength(0);
   });
 });
