@@ -1,5 +1,5 @@
 import type { Kysely } from 'kysely';
-import { vi } from 'vitest';
+import { beforeEach, vi } from 'vitest';
 import type { DB } from '@/types/db';
 
 /**
@@ -34,6 +34,15 @@ export const mockEnv = {
 
 // Mock for @/scheduler
 export const mockRefreshScheduler = vi.fn();
+
+// Pin system time at module level so describe-level new Date() calls see the faked time
+vi.useFakeTimers();
+vi.setSystemTime(new Date('2025-01-08T09:00:00'));
+
+// Reset time before each test (in case a previous test changed it)
+beforeEach(() => {
+  vi.setSystemTime(new Date('2025-01-08T09:00:00'));
+});
 
 // Set up global mocks
 vi.mock('@/db', () => mockDb);
