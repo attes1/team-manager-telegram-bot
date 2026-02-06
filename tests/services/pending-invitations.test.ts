@@ -15,7 +15,6 @@ describe('pending-invitations service', () => {
 
   afterEach(() => {
     clearAll();
-    vi.useRealTimers();
   });
 
   describe('addInvitation', () => {
@@ -101,7 +100,6 @@ describe('pending-invitations service', () => {
     });
 
     test('returns undefined and removes expired invitation', () => {
-      vi.useFakeTimers();
       const now = new Date('2025-01-01T12:00:00Z');
       vi.setSystemTime(now);
 
@@ -125,7 +123,6 @@ describe('pending-invitations service', () => {
     });
 
     test('returns valid invitation before expiration', () => {
-      vi.useFakeTimers();
       const now = new Date('2025-01-01T12:00:00Z');
       vi.setSystemTime(now);
 
@@ -170,7 +167,6 @@ describe('pending-invitations service', () => {
 
   describe('cleanupExpired', () => {
     test('removes expired invitations and returns count', () => {
-      vi.useFakeTimers();
       const now = new Date('2025-01-01T12:00:00Z');
       vi.setSystemTime(now);
 
@@ -202,7 +198,6 @@ describe('pending-invitations service', () => {
     });
 
     test('keeps valid invitations', () => {
-      vi.useFakeTimers();
       const now = new Date('2025-01-01T12:00:00Z');
       vi.setSystemTime(now);
 
@@ -224,7 +219,6 @@ describe('pending-invitations service', () => {
     });
 
     test('removes only expired invitations in mixed set', () => {
-      vi.useFakeTimers();
       const now = new Date('2025-01-01T12:00:00Z');
       vi.setSystemTime(now);
 

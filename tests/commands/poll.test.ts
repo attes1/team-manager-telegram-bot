@@ -10,15 +10,10 @@ const DM_CHAT_ID = 111; // DM chat ID equals user ID in Telegram
 
 describe('/poll command', () => {
   beforeEach(async () => {
-    vi.useFakeTimers();
-    // Set to Wednesday of week 2, 2025 - before Thursday cutoff
-    vi.setSystemTime(new Date('2025-01-08T09:00:00'));
-
     mockDb.db = await createTestDb();
   });
 
   afterEach(async () => {
-    vi.useRealTimers();
     await mockDb.db.destroy();
   });
 

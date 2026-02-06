@@ -2,7 +2,7 @@ import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { Bot } from 'grammy';
 import type { UserFromGetMe } from 'grammy/types';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import type { BotContext } from '@/bot/context';
 import { sendWeeklyPoll } from '@/scheduler/weekly-poll';
 
@@ -50,13 +50,10 @@ const createMockBot = () => {
 
 describe('sendWeeklyPoll', () => {
   beforeEach(async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2025-01-08T09:00:00'));
     mockDb.db = await createTestDb();
   });
 
   afterEach(async () => {
-    vi.useRealTimers();
     await mockDb.db.destroy();
   });
 

@@ -2,7 +2,7 @@ import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { Bot } from 'grammy';
 import type { UserFromGetMe } from 'grammy/types';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import type { BotContext } from '@/bot/context';
 import { sendReminder } from '@/scheduler/reminder';
 import { setDayAvailability } from '@/services/availability';
@@ -51,7 +51,6 @@ const createMockBot = () => {
 
 describe('sendReminder', () => {
   beforeEach(async () => {
-    vi.setSystemTime(new Date('2025-01-08T09:00:00'));
     mockDb.db = await createTestDb();
   });
 

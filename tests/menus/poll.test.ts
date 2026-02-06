@@ -1,18 +1,14 @@
 import { createTestDb } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { decodeWeekPayload, getDisplayStatus, getNextStatus, getPollMessage } from '@/menus/poll';
 
 describe('getPollMessage', () => {
   beforeEach(async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2025-01-08T09:00:00'));
-
     mockDb.db = await createTestDb();
   });
 
   afterEach(async () => {
-    vi.useRealTimers();
     await mockDb.db.destroy();
   });
 
@@ -211,13 +207,10 @@ describe('getDisplayStatus', () => {
 
 describe('poll message legend', () => {
   beforeEach(async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2025-01-08T09:00:00'));
     mockDb.db = await createTestDb();
   });
 
   afterEach(async () => {
-    vi.useRealTimers();
     await mockDb.db.destroy();
   });
 

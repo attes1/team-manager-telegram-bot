@@ -303,8 +303,6 @@ describe('/avail command', () => {
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('must be');
-
-    vi.useRealTimers();
   });
 
   test('accepts week with year format', async () => {
@@ -356,8 +354,6 @@ describe('/avail command', () => {
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Week 24');
-
-    vi.useRealTimers();
   });
 
   test('accepts day with week format', async () => {
@@ -409,8 +405,6 @@ describe('/avail command', () => {
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Tue');
     expect(calls[0].payload.text).toContain('Week 24');
-
-    vi.useRealTimers();
   });
 
   test('accepts day with week and year format', async () => {
@@ -462,7 +456,5 @@ describe('/avail command', () => {
     expect(calls[0].method).toBe('sendMessage');
     expect(calls[0].payload.text).toContain('Wed');
     expect(calls[0].payload.text).toContain('Week 24');
-
-    vi.useRealTimers();
   });
 });

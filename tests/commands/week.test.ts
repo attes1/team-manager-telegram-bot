@@ -139,12 +139,10 @@ describe('/setweek command', () => {
 
 describe('/setweek with optional week number', () => {
   beforeEach(async () => {
-    vi.useFakeTimers();
     mockDb.db = await createTestDb();
   });
 
   afterEach(async () => {
-    vi.useRealTimers();
     await mockDb.db.destroy();
   });
 

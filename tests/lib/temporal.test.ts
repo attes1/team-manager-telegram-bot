@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import {
   getCurrentWeek,
   getSchedulingWeek,
@@ -73,14 +73,6 @@ describe('getCurrentWeek', () => {
 });
 
 describe('getTodayDay', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   test('returns mon for Monday', () => {
     vi.setSystemTime(new Date('2025-01-06T12:00:00')); // Monday
     expect(getTodayDay()).toBe('mon');
@@ -118,14 +110,6 @@ describe('getTodayDay', () => {
 });
 
 describe('getSchedulingWeek', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   test('returns current week when before cutoff', () => {
     // Wednesday 09:00 of week 2, 2025 - before Thursday 10:00 cutoff
     vi.setSystemTime(new Date('2025-01-08T09:00:00'));
