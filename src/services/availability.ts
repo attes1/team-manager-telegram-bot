@@ -39,6 +39,18 @@ export interface GetWeekParams {
   year: number;
 }
 
+const groupSlotsByResponseId = (
+  slots: Array<{ dayResponseId: number; timeSlot: string }>,
+): Map<number, string[]> => {
+  const map = new Map<number, string[]>();
+  for (const slot of slots) {
+    const existing = map.get(slot.dayResponseId) ?? [];
+    existing.push(slot.timeSlot);
+    map.set(slot.dayResponseId, existing);
+  }
+  return map;
+};
+
 export interface PlayerWeekAvailability {
   playerId: number;
   displayName: string;
@@ -151,12 +163,7 @@ export const getPlayerWeekAvailability = async (
     .where('dayResponseId', 'in', responseIds)
     .execute();
 
-  const slotsByResponseId = new Map<number, string[]>();
-  for (const slot of slots) {
-    const existing = slotsByResponseId.get(slot.dayResponseId) ?? [];
-    existing.push(slot.timeSlot);
-    slotsByResponseId.set(slot.dayResponseId, existing);
-  }
+  const slotsByResponseId = groupSlotsByResponseId(slots);
 
   const result: Partial<Record<Day, DayAvailability>> = {};
   for (const response of responses) {
@@ -203,12 +210,7 @@ export const getWeekAvailability = async (
     .where('dayResponseId', 'in', responseIds)
     .execute();
 
-  const slotsByResponseId = new Map<number, string[]>();
-  for (const slot of slots) {
-    const existing = slotsByResponseId.get(slot.dayResponseId) ?? [];
-    existing.push(slot.timeSlot);
-    slotsByResponseId.set(slot.dayResponseId, existing);
-  }
+  const slotsByResponseId = groupSlotsByResponseId(slots);
 
   const playerMap = new Map<number, PlayerWeekAvailability>();
   for (const response of responses) {

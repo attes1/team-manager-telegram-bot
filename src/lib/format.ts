@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import type { AvailabilityStatus, Day } from './schemas';
-import { DAYS, getWeekDateRange } from './temporal';
+import { getDayOffset, getWeekDateRange } from './temporal';
 
 const DAY_NAMES_FI: Record<Day, string> = {
   mon: 'maanantai',
@@ -70,7 +70,7 @@ export const formatPlayerName = (
 
 export const formatDayDate = (year: number, week: number, day: Day): string => {
   const { start } = getWeekDateRange(year, week);
-  const dayIndex = DAYS.indexOf(day);
+  const dayIndex = getDayOffset(day);
   const dayDate = new Date(start);
   dayDate.setDate(dayDate.getDate() + dayIndex);
   return formatDate(dayDate);

@@ -10,9 +10,9 @@ import {
 import type { Day } from './schemas';
 import { dayWeekInputSchema, weekInputSchema } from './schemas';
 
-export const DAYS: Day[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const DAYS: Day[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
-const getDayOffset = (day: Day): number => DAYS.indexOf(day);
+export const getDayOffset = (day: Day): number => DAYS.indexOf(day);
 
 export const getWeekNumber = (date: Date): number => getISOWeek(date);
 

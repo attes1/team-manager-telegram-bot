@@ -371,6 +371,6 @@ describe('/remind command', () => {
     await bot.handleUpdate(update);
 
     expect(calls).toHaveLength(1);
-    expect(calls[0].payload.text).toContain('Roster is empty');
+    expect(calls[0].payload.text).toContain('Rosteri on tyhjä');
   });
 });

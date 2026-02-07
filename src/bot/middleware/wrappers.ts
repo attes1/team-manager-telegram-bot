@@ -19,6 +19,8 @@ import {
 
 type CommandHandler<T extends BotContext> = (ctx: T) => Promise<unknown> | unknown;
 
+const isRestrictedInPublicGroup = (ctx: BotContext): boolean => ctx.isInPublicGroup && !ctx.isAdmin;
+
 export const adminCommand = (
   handler: CommandHandler<AdminContext>,
 ): CommandMiddleware<BotContext> => {
@@ -47,7 +49,7 @@ export const rosterCommand = (
   handler: CommandHandler<RosterContext>,
 ): CommandMiddleware<BotContext> => {
   return async (ctx) => {
-    if (ctx.isInPublicGroup && !ctx.isAdmin) {
+    if (isRestrictedInPublicGroup(ctx)) {
       await ctx.reply(ctx.i18n.errors.notAvailableInPublicGroup);
       return;
     }
@@ -83,7 +85,7 @@ export const captainCommand = (
   handler: CommandHandler<CaptainContext>,
 ): CommandMiddleware<BotContext> => {
   return async (ctx) => {
-    if (ctx.isInPublicGroup && !ctx.isAdmin) {
+    if (isRestrictedInPublicGroup(ctx)) {
       await ctx.reply(ctx.i18n.errors.notAvailableInPublicGroup);
       return;
     }
@@ -99,7 +101,7 @@ export const captainSeasonCommand = (
   handler: CommandHandler<CaptainSeasonContext>,
 ): CommandMiddleware<BotContext> => {
   return async (ctx) => {
-    if (ctx.isInPublicGroup && !ctx.isAdmin) {
+    if (isRestrictedInPublicGroup(ctx)) {
       await ctx.reply(ctx.i18n.errors.notAvailableInPublicGroup);
       return;
     }

@@ -6,11 +6,6 @@ export {
   isCaptainSeasonContext,
   isRosterContext,
   isSeasonContext,
-  requireAdmin,
-  requireAdminAndSeason,
-  requireCaptain,
-  requireCaptainAndSeason,
-  requireSeason,
 } from './guards';
 export { publicCommandsRestriction } from './public-commands';
 export {

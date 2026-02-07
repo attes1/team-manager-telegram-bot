@@ -17,7 +17,7 @@ export const registerRemindCommand = (bot: Bot<BotContext>) => {
 
       const roster = await getRoster(db, season.id);
       if (roster.length === 0) {
-        return ctx.reply('Roster is empty.');
+        return ctx.reply(i18n.roster.empty);
       }
 
       const playersWithoutResponse: Array<{

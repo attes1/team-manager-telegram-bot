@@ -7,8 +7,6 @@ export const timeSchema = z
     'Invalid time format, expected HH:MM (e.g., 09:00, 14:30, 21:00)',
   );
 
-export const hourSchema = z.coerce.number().int().min(0).max(23);
-
 export const weekNumberSchema = z.coerce.number().int().min(1).max(53);
 
 export const daySchema = z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
@@ -43,10 +41,6 @@ export const daysListSchema = z
   .string()
   .transform((val) => val.split(',').map((v) => v.trim()))
   .pipe(z.array(daySchema));
-
-export const hoursListSchema = z
-  .string()
-  .transform((val) => val.split(',').map((v) => hourSchema.parse(v.trim())));
 
 export const pollTimesSchema = z
   .string()

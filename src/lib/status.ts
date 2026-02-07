@@ -1,4 +1,5 @@
 import type { Translations } from '@/i18n';
+import { escapeHtml } from './format';
 import type { WeekType } from './schemas';
 
 export interface StatusData {
@@ -42,7 +43,7 @@ export const buildStatusMessage = (data: StatusData): string => {
   const lines: string[] = [
     `📊 <b>${i18n.status.title}</b>${devBadge}`,
     '',
-    `<b>${i18n.status.season}:</b> ${data.seasonName}`,
+    `<b>${i18n.status.season}:</b> ${escapeHtml(data.seasonName)}`,
   ];
 
   if (
