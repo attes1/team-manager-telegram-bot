@@ -3,7 +3,10 @@ import { z } from 'zod';
 const commaSeparatedNumbers = (defaultVal?: string) =>
   z.preprocess(
     (val) => (val === undefined && defaultVal ? defaultVal : val),
-    z.string().transform((val) => val.split(',').map((v) => Number(v.trim()))),
+    z
+      .string()
+      .transform((val) => val.split(',').map((v) => Number(v.trim())))
+      .pipe(z.array(z.number().int().finite())),
   );
 
 const commaSeparatedStrings = (defaultVal?: string) =>

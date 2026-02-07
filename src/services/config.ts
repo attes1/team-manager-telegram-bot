@@ -32,6 +32,8 @@ const configValidators: Record<string, z.ZodTypeAny> = {
   matchDayReminderTime: timeSchema,
   publicAnnouncements: onOffSchema,
   publicCommandsMode: publicCommandsModeSchema,
+  menuExpirationHours: z.coerce.number().int().min(1).max(168),
+  menuCleanupTime: timeSchema,
 };
 
 export type { ParsedConfig as Config };
@@ -54,6 +56,8 @@ const VALID_CONFIG_KEYS = [
   'matchDayReminderTime',
   'publicAnnouncements',
   'publicCommandsMode',
+  'menuExpirationHours',
+  'menuCleanupTime',
 ] as const;
 
 type ConfigKey = (typeof VALID_CONFIG_KEYS)[number];
@@ -93,10 +97,8 @@ export const updateConfig = async (
     validator.parse(value);
   }
 
-  let updateValue: string | number = value;
-  if (key === 'lineupSize') {
-    updateValue = Number(value);
-  }
+  const numericKeys: ReadonlyArray<string> = ['lineupSize', 'menuExpirationHours'];
+  const updateValue: string | number = numericKeys.includes(key) ? Number(value) : value;
 
   const result = await db
     .updateTable('config')

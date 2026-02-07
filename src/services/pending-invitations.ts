@@ -44,20 +44,6 @@ export const removeInvitation = (messageId: number): boolean => {
   return pendingInvitations.delete(messageId);
 };
 
-export const cleanupExpired = (): number => {
-  const now = Date.now();
-  let removed = 0;
-
-  for (const [messageId, invitation] of pendingInvitations) {
-    if (now - invitation.createdAt.getTime() > EXPIRATION_MS) {
-      pendingInvitations.delete(messageId);
-      removed++;
-    }
-  }
-
-  return removed;
-};
-
 // For testing purposes
 export const clearAll = () => {
   pendingInvitations.clear();

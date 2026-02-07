@@ -2,13 +2,16 @@ import type { Bot } from 'grammy';
 import { ZodError } from 'zod';
 import type { AdminSeasonContext, BotContext } from '@/bot/context';
 import { adminSeasonCommand } from '@/bot/middleware';
-import type { Language, Translations } from '@/i18n';
+import type { Translations } from '@/i18n';
 import type { ParsedConfig } from '@/lib/schemas';
+import { languageSchema } from '@/lib/schemas';
 import { refreshScheduler } from '@/scheduler';
 import { updateConfig } from '@/services/config';
 import { commandDefinitions } from '../definitions';
 
-const USER_TO_DB_KEY: Record<string, string> = {
+type UserConfigKey = keyof Translations['config']['keys'];
+
+const USER_TO_DB_KEY: Record<UserConfigKey, keyof ParsedConfig> = {
   language: 'language',
   poll_day: 'pollDay',
   poll_time: 'pollTime',
@@ -26,9 +29,11 @@ const USER_TO_DB_KEY: Record<string, string> = {
   match_day_reminder_time: 'matchDayReminderTime',
   public_announcements: 'publicAnnouncements',
   public_commands_mode: 'publicCommandsMode',
+  menu_expiration_hours: 'menuExpirationHours',
+  menu_cleanup_time: 'menuCleanupTime',
 };
 
-const SCHEDULER_KEYS = [
+const SCHEDULER_KEYS: readonly UserConfigKey[] = [
   'poll_day',
   'poll_time',
   'reminder_day',
@@ -37,17 +42,18 @@ const SCHEDULER_KEYS = [
   'match_day',
   'match_day_reminder_mode',
   'match_day_reminder_time',
+  'menu_cleanup_time',
 ];
 
-const USER_KEYS = Object.keys(USER_TO_DB_KEY);
+const USER_KEYS: ReadonlySet<string> = new Set(Object.keys(USER_TO_DB_KEY));
 
-const isValidUserKey = (key: string): boolean => USER_KEYS.includes(key);
-const toDbKey = (userKey: string): string => USER_TO_DB_KEY[userKey];
-const affectsScheduler = (key: string): boolean => SCHEDULER_KEYS.includes(key);
+const isValidUserKey = (key: string): key is UserConfigKey => USER_KEYS.has(key);
 
-const getConfigValue = (config: ParsedConfig, userKey: string): string => {
+const affectsScheduler = (key: UserConfigKey): boolean => SCHEDULER_KEYS.includes(key);
+
+const getConfigValue = (config: ParsedConfig, userKey: UserConfigKey): string => {
   const dbKey = USER_TO_DB_KEY[userKey];
-  const value = config[dbKey as keyof ParsedConfig];
+  const value = config[dbKey];
   if (Array.isArray(value)) {
     return value.join(',');
   }
@@ -93,6 +99,12 @@ const formatConfigDisplay = (i18n: Translations, config: ParsedConfig): string =
       'public_commands_mode',
       config.publicCommandsMode,
     ),
+    formatConfigLine(
+      labels.menu_expiration_hours,
+      'menu_expiration_hours',
+      String(config.menuExpirationHours),
+    ),
+    formatConfigLine(labels.menu_cleanup_time, 'menu_cleanup_time', config.menuCleanupTime),
   ];
   return `${i18n.config.title}\n${lines.join('\n')}\n\n${i18n.config.usage}`;
 };
@@ -118,9 +130,9 @@ export const registerConfigCommand = (bot: Bot<BotContext>) => {
 
       // Key only, no value - show current value and options
       if (!value) {
-        const label = i18n.config.keys[key as keyof typeof i18n.config.keys];
+        const label = i18n.config.keys[key];
         const currentValue = getConfigValue(config, key);
-        const options = i18n.config.options[key as keyof typeof i18n.config.options];
+        const options = i18n.config.options[key];
         const lines = [
           `<b>${label}</b> (${key})`,
           `${i18n.config.currentValue}: ${currentValue}`,
@@ -130,16 +142,15 @@ export const registerConfigCommand = (bot: Bot<BotContext>) => {
       }
 
       try {
-        const dbKey = toDbKey(key);
+        const dbKey = USER_TO_DB_KEY[key];
         await updateConfig(db, season.id, dbKey, value);
         if (affectsScheduler(key)) {
           await refreshScheduler();
         }
         // Update bot command descriptions when language changes
-        if (key === 'language' && (value === 'en' || value === 'fi') && ctx.chat) {
-          const lang = value as Language;
-          const commands = commandDefinitions[lang];
-          // Set commands globally and for this specific chat
+        const langResult = key === 'language' ? languageSchema.safeParse(value) : null;
+        if (langResult?.success && ctx.chat) {
+          const commands = commandDefinitions[langResult.data];
           await ctx.api.setMyCommands(commands);
           await ctx.api.setMyCommands(commands, {
             scope: { type: 'chat', chat_id: ctx.chat.id },

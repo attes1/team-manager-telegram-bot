@@ -126,6 +126,11 @@ export const rescheduleTaskInMinutes = (taskType: TaskType, minutes: number): bo
     return false;
   }
 
+  const bot = storedBot;
+  if (!bot) {
+    return false;
+  }
+
   // Stop the existing task
   tasks[taskIndex].task.stop();
 
@@ -134,20 +139,15 @@ export const rescheduleTaskInMinutes = (taskType: TaskType, minutes: number): bo
   now.setMinutes(now.getMinutes() + minutes);
   const cronExpression = `${now.getMinutes()} ${now.getHours()} ${now.getDate()} ${now.getMonth() + 1} *`;
 
-  // Schedule replacement task based on type
-  const bot = storedBot;
-  if (!bot) {
-    return false;
-  }
-
-  // We need to get the chatId from the database
   const createHandler = async () => {
     const season = await getActiveSeason(db);
     if (!season) {
+      console.log(`Scheduler: ${taskType} skipped - no active season`);
       return;
     }
     const teamGroupId = await getTeamGroupId(db);
     if (!teamGroupId) {
+      console.log(`Scheduler: ${taskType} skipped - no team group`);
       return;
     }
 
