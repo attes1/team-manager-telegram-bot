@@ -55,13 +55,13 @@ This document provides a manual testing checklist with copy-pasteable commands t
 ```
 - Verify: Shows "Roster is empty" message
 
-**Add yourself to roster:**
+**Add yourself to roster (deep link flow):**
 ```
 /addplayer yourusername
 ```
-- Verify: Invitation message with reaction buttons appears
-- React with 👍 to accept
-- Verify: Confirmation that you were added
+- Verify: Invitation message with "Accept" deep link button appears
+- Click the button to open bot DM
+- Verify: Bot adds you to roster and confirms
 
 **View roster (with player):**
 ```
@@ -173,6 +173,15 @@ This document provides a manual testing checklist with copy-pasteable commands t
 /config language fi
 ```
 - Verify: Confirmation message, bot responds in new language
+
+**Change public group settings:**
+```
+/config public_commands_mode all
+/config public_commands_mode admins
+/config public_announcements on
+/config public_announcements off
+```
+- Verify: Confirmation for each change
 
 **Demote captain:**
 ```
