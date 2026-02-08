@@ -7,6 +7,8 @@ import { registerNextMatchCommand } from '@/bot/commands/public/nextmatch';
 import { registerRosterCommand } from '@/bot/commands/public/roster';
 import { registerAvailCommand } from '@/bot/commands/user/avail';
 import { registerWeekCommand } from '@/bot/commands/user/week';
+import { publicCommandsRestriction } from '@/bot/middleware';
+import { updateConfig } from '@/services/config';
 import { registerGroup, setGroupType } from '@/services/group';
 import { addPlayerToRoster, setPlayerRole } from '@/services/roster';
 import { startSeason } from '@/services/season';
@@ -275,6 +277,58 @@ describe('public group restrictions', () => {
       expect(calls).toHaveLength(1);
       expect(calls[0].payload.text).toContain('not available in public group');
     });
+  });
+});
+
+describe('publicCommandsMode = admins', () => {
+  beforeEach(async () => {
+    mockDb.db = await createTestDb();
+    await registerGroup(mockDb.db, PUBLIC_GROUP_ID, 'Public Group');
+  });
+
+  afterEach(async () => {
+    await mockDb.db.destroy();
+  });
+
+  test('non-admin cannot run /roster when mode is admins', async () => {
+    const season = await startSeason(mockDb.db, 'Test Season');
+    await updateConfig(mockDb.db, season.id, 'publicCommandsMode', 'admins');
+
+    const { bot, calls } = createTestBot();
+    bot.use(publicCommandsRestriction);
+    registerRosterCommand(bot);
+
+    const update = createCommandUpdate('/roster', TEST_USER_ID, PUBLIC_GROUP_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(0);
+  });
+
+  test('admin can run /roster when mode is admins', async () => {
+    const season = await startSeason(mockDb.db, 'Test Season');
+    await updateConfig(mockDb.db, season.id, 'publicCommandsMode', 'admins');
+
+    const { bot, calls } = createTestBot();
+    bot.use(publicCommandsRestriction);
+    registerRosterCommand(bot);
+
+    const update = createCommandUpdate('/roster', TEST_ADMIN_ID, PUBLIC_GROUP_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
+  });
+
+  test('non-admin can run /roster when mode is all', async () => {
+    await startSeason(mockDb.db, 'Test Season');
+
+    const { bot, calls } = createTestBot();
+    bot.use(publicCommandsRestriction);
+    registerRosterCommand(bot);
+
+    const update = createCommandUpdate('/roster', TEST_USER_ID, PUBLIC_GROUP_ID);
+    await bot.handleUpdate(update);
+
+    expect(calls).toHaveLength(1);
   });
 });
 
