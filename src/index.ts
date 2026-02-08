@@ -1,7 +1,10 @@
 import { createBot, setCommands } from './bot/index';
+import { runMigrations } from './db/migrate';
 import { startScheduler } from './scheduler';
 
 const main = async () => {
+  await runMigrations();
+
   const bot = createBot();
 
   console.log('Starting bot...');

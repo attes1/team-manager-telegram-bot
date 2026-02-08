@@ -3,7 +3,7 @@ import { Kysely, type Migration, Migrator, SqliteDialect } from 'kysely';
 
 const DB_PATH = process.env.DB_PATH ?? './data/bot.db';
 
-const runMigrations = async () => {
+export const runMigrations = async () => {
   const dialect = new SqliteDialect({
     database: new Database(DB_PATH),
   });
@@ -62,4 +62,7 @@ const runMigrations = async () => {
   await db.destroy();
 };
 
-runMigrations().catch(console.error);
+const isDirectRun = process.argv[1]?.includes('migrate');
+if (isDirectRun) {
+  runMigrations().catch(console.error);
+}
