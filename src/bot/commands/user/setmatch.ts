@@ -5,7 +5,7 @@ import { formatDateRange, formatDay } from '@/lib/format';
 import { dayWeekInputSchema, timeSchema } from '@/lib/schemas';
 import { getWeekDateRange, parseWeekInput } from '@/lib/temporal';
 import { getPublicGroupIds } from '@/services/group';
-import { buildMatchScheduledMessage, setMatchTime } from '@/services/match';
+import { buildMatchScheduledMessage, getMatchTargetWeek, setMatchTime } from '@/services/match';
 
 export const registerSetmatchCommand = (bot: Bot<BotContext>) => {
   bot.command(
@@ -32,10 +32,10 @@ export const registerSetmatchCommand = (bot: Bot<BotContext>) => {
 
       const { day, week: parsedWeek, year: parsedYear } = dayWeekResult.data;
 
-      // Use parsed week/year or fall back to scheduling week
-      let weekNumber = parsedWeek ?? schedulingWeek.week;
-      let year =
-        parsedYear ?? (parsedWeek !== null ? new Date().getFullYear() : schedulingWeek.year);
+      // Use parsed week/year or fall back to match target week
+      const defaultWeek = await getMatchTargetWeek(db, season.id, config, schedulingWeek);
+      let weekNumber = parsedWeek ?? defaultWeek.week;
+      let year = parsedYear ?? (parsedWeek !== null ? new Date().getFullYear() : defaultWeek.year);
 
       // Validate week is not in the past if explicitly provided
       if (parsedWeek !== null) {

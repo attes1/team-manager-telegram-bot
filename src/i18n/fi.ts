@@ -147,7 +147,7 @@ export interface Translations {
     weekInPast: (schedulingWeek: number) => string;
   };
   lineup: {
-    set: (count: number, players: string) => string;
+    set: (count: number, players: string, week: number, dateRange: string) => string;
     cleared: string;
     usage: string;
     noMentions: string;
@@ -246,8 +246,8 @@ export interface Translations {
     opponentWithUrl: (name: string, url: string) => string;
   };
   opponent: {
-    set: (name: string) => string;
-    setWithUrl: (name: string, url: string) => string;
+    set: (name: string, week: number, dateRange: string) => string;
+    setWithUrl: (name: string, url: string, week: number, dateRange: string) => string;
     cleared: string;
     usage: string;
     noOpponentSet: string;
@@ -431,7 +431,8 @@ export const fi: Translations = {
     weekInPast: (schedulingWeek) => `Viikon pitää olla ${schedulingWeek} tai myöhempi.`,
   },
   lineup: {
-    set: (count, players) => `Linari asetettu (${count} pelaajaa):\n${players}`,
+    set: (count, players, week, dateRange) =>
+      `Linari asetettu (${count} pelaajaa, vko ${week}, ${dateRange}):\n${players}`,
     cleared: 'Linari tyhjennetty.',
     usage:
       'Käyttö: /setlineup @pelaaja1 @pelaaja2 ... [week[/year]]\nTai /setlineup clear [week[/year]] tyhjentääksesi',
@@ -538,8 +539,9 @@ export const fi: Translations = {
     opponentWithUrl: (name, url) => `🆚 Vihu: [${name}](${url})`,
   },
   opponent: {
-    set: (name) => `Vihu asetettu: ${name}`,
-    setWithUrl: (name, url) => `Vihu asetettu: ${name} (${url})`,
+    set: (name, week, dateRange) => `Vihu asetettu: ${name} (vko ${week}, ${dateRange})`,
+    setWithUrl: (name, url, week, dateRange) =>
+      `Vihu asetettu: ${name} (${url}) (vko ${week}, ${dateRange})`,
     cleared: 'Vihu poistettu.',
     usage:
       'Käyttö: /setopponent <nimi> [url] [week[/year]]\nEsim: /setopponent EC Myyrylit https://example.com/team 5',

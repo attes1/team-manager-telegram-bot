@@ -4,6 +4,7 @@ import type { Day, ParsedConfig } from '@/lib/schemas';
 import { getCurrentWeek, getWeekDateRange, isMatchInFuture } from '@/lib/temporal';
 import type { DB, Player, Week } from '@/types/db';
 import type { Translations } from '../i18n';
+import { getWeek } from './week';
 
 export interface SetMatchTimeParams {
   seasonId: number;
@@ -280,6 +281,30 @@ const buildMatchDisplayData = async (
     opponentName: matchInfo?.opponentName ?? null,
     opponentUrl: matchInfo?.opponentUrl ?? null,
   };
+};
+
+export const getMatchTargetWeek = async (
+  db: Kysely<DB>,
+  seasonId: number,
+  config: ParsedConfig,
+  schedulingWeek: { week: number; year: number },
+): Promise<{ week: number; year: number }> => {
+  const { week: currentWeek, year: currentYear } = getCurrentWeek();
+
+  const weekInfo = await getWeek(db, seasonId, currentWeek, currentYear);
+
+  if (weekInfo?.type === 'practice') {
+    return schedulingWeek;
+  }
+
+  const matchDay: Day = weekInfo?.matchDay ?? config.matchDay;
+  const matchTime: string = weekInfo?.matchTime ?? config.matchTime;
+
+  if (isMatchInFuture(currentYear, currentWeek, matchDay, matchTime)) {
+    return { week: currentWeek, year: currentYear };
+  }
+
+  return schedulingWeek;
 };
 
 export const getNextMatchResult = async (ctx: MatchInfoContext): Promise<NextMatchResult> => {

@@ -1,15 +1,17 @@
 import type { Bot } from 'grammy';
 import type { BotContext, CaptainSeasonContext } from '@/bot/context';
 import { captainSeasonCommand } from '@/bot/middleware';
-import { parseWeekInput } from '@/lib/temporal';
-import { clearOpponent, setOpponent } from '@/services/match';
+import { formatDateRange } from '@/lib/format';
+import { getWeekDateRange, parseWeekInput } from '@/lib/temporal';
+import { clearOpponent, getMatchTargetWeek, setOpponent } from '@/services/match';
 
 export const registerSetopponentCommand = (bot: Bot<BotContext>) => {
   bot.command(
     'setopponent',
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
-      const { db, season, schedulingWeek, i18n } = ctx;
+      const { db, season, config, schedulingWeek, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
+      const defaultWeek = await getMatchTargetWeek(db, season.id, config, schedulingWeek);
 
       // Check for clear command (with optional week or week/year)
       const clearMatch = args.toLowerCase().match(/^clear(?:\s+(\d+(?:\/\d+)?))?$/);
@@ -25,8 +27,8 @@ export const registerSetopponentCommand = (bot: Bot<BotContext>) => {
           week = result.week;
           year = result.year;
         } else {
-          week = schedulingWeek.week;
-          year = schedulingWeek.year;
+          week = defaultWeek.week;
+          year = defaultWeek.year;
         }
 
         await clearOpponent(db, { seasonId: season.id, weekNumber: week, year });
@@ -40,8 +42,8 @@ export const registerSetopponentCommand = (bot: Bot<BotContext>) => {
       // Check for week/year at the end of args (e.g., "5" or "5/2026")
       const weekMatch = args.match(/\s+(\d+(?:\/\d+)?)$/);
       let argsWithoutWeek = args;
-      let weekNumber = schedulingWeek.week;
-      let year = schedulingWeek.year;
+      let weekNumber = defaultWeek.week;
+      let year = defaultWeek.year;
 
       if (weekMatch) {
         const result = parseWeekInput(weekMatch[1], { allowPast: false, schedulingWeek });
@@ -76,10 +78,15 @@ export const registerSetopponentCommand = (bot: Bot<BotContext>) => {
         opponentUrl,
       });
 
+      const { start, end } = getWeekDateRange(year, weekNumber);
+      const dateRange = formatDateRange(start, end);
+
       if (opponentUrl) {
-        return ctx.reply(i18n.opponent.setWithUrl(opponentName, opponentUrl));
+        return ctx.reply(
+          i18n.opponent.setWithUrl(opponentName, opponentUrl, weekNumber, dateRange),
+        );
       }
-      return ctx.reply(i18n.opponent.set(opponentName));
+      return ctx.reply(i18n.opponent.set(opponentName, weekNumber, dateRange));
     }),
   );
 };

@@ -6,7 +6,13 @@ import { getTextMentions, getUsernameMentions, type MentionedUser } from '@/lib/
 import { getWeekDateRange, parseWeekInput } from '@/lib/temporal';
 import { getLineupMenuMessage, lineupMenu } from '@/menus/lineup';
 import { getPublicGroupIds } from '@/services/group';
-import { buildLineupMessage, clearLineup, getLineup, setLineup } from '@/services/match';
+import {
+  buildLineupMessage,
+  clearLineup,
+  getLineup,
+  getMatchTargetWeek,
+  setLineup,
+} from '@/services/match';
 import { deleteActiveMenu, getActiveMenu, saveActiveMenu } from '@/services/menu';
 import { getPlayerByUsername, isPlayerInRoster } from '@/services/roster';
 import { getWeek } from '@/services/week';
@@ -17,6 +23,7 @@ export const registerSetlineupCommand = (bot: Bot<BotContext>) => {
     captainSeasonCommand(async (ctx: CaptainSeasonContext) => {
       const { db, season, config, schedulingWeek, i18n } = ctx;
       const args = ctx.match?.toString().trim() ?? '';
+      const defaultWeek = await getMatchTargetWeek(db, season.id, config, schedulingWeek);
 
       // Parse optional week number from args (last word if it matches week or week/year format)
       const parseWeekFromArgs = (
@@ -52,8 +59,8 @@ export const registerSetlineupCommand = (bot: Bot<BotContext>) => {
           week = result.week;
           year = result.year;
         } else {
-          week = schedulingWeek.week;
-          year = schedulingWeek.year;
+          week = defaultWeek.week;
+          year = defaultWeek.year;
         }
 
         await clearLineup(db, { seasonId: season.id, weekNumber: week, year });
@@ -86,7 +93,7 @@ export const registerSetlineupCommand = (bot: Bot<BotContext>) => {
       if (mentionedUsers.length === 0) {
         // Check for optional week parameter (supports 5 or 5/2026 format)
         const weekArg = args.match(/^(\d+(?:\/\d+)?)$/);
-        let lineupWeek = schedulingWeek;
+        let lineupWeek = defaultWeek;
 
         if (weekArg) {
           const result = parseWeekInput(weekArg[1], { allowPast: false, schedulingWeek });
@@ -153,8 +160,8 @@ export const registerSetlineupCommand = (bot: Bot<BotContext>) => {
 
       // Parse week from args or use scheduling week
       const weekParsed = parseWeekFromArgs(args);
-      const week = weekParsed?.week ?? schedulingWeek.week;
-      const year = weekParsed?.year ?? schedulingWeek.year;
+      const week = weekParsed?.week ?? defaultWeek.week;
+      const year = weekParsed?.year ?? defaultWeek.year;
 
       const result = await setLineup(db, {
         seasonId: season.id,
@@ -186,8 +193,10 @@ export const registerSetlineupCommand = (bot: Bot<BotContext>) => {
         }
       }
 
+      const { start, end } = getWeekDateRange(year, week);
+      const dateRange = formatDateRange(start, end);
       const playerList = mentionedUsers.map((u) => `• ${u.displayName}`).join('\n');
-      return ctx.reply(i18n.lineup.set(mentionedUsers.length, playerList));
+      return ctx.reply(i18n.lineup.set(mentionedUsers.length, playerList, week, dateRange));
     }),
   );
 };

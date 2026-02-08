@@ -90,9 +90,11 @@ export const lineupMenu = new Menu<BotContext>('lineup').dynamic(async (ctx, ran
         }
       }
 
+      const { start: weekStart, end: weekEnd } = getWeekDateRange(year, week);
+      const weekDateRange = formatDateRange(weekStart, weekEnd);
       const playerList = lineup.map((p) => `• ${formatPlayerName(p)}`).join('\n');
       await ctx.deleteMessage();
-      await ctx.reply(ctx.i18n.lineup.set(lineup.length, playerList));
+      await ctx.reply(ctx.i18n.lineup.set(lineup.length, playerList, week, weekDateRange));
     })
     .row();
 });

@@ -155,7 +155,8 @@ export const en: Translations = {
     weekInPast: (schedulingWeek) => `Week must be ${schedulingWeek} or later.`,
   },
   lineup: {
-    set: (count, players) => `Lineup set (${count} players):\n${players}`,
+    set: (count, players, week, dateRange) =>
+      `Lineup set (${count} players, week ${week}, ${dateRange}):\n${players}`,
     cleared: 'Lineup cleared.',
     usage:
       'Usage: /setlineup @player1 @player2 ... [week[/year]]\nOr /setlineup clear [week[/year]] to clear',
@@ -262,8 +263,9 @@ export const en: Translations = {
     opponentWithUrl: (name, url) => `🆚 Opponent: [${name}](${url})`,
   },
   opponent: {
-    set: (name) => `Opponent set: ${name}`,
-    setWithUrl: (name, url) => `Opponent set: ${name} (${url})`,
+    set: (name, week, dateRange) => `Opponent set: ${name} (week ${week}, ${dateRange})`,
+    setWithUrl: (name, url, week, dateRange) =>
+      `Opponent set: ${name} (${url}) (week ${week}, ${dateRange})`,
     cleared: 'Opponent cleared.',
     usage:
       'Usage: /setopponent <name> [url] [week[/year]]\nExample: /setopponent EC Myyrylit https://example.com/team 5',

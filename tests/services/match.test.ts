@@ -1,7 +1,8 @@
 import { createTestDb } from '@tests/helpers';
 import type { Kysely } from 'kysely';
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { en } from '@/i18n/en';
+import type { Day } from '@/lib/schemas';
 import {
   addPlayerToLineup,
   buildLineupMessage,
@@ -11,6 +12,7 @@ import {
   clearOpponent,
   getLineup,
   getMatchInfo,
+  getMatchTargetWeek,
   type MatchDisplayData,
   type NextMatchResult,
   removePlayerFromLineup,
@@ -20,6 +22,7 @@ import {
 } from '@/services/match';
 import { addPlayerToRoster } from '@/services/roster';
 import { startSeason } from '@/services/season';
+import { setWeekType } from '@/services/week';
 import type { DB, Player } from '@/types/db';
 
 describe('match service', () => {
@@ -695,5 +698,96 @@ describe('match message formatting', () => {
       expect(message).toContain('Match scheduled');
       expect(message).toContain('Sunday at 20:00');
     });
+  });
+});
+
+describe('getMatchTargetWeek', () => {
+  let db: Kysely<DB>;
+  let seasonId: number;
+
+  const config = {
+    seasonId: 1,
+    language: 'en' as const,
+    pollDay: 'sun' as const,
+    pollTime: '10:00',
+    pollDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as Day[],
+    pollTimes: '19,20,21',
+    weekChangeDay: 'thu' as const,
+    weekChangeTime: '10:00',
+    reminderDay: 'wed' as const,
+    reminderTime: '18:00',
+    remindersMode: 'quiet' as const,
+    matchDay: 'sun' as const,
+    matchTime: '20:00',
+    lineupSize: 5,
+    matchDayReminderMode: 'quiet' as const,
+    matchDayReminderTime: '18:00',
+    publicAnnouncements: 'on' as const,
+    publicCommandsMode: 'all' as const,
+    menuExpirationHours: 24,
+    menuCleanupTime: '04:00',
+  };
+
+  const schedulingWeek = { week: 3, year: 2025 };
+
+  beforeEach(async () => {
+    db = await createTestDb();
+    const season = await startSeason(db, 'Test Season');
+    seasonId = season.id;
+  });
+
+  afterEach(async () => {
+    await db.destroy();
+  });
+
+  test('returns current week when match is in the future', async () => {
+    // Pinned time: Wed 2025-01-08 09:00 (week 2). Default match: Sun 20:00 → future
+    const result = await getMatchTargetWeek(db, seasonId, config, schedulingWeek);
+    expect(result).toEqual({ week: 2, year: 2025 });
+  });
+
+  test('returns schedulingWeek when match is in the past', async () => {
+    // Set time to after Sunday 20:00 of week 2
+    vi.setSystemTime(new Date('2025-01-12T21:00:00'));
+
+    const result = await getMatchTargetWeek(db, seasonId, config, schedulingWeek);
+    expect(result).toEqual(schedulingWeek);
+  });
+
+  test('returns schedulingWeek when current week is practice', async () => {
+    await setWeekType(db, seasonId, 2, 2025, 'practice');
+
+    const result = await getMatchTargetWeek(db, seasonId, config, schedulingWeek);
+    expect(result).toEqual(schedulingWeek);
+  });
+
+  test('uses custom match day/time from weeks table', async () => {
+    // Set a custom match time on Wednesday 10:00 for week 2
+    await setMatchTime(db, {
+      seasonId,
+      weekNumber: 2,
+      year: 2025,
+      matchDay: 'wed',
+      matchTime: '10:00',
+    });
+
+    // Pinned time: Wed 09:00, match is Wed 10:00 → still in future
+    const result = await getMatchTargetWeek(db, seasonId, config, schedulingWeek);
+    expect(result).toEqual({ week: 2, year: 2025 });
+  });
+
+  test('returns schedulingWeek when custom match time has passed', async () => {
+    // Set a custom match time on Monday 10:00 for week 2
+    await setMatchTime(db, {
+      seasonId,
+      weekNumber: 2,
+      year: 2025,
+      matchDay: 'mon',
+      matchTime: '10:00',
+    });
+
+    // Pinned time: Wed 09:00, match was Mon 10:00 → in the past
+    const result = await getMatchTargetWeek(db, seasonId, config, schedulingWeek);
+    expect(result).toEqual(schedulingWeek);
   });
 });
