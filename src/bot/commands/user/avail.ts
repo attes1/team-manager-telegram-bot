@@ -4,7 +4,7 @@ import { rosterCommand } from '@/bot/middleware';
 import type { Translations } from '@/i18n';
 import { formatDateRange, formatDayDate, formatPlayerName, STATUS_ICONS } from '@/lib/format';
 import { type AvailabilityStatus, availFilterSchema, type Day } from '@/lib/schemas';
-import { getTodayDay, getWeekDateRange, parseDayOrWeekInput } from '@/lib/temporal';
+import { getCurrentWeek, getTodayDay, getWeekDateRange, parseDayOrWeekInput } from '@/lib/temporal';
 import type { PlayerWeekAvailability } from '@/services/availability';
 import { getWeekAvailability } from '@/services/availability';
 
@@ -184,12 +184,13 @@ const parseAvailArgs = (
   const finalYear = year ?? schedulingWeek.year;
 
   if (day === 'today') {
+    const currentWeek = getCurrentWeek();
     return {
       type: 'day',
       filter,
       day: getTodayDay(),
-      week: finalWeek,
-      year: finalYear,
+      week: currentWeek.week,
+      year: currentWeek.year,
     };
   } else if (day) {
     return { type: 'day', filter, day, week: finalWeek, year: finalYear };
