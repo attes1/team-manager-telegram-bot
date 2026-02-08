@@ -35,6 +35,10 @@ export const startSeason = async (db: Kysely<DB>, name: string): Promise<Season>
       matchDayReminderMode: env.DEFAULT_MATCH_DAY_REMINDER_MODE,
       matchDayReminderTime: env.DEFAULT_MATCH_DAY_REMINDER_TIME,
       lineupSize: env.DEFAULT_LINEUP_SIZE,
+      publicAnnouncements: env.DEFAULT_PUBLIC_ANNOUNCEMENTS,
+      publicCommandsMode: env.DEFAULT_PUBLIC_COMMANDS_MODE,
+      menuExpirationHours: env.DEFAULT_MENU_EXPIRATION_HOURS,
+      menuCleanupTime: env.DEFAULT_MENU_CLEANUP_TIME,
     })
     .execute();
 

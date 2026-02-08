@@ -46,6 +46,9 @@ const envSchema = z.object({
 
   DEFAULT_LINEUP_SIZE: z.coerce.number().default(5),
 
+  DEFAULT_PUBLIC_ANNOUNCEMENTS: z.enum(['on', 'off']).default('off'),
+  DEFAULT_PUBLIC_COMMANDS_MODE: z.enum(['all', 'admins']).default('admins'),
+
   DEFAULT_MENU_EXPIRATION_HOURS: z.coerce.number().min(1).max(168).default(24),
   DEFAULT_MENU_CLEANUP_TIME: z.string().default('04:00'),
 });
