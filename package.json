@@ -25,6 +25,7 @@
     "grammy": "^1.39.2",
     "kysely": "^0.28.9",
     "node-cron": "^4.2.1",
+    "tsx": "^4.21.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
@@ -35,7 +36,6 @@
     "@vitest/coverage-v8": "4.0.16",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   },
