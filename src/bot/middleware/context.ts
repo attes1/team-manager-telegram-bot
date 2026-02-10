@@ -21,7 +21,7 @@ export const contextMiddleware = async (ctx: BotContext, next: NextFunction) => 
   const chatType = ctx.chat?.type;
   if (chatId && (chatType === 'group' || chatType === 'supergroup')) {
     const group = await getGroup(db, chatId);
-    ctx.isInPublicGroup = group?.type === 'public';
+    ctx.isInPublicGroup = group?.type !== 'team';
   } else {
     ctx.isInPublicGroup = false;
   }

@@ -37,6 +37,10 @@ export const createTestDb = async (): Promise<Kysely<DB>> => {
   return db;
 };
 
+export const registerTeamGroup = async (db: Kysely<DB>, telegramId: number): Promise<void> => {
+  await db.insertInto('groups').values({ telegramId, type: 'team' }).execute();
+};
+
 export interface ApiCall {
   method: string;
   payload: Record<string, unknown>;

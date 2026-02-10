@@ -1,4 +1,4 @@
-import { createTestDb } from '@tests/helpers';
+import { createTestDb, registerTeamGroup } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerSeasonCommands } from '@/bot/commands/admin/season';
@@ -341,7 +341,7 @@ describe('when not in public group', () => {
     await mockDb.db.destroy();
   });
 
-  test('commands work normally in a different group than PUBLIC_GROUP_ID', async () => {
+  test('commands work normally in a team group', async () => {
     const season = await startSeason(mockDb.db, 'Test Season');
     await addPlayerToRoster(mockDb.db, {
       seasonId: season.id,
@@ -349,11 +349,12 @@ describe('when not in public group', () => {
       displayName: 'Captain',
     });
     await setPlayerRole(mockDb.db, season.id, TEST_CAPTAIN_ID, 'captain');
+    await registerTeamGroup(mockDb.db, -100999);
 
     const { bot, calls } = createTestBot();
     registerWeekCommand(bot);
 
-    // In a group that is NOT the public group - should work
+    // In a team group - should work
     const update = createCommandUpdate('/setweek 5 practice', TEST_CAPTAIN_ID, -100999);
     await bot.handleUpdate(update);
 

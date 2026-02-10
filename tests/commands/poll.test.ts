@@ -1,4 +1,4 @@
-import { createTestDb } from '@tests/helpers';
+import { createTestDb, registerTeamGroup } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { registerPollCommand } from '@/bot/commands/user/poll';
@@ -11,6 +11,7 @@ const DM_CHAT_ID = 111; // DM chat ID equals user ID in Telegram
 describe('/poll command', () => {
   beforeEach(async () => {
     mockDb.db = await createTestDb();
+    await registerTeamGroup(mockDb.db, CHAT_ID);
   });
 
   afterEach(async () => {

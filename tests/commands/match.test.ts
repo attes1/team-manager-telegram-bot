@@ -1,4 +1,4 @@
-import { createTestDb } from '@tests/helpers';
+import { createTestDb, registerTeamGroup } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { registerSetlineupCommand } from '@/bot/commands/user/setlineup';
@@ -29,6 +29,7 @@ const TEST_CHAT_ID = -100123;
 describe('/setmatch command', () => {
   beforeEach(async () => {
     mockDb.db = await createTestDb();
+    await registerTeamGroup(mockDb.db, TEST_CHAT_ID);
   });
 
   afterEach(async () => {
@@ -160,6 +161,7 @@ describe('/setlineup command', () => {
 
   beforeEach(async () => {
     mockDb.db = await createTestDb();
+    await registerTeamGroup(mockDb.db, TEST_CHAT_ID);
 
     const season = await startSeason(mockDb.db, 'Test Season');
     seasonId = season.id;

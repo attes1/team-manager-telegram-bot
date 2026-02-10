@@ -1,4 +1,4 @@
-import { createTestDb } from '@tests/helpers';
+import { createTestDb, registerTeamGroup } from '@tests/helpers';
 import { mockDb } from '@tests/setup';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { registerWeekCommand } from '@/bot/commands/user/week';
@@ -12,6 +12,7 @@ const TEST_CHAT_ID = -100123;
 describe('/setweek command', () => {
   beforeEach(async () => {
     mockDb.db = await createTestDb();
+    await registerTeamGroup(mockDb.db, TEST_CHAT_ID);
   });
 
   afterEach(async () => {
